@@ -1,0 +1,74 @@
+.master-card {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-top: 4px solid;
+}
+
+.master-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+}
+
+.master-photo {
+  width: 100%;
+  height: 300px;
+  overflow: hidden;
+  background: #f5f5f5;
+}
+
+.master-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(20%);
+  transition: filter 0.3s ease;
+}
+
+.master-card:hover .master-photo img {
+  filter: grayscale(0%);
+}
+
+.master-info {
+  padding: 24px;
+}
+
+.master-info h2 {
+  margin: 0 0 8px 0;
+  font-size: 24px;
+  color: #1a1a1a;
+  font-weight: 600;
+}
+
+.years {
+  color: #666;
+  font-size: 14px;
+  margin: 4px 0;
+}
+
+.nationality {
+  color: #444;
+  font-size: 14px;
+  margin: 8px 0;
+}
+
+.rating {
+  display: inline-block;
+  background: #f0f0f0;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #333;
+  margin: 12px 0;
+}
+
+.style-preview {
+  color: #555;
+  font-size: 14px;
+  line-height: 1.6;
+  margin-top: 12px;
+}

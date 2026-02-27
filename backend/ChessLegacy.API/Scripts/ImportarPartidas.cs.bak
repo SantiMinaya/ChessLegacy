@@ -1,0 +1,60 @@
+using ChessLegacy.API.Data;
+using ChessLegacy.API.Services;
+using Microsoft.EntityFrameworkCore;
+
+var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddDbContext<ChessLegacyContext>(options =>
+    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddScoped<PgnImporterAdvanced>();
+
+var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<ChessLegacyContext>();
+    var importer = scope.ServiceProvider.GetRequiredService<PgnImporterAdvanced>();
+    
+    var maestros = new Dictionary<string, int>
+    {
+        { "Tal", 1 },
+        { "Capablanca", 2 },
+        { "Kasparov", 3 },
+        { "Fischer", 4 },
+        { "Karpov", 5 },
+        { "Alekhine", 6 },
+        { "Petrosian", 7 },
+        { "Carlsen", 8 }
+    };
+
+    var baseDir = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "Scripts", "pgn_files");
+    
+    foreach (var (nombre, jugadorId) in maestros)
+    {
+        var pgnPath = Path.Combine(baseDir, nombre, $"{nombre}.pgn");
+        
+        if (!File.Exists(pgnPath))
+        {
+            Console.WriteLine($"❌ No encontrado: {pgnPath}");
+            continue;
+        }
+
+        Console.WriteLine($"\n📥 Importando {nombre}...");
+        Console.WriteLine($"   Archivo: {pgnPath}");
+        
+        try
+        {
+            var pgnContent = await File.ReadAllTextAsync(pgnPath);
+            await importer.ImportarPGN(pgnContent, jugadorId);
+            Console.WriteLine($"✅ {nombre} importado correctamente");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"❌ Error con {nombre}: {ex.Message}");
+        }
+    }
+    
+    var totalPartidas = await context.Partidas.CountAsync();
+    Console.WriteLine($"\n🎉 Importación completada. Total partidas: {totalPartidas}");
+}

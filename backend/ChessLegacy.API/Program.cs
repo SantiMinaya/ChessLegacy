@@ -14,12 +14,16 @@ builder.Services.AddCors(options =>
     });
 });
 
-builder.Services.AddSingleton(new ChessLegacy.API.Engine.StockfishEngine("stockfish/stockfish.exe"));
-builder.Services.AddSingleton(new ChessLegacy.API.Engine.MotorPersonalizado("stockfish/stockfish.exe"));
+var stockfishPath = Path.Combine(AppContext.BaseDirectory, "stockfish", "stockfish.exe");
+builder.Services.AddSingleton(new ChessLegacy.API.Engine.StockfishEngine(stockfishPath));
+builder.Services.AddSingleton(new ChessLegacy.API.Engine.MotorPersonalizado(stockfishPath));
+builder.Services.AddSingleton<ChessLegacy.API.Engine.SimpleChessEngine>();
 builder.Services.AddScoped<ChessLegacy.API.Services.AnalisisService>();
 builder.Services.AddScoped<ChessLegacy.API.Services.PgnImporter>();
+builder.Services.AddScoped<ChessLegacy.API.Services.PgnImporterAdvanced>();
 builder.Services.AddScoped<ChessLegacy.API.Repositories.JugadorRepository>();
 builder.Services.AddScoped<ChessLegacy.API.Repositories.PosicionRepository>();
+builder.Services.AddScoped<ChessLegacy.API.Repositories.PartidaRepository>();
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
     options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;

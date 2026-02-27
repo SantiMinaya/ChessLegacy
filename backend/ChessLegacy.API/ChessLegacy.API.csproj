@@ -14,6 +14,13 @@
     </PackageReference>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.3" />
     <PackageReference Include="pgn.net" Version="1.2.1" />
+    <PackageReference Include="Scalar.AspNetCore" Version="1.2.42" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="stockfish\**">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

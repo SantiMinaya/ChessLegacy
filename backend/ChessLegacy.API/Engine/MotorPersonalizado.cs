@@ -76,6 +76,119 @@ public class MotorPersonalizado
         return (movimiento, comentario);
     }
 
+    public async Task<string> ObtenerMejorMovimiento(string fen)
+    {
+        var process = new Process
+        {
+            StartInfo = new ProcessStartInfo
+            {
+                FileName = _stockfishPath,
+                UseShellExecute = false,
+                RedirectStandardInput = true,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                CreateNoWindow = true
+            }
+        };
+
+        process.Start();
+        
+        var writer = process.StandardInput;
+        var reader = process.StandardOutput;
+        
+        writer.WriteLine("uci");
+        writer.WriteLine("isready");
+        writer.Flush();
+        
+        // Esperar readyok
+        string? line;
+        while ((line = await reader.ReadLineAsync()) != null)
+        {
+            if (line.Contains("readyok")) break;
+        }
+        
+        writer.WriteLine($"position fen {fen}");
+        writer.WriteLine("go depth 10");
+        writer.Flush();
+
+        string bestMove = "";
+        while ((line = await reader.ReadLineAsync()) != null)
+        {
+            if (line.StartsWith("bestmove"))
+            {
+                var parts = line.Split(' ');
+                if (parts.Length > 1)
+                    bestMove = parts[1];
+                break;
+            }
+        }
+
+        writer.WriteLine("quit");
+        writer.Flush();
+        
+        if (!process.WaitForExit(2000))
+            process.Kill();
+        
+        return bestMove;
+    }
+
+    public async Task<int> EvaluarPosicion(string fen)
+    {
+        var process = new Process
+        {
+            StartInfo = new ProcessStartInfo
+            {
+                FileName = _stockfishPath,
+                UseShellExecute = false,
+                RedirectStandardInput = true,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                CreateNoWindow = true
+            }
+        };
+
+        process.Start();
+        
+        var writer = process.StandardInput;
+        var reader = process.StandardOutput;
+        
+        writer.WriteLine("uci");
+        writer.WriteLine("isready");
+        writer.Flush();
+        
+        // Esperar readyok
+        string? line;
+        while ((line = await reader.ReadLineAsync()) != null)
+        {
+            if (line.Contains("readyok")) break;
+        }
+        
+        writer.WriteLine($"position fen {fen}");
+        writer.WriteLine("go depth 10");
+        writer.Flush();
+
+        int evaluacion = 0;
+        while ((line = await reader.ReadLineAsync()) != null)
+        {
+            if (line.Contains("score cp"))
+            {
+                var parts = line.Split(' ');
+                var cpIndex = Array.IndexOf(parts, "cp");
+                if (cpIndex > 0 && cpIndex + 1 < parts.Length)
+                    int.TryParse(parts[cpIndex + 1], out evaluacion);
+            }
+            if (line.StartsWith("bestmove")) break;
+        }
+
+        writer.WriteLine("quit");
+        writer.Flush();
+        
+        if (!process.WaitForExit(2000))
+            process.Kill();
+        
+        return evaluacion;
+    }
+
     private string GenerarComentario(string maestro, string movimiento)
     {
         return maestro switch

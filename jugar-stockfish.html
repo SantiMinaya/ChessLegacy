@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chess Legacy - Jugar vs Stockfish</title>
+    <link rel="stylesheet" href="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 600px 1fr;
+            gap: 30px;
+        }
+        .board-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .info-panel {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 { color: #333; margin-top: 0; }
+        h2 { color: #555; font-size: 18px; }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px;
+        }
+        button:hover { background: #0056b3; }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .status {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 4px;
+            background: #e7f3ff;
+            border-left: 4px solid #007bff;
+        }
+        .move-history {
+            max-height: 300px;
+            overflow-y: auto;
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .evaluation {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            margin: 10px 0;
+        }
+        #myBoard {
+            width: 560px;
+        }
+    </style>
+</head>
+<body>
+    <h1>♟️ Chess Legacy - Jugar vs Stockfish</h1>
+    
+    <div class="container">
+        <div class="board-container">
+            <div id="myBoard"></div>
+            <div style="margin-top: 20px;">
+                <button onclick="resetGame()">🔄 Nueva Partida</button>
+                <button onclick="undoMove()" id="undoBtn">↩️ Deshacer</button>
+            </div>
+        </div>
+        
+        <div class="info-panel">
+            <h2>Estado del Juego</h2>
+            <div class="status" id="status">Tu turno - Mueve las blancas</div>
+            
+            <h2>Evaluación</h2>
+            <div class="evaluation" id="evaluation">0.0</div>
+            
+            <h2>Historial de Movimientos</h2>
+            <div class="move-history" id="moveHistory">Partida iniciada...</div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:5000/api';
+        let board = null;
+        let game = new Chess();
+        let moveHistory = [];
+
+        function onDragStart(source, piece, position, orientation) {
+            if (game.game_over()) return false;
+            if (piece.search(/^b/) !== -1) return false;
+        }
+
+        async function onDrop(source, target) {
+            const move = game.move({
+                from: source,
+                to: target,
+                promotion: 'q'
+            });
+
+            if (move === null) return 'snapback';
+
+            updateStatus();
+            addMoveToHistory(move);
+            
+            if (game.game_over()) {
+                updateStatus();
+                return;
+            }
+
+            setTimeout(makeStockfishMove, 250);
+        }
+
+        async function makeStockfishMove() {
+            updateStatus('🤔 Stockfish pensando...');
+            
+            try {
+                const fen = game.fen();
+                const response = await fetch(`${API_URL}/juego/mejor-movimiento`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ fen: fen })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Error al obtener movimiento de Stockfish');
+                }
+
+                const data = await response.json();
+                const move = game.move(data.movimiento, { sloppy: true });
+                
+                if (move) {
+                    board.position(game.fen());
+                    addMoveToHistory(move);
+                    updateEvaluation(data.evaluacion);
+                }
+                
+                updateStatus();
+                
+            } catch (error) {
+                console.error('Error:', error);
+                updateStatus('❌ Error: ' + error.message);
+            }
+        }
+
+        function onSnapEnd() {
+            board.position(game.fen());
+        }
+
+        function updateStatus(customMsg) {
+            const statusEl = document.getElementById('status');
+            
+            if (customMsg) {
+                statusEl.textContent = customMsg;
+                return;
+            }
+            
+            if (game.in_checkmate()) {
+                statusEl.textContent = game.turn() === 'w' ? '🎉 ¡Stockfish gana por jaque mate!' : '🎉 ¡Ganaste por jaque mate!';
+                statusEl.style.background = game.turn() === 'w' ? '#ffe7e7' : '#e7ffe7';
+            } else if (game.in_draw()) {
+                statusEl.textContent = '🤝 Empate';
+                statusEl.style.background = '#fff3cd';
+            } else if (game.in_stalemate()) {
+                statusEl.textContent = '🤝 Empate por ahogado';
+                statusEl.style.background = '#fff3cd';
+            } else if (game.in_check()) {
+                statusEl.textContent = game.turn() === 'w' ? '⚠️ ¡Jaque! - Tu turno' : '⚠️ ¡Jaque a Stockfish!';
+                statusEl.style.background = '#fff3cd';
+            } else {
+                statusEl.textContent = game.turn() === 'w' ? '♟️ Tu turno - Mueve las blancas' : '⏳ Turno de Stockfish...';
+                statusEl.style.background = '#e7f3ff';
+            }
+        }
+
+        function addMoveToHistory(move) {
+            moveHistory.push(move);
+            const historyEl = document.getElementById('moveHistory');
+            const moveNum = Math.ceil(moveHistory.length / 2);
+            const isWhite = move.color === 'w';
+            
+            if (isWhite) {
+                historyEl.innerHTML += `\n${moveNum}. ${move.san}`;
+            } else {
+                historyEl.innerHTML += ` ${move.san}`;
+            }
+            
+            historyEl.scrollTop = historyEl.scrollHeight;
+        }
+
+        function updateEvaluation(eval) {
+            const evalEl = document.getElementById('evaluation');
+            if (eval !== undefined && eval !== null) {
+                const score = (eval / 100).toFixed(2);
+                evalEl.textContent = score > 0 ? `+${score}` : score;
+                evalEl.style.color = score > 0 ? '#28a745' : score < 0 ? '#dc3545' : '#333';
+            }
+        }
+
+        function resetGame() {
+            game = new Chess();
+            board.start();
+            moveHistory = [];
+            document.getElementById('moveHistory').innerHTML = 'Partida iniciada...';
+            document.getElementById('evaluation').textContent = '0.0';
+            updateStatus();
+        }
+
+        function undoMove() {
+            if (moveHistory.length < 2) return;
+            
+            game.undo();
+            game.undo();
+            moveHistory.pop();
+            moveHistory.pop();
+            
+            board.position(game.fen());
+            
+            const historyEl = document.getElementById('moveHistory');
+            const moves = moveHistory.map((m, i) => {
+                const moveNum = Math.ceil((i + 1) / 2);
+                return i % 2 === 0 ? `\n${moveNum}. ${m.san}` : ` ${m.san}`;
+            }).join('');
+            historyEl.innerHTML = 'Partida iniciada...' + moves;
+            
+            updateStatus();
+        }
+
+        const config = {
+            draggable: true,
+            position: 'start',
+            onDragStart: onDragStart,
+            onDrop: onDrop,
+            onSnapEnd: onSnapEnd,
+            pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png'
+        };
+
+        window.onload = function() {
+            board = Chessboard('myBoard', config);
+        };
+    </script>
+</body>
+</html>

@@ -17,6 +17,30 @@ namespace ChessLegacy.API.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.3");
 
+            modelBuilder.Entity("ChessLegacy.API.Models.Apertura", b =>
+                {
+                    b.Property<string>("ECO")
+                        .HasMaxLength(10)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("MovimientosIniciales")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Variante")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("ECO");
+
+                    b.HasIndex("Nombre");
+
+                    b.ToTable("Aperturas");
+                });
+
             modelBuilder.Entity("ChessLegacy.API.Models.Intento", b =>
                 {
                     b.Property<int>("Id")
@@ -65,6 +89,12 @@ namespace ChessLegacy.API.Migrations
                     b.Property<int>("AnioNacimiento")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("Biografia")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("FotoUrl")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Nombre")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -73,6 +103,9 @@ namespace ChessLegacy.API.Migrations
                     b.Property<string>("Pais")
                         .IsRequired()
                         .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PerfilEstilo")
                         .HasColumnType("TEXT");
 
                     b.Property<double>("PesoAtaqueRey")
@@ -92,7 +125,55 @@ namespace ChessLegacy.API.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Nombre");
+
                     b.ToTable("Jugadores");
+                });
+
+            modelBuilder.Entity("ChessLegacy.API.Models.Movimiento", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("CaracteristicasEstilo")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int?>("EvaluacionStockfish")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("FaseJuego")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("FenAntes")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("FenDespues")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("NumeroMovimiento")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("PartidaId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("San")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("TipoMovimiento")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FaseJuego");
+
+                    b.HasIndex("PartidaId", "NumeroMovimiento");
+
+                    b.ToTable("Movimientos");
                 });
 
             modelBuilder.Entity("ChessLegacy.API.Models.Partida", b =>
@@ -104,8 +185,26 @@ namespace ChessLegacy.API.Migrations
                     b.Property<int>("Anio")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("AperturaNombre")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CodigoECO")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ColorJugador")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int?>("EloJugador")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("EloOponente")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Evento")
                         .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("Fecha")
                         .HasColumnType("TEXT");
 
                     b.Property<int>("JugadorId")
@@ -119,9 +218,19 @@ namespace ChessLegacy.API.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("Resultado")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("VarianteNombre")
+                        .HasColumnType("TEXT");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("JugadorId");
+                    b.HasIndex("Anio");
+
+                    b.HasIndex("CodigoECO");
+
+                    b.HasIndex("JugadorId", "CodigoECO");
 
                     b.ToTable("Partidas");
                 });
@@ -165,13 +274,30 @@ namespace ChessLegacy.API.Migrations
                     b.Navigation("Posicion");
                 });
 
+            modelBuilder.Entity("ChessLegacy.API.Models.Movimiento", b =>
+                {
+                    b.HasOne("ChessLegacy.API.Models.Partida", "Partida")
+                        .WithMany("Movimientos")
+                        .HasForeignKey("PartidaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Partida");
+                });
+
             modelBuilder.Entity("ChessLegacy.API.Models.Partida", b =>
                 {
+                    b.HasOne("ChessLegacy.API.Models.Apertura", "Apertura")
+                        .WithMany("Partidas")
+                        .HasForeignKey("CodigoECO");
+
                     b.HasOne("ChessLegacy.API.Models.Jugador", "Jugador")
                         .WithMany("Partidas")
                         .HasForeignKey("JugadorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Apertura");
 
                     b.Navigation("Jugador");
                 });
@@ -187,6 +313,11 @@ namespace ChessLegacy.API.Migrations
                     b.Navigation("Partida");
                 });
 
+            modelBuilder.Entity("ChessLegacy.API.Models.Apertura", b =>
+                {
+                    b.Navigation("Partidas");
+                });
+
             modelBuilder.Entity("ChessLegacy.API.Models.Jugador", b =>
                 {
                     b.Navigation("Partidas");
@@ -194,6 +325,8 @@ namespace ChessLegacy.API.Migrations
 
             modelBuilder.Entity("ChessLegacy.API.Models.Partida", b =>
                 {
+                    b.Navigation("Movimientos");
+
                     b.Navigation("Posiciones");
                 });
 

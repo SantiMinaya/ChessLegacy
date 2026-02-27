@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Text;
 
 namespace ChessLegacy.API.Engine;
 
@@ -13,50 +14,97 @@ public class StockfishEngine
 
     public async Task<(string bestMove, int evaluation)> AnalyzePosition(string fen)
     {
-        var process = new Process
+        return await Task.Run(() =>
         {
-            StartInfo = new ProcessStartInfo
+            try
             {
-                FileName = _stockfishPath,
-                UseShellExecute = false,
-                RedirectStandardInput = true,
-                RedirectStandardOutput = true,
-                CreateNoWindow = true
+                Console.WriteLine($"Iniciando Stockfish desde: {_stockfishPath}");
+                Console.WriteLine($"Analizando FEN: {fen}");
+                
+                var process = new Process
+                {
+                    StartInfo = new ProcessStartInfo
+                    {
+                        FileName = _stockfishPath,
+                        UseShellExecute = false,
+                        RedirectStandardInput = true,
+                        RedirectStandardOutput = true,
+                        RedirectStandardError = true,
+                        CreateNoWindow = true,
+                        StandardOutputEncoding = Encoding.UTF8,
+                        StandardErrorEncoding = Encoding.UTF8
+                    }
+                };
+
+                process.Start();
+                Console.WriteLine("Proceso iniciado");
+
+                // Enviar comandos
+                process.StandardInput.AutoFlush = true;
+                process.StandardInput.WriteLine("uci");
+                Console.WriteLine("Comando UCI enviado");
+                
+                // Esperar uciok
+                string? line;
+                int lineCount = 0;
+                while ((line = process.StandardOutput.ReadLine()) != null && lineCount < 100)
+                {
+                    lineCount++;
+                    Console.WriteLine($"Stockfish: {line}");
+                    if (line.Contains("uciok")) break;
+                }
+
+                // Analizar posición
+                process.StandardInput.WriteLine($"position fen {fen}");
+                process.StandardInput.WriteLine("go depth 10");
+                Console.WriteLine("Comandos de análisis enviados");
+
+                string bestMove = "";
+                int evaluation = 0;
+
+                // Leer resultado
+                lineCount = 0;
+                while ((line = process.StandardOutput.ReadLine()) != null && lineCount < 200)
+                {
+                    lineCount++;
+                    Console.WriteLine($"Análisis: {line}");
+                    
+                    if (line.Contains("score cp"))
+                    {
+                        var parts = line.Split(' ');
+                        var cpIndex = Array.IndexOf(parts, "cp");
+                        if (cpIndex >= 0 && cpIndex + 1 < parts.Length)
+                            int.TryParse(parts[cpIndex + 1], out evaluation);
+                    }
+
+                    if (line.StartsWith("bestmove"))
+                    {
+                        var parts = line.Split(' ');
+                        if (parts.Length > 1)
+                            bestMove = parts[1];
+                        Console.WriteLine($"Mejor movimiento encontrado: {bestMove}");
+                        break;
+                    }
+                }
+
+                // Cerrar
+                process.StandardInput.WriteLine("quit");
+                process.WaitForExit(2000);
+                
+                if (!process.HasExited)
+                    process.Kill();
+
+                process.Dispose();
+
+                Console.WriteLine($"Resultado: movimiento={bestMove}, evaluacion={evaluation}");
+                return (bestMove, evaluation);
             }
-        };
-
-        process.Start();
-
-        await process.StandardInput.WriteLineAsync("uci");
-        await process.StandardInput.WriteLineAsync($"position fen {fen}");
-        await process.StandardInput.WriteLineAsync("go depth 15");
-
-        string bestMove = "";
-        int evaluation = 0;
-
-        while (!process.StandardOutput.EndOfStream)
-        {
-            var line = await process.StandardOutput.ReadLineAsync();
-            if (line == null) continue;
-
-            if (line.StartsWith("bestmove"))
+            catch (Exception ex)
             {
-                bestMove = line.Split(' ')[1];
-                break;
+                Console.WriteLine($"Error en Stockfish: {ex.Message}");
+                Console.WriteLine($"StackTrace: {ex.StackTrace}");
+                return ("", 0);
             }
-
-            if (line.Contains("score cp"))
-            {
-                var parts = line.Split(' ');
-                var cpIndex = Array.IndexOf(parts, "cp");
-                if (cpIndex > 0 && cpIndex + 1 < parts.Length)
-                    int.TryParse(parts[cpIndex + 1], out evaluation);
-            }
-        }
-
-        await process.StandardInput.WriteLineAsync("quit");
-        await process.WaitForExitAsync();
-
-        return (bestMove, evaluation);
+        });
     }
 }

@@ -7,37 +7,54 @@ namespace ChessLegacy.API.Controllers;
 [Route("api/[controller]")]
 public class ImportController : ControllerBase
 {
-    private readonly PgnImporter _importer;
+    private readonly PgnImporterAdvanced _importer;
 
-    public ImportController(PgnImporter importer)
+    public ImportController(PgnImporterAdvanced importer)
     {
         _importer = importer;
     }
 
-    [HttpPost("pgn")]
-    public async Task<ActionResult> ImportarPgn([FromForm] IFormFile archivo, [FromForm] int jugadorId)
+    [HttpPost("importar-todos")]
+    public async Task<ActionResult> ImportarTodos([FromQuery] int limite = 0)
     {
-        try
+        var maestros = new Dictionary<string, int>
         {
-            if (archivo == null || archivo.Length == 0)
-                return BadRequest(new { error = "Archivo vacío" });
+            { "Tal", 1 },
+            { "Capablanca", 2 },
+            { "Kasparov", 3 },
+            { "Fischer", 4 },
+            { "Karpov", 5 },
+            { "Alekhine", 6 },
+            { "Petrosian", 7 },
+            { "Carlsen", 8 }
+        };
 
-            var tempPath = Path.GetTempFileName();
-            using (var stream = new FileStream(tempPath, FileMode.Create))
+        var baseDir = Path.Combine(Directory.GetCurrentDirectory(), "Scripts", "pgn_files");
+        var resultados = new List<object>();
+        int totalImportadas = 0;
+
+        foreach (var (nombre, jugadorId) in maestros)
+        {
+            var pgnPath = Path.Combine(baseDir, nombre, $"{nombre}.pgn");
+            
+            if (!System.IO.File.Exists(pgnPath))
             {
-                await archivo.CopyToAsync(stream);
+                resultados.Add(new { maestro = nombre, status = "No encontrado", archivo = pgnPath });
+                continue;
             }
 
-            var importadas = await _importer.ImportarPgn(tempPath, jugadorId);
-            
-            if (System.IO.File.Exists(tempPath))
-                System.IO.File.Delete(tempPath);
-                
-            return Ok(new { mensaje = $"{importadas} partidas importadas correctamente" });
+            try
+            {
+                var importadas = await _importer.ImportarPgnCompleto(pgnPath, jugadorId, limite);
+                totalImportadas += importadas;
+                resultados.Add(new { maestro = nombre, status = "Importado", partidas = importadas });
+            }
+            catch (Exception ex)
+            {
+                resultados.Add(new { maestro = nombre, status = "Error", error = ex.Message });
+            }
         }
-        catch (Exception ex)
-        {
-            return BadRequest(new { error = ex.Message, stack = ex.StackTrace });
-        }
+
+        return Ok(new { mensaje = "Importación completada", totalPartidas = totalImportadas, resultados });
     }
 }
