@@ -1,5 +1,4 @@
-using ChessLegacy.API.DTOs;
-using ChessLegacy.API.Services;
+using ChessLegacy.API.Engine;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ChessLegacy.API.Controllers;
@@ -8,24 +7,36 @@ namespace ChessLegacy.API.Controllers;
 [Route("api/[controller]")]
 public class AnalisisController : ControllerBase
 {
-    private readonly AnalisisService _service;
+    private readonly StockfishEngine _engine;
 
-    public AnalisisController(AnalisisService service)
+    public AnalisisController()
     {
-        _service = service;
+        var stockfishPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "stockfish", "stockfish.exe");
+        _engine = new StockfishEngine(stockfishPath);
     }
 
-    [HttpPost]
-    public async Task<ActionResult<AnalisisResponse>> Analizar(AnalisisRequest request)
+    [HttpPost("evaluar")]
+    public async Task<ActionResult> EvaluarPosicion([FromBody] EvaluarRequest request)
     {
-        try
+        var (bestMove, evaluation) = await _engine.AnalyzePosition(request.Fen);
+        
+        return Ok(new
         {
-            var resultado = await _service.AnalizarMovimiento(request);
-            return Ok(resultado);
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new { error = ex.Message });
-        }
+            fen = request.Fen,
+            mejorMovimiento = bestMove,
+            evaluacion = evaluation,
+            evaluacionTexto = FormatearEvaluacion(evaluation)
+        });
+    }
+
+    private string FormatearEvaluacion(int centipawns)
+    {
+        if (Math.Abs(centipawns) > 1000)
+            return centipawns > 0 ? "+M" : "-M";
+        
+        double pawns = centipawns / 100.0;
+        return pawns >= 0 ? $"+{pawns:F2}" : $"{pawns:F2}";
     }
 }
+
+public record EvaluarRequest(string Fen);

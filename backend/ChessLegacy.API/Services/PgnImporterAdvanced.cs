@@ -26,6 +26,10 @@ public class PgnImporterAdvanced
         int importadas = 0;
         var games = limite > 0 ? database.Games.Take(limite) : database.Games;
         var gamesList = games.ToList();
+        
+        const int batchSize = 50;
+        var partidasLote = new List<Partida>();
+        var movimientosLote = new List<Movimiento>();
 
         for (int i = 0; i < gamesList.Count; i++)
         {
@@ -33,23 +37,37 @@ public class PgnImporterAdvanced
             {
                 var game = gamesList[i];
                 var partida = await CrearPartida(game, jugadorId, jugador.Nombre);
-                _context.Partidas.Add(partida);
-                await _context.SaveChangesAsync();
+                partidasLote.Add(partida);
 
-                var movimientos = GenerarMovimientos(game, partida.Id);
-                _context.Movimientos.AddRange(movimientos);
-                await _context.SaveChangesAsync();
-
-                importadas++;
-                
-                if (importadas % 100 == 0)
+                if (partidasLote.Count >= batchSize || i == gamesList.Count - 1)
                 {
+                    _context.Partidas.AddRange(partidasLote);
+                    await _context.SaveChangesAsync();
+                    
+                    foreach (var p in partidasLote)
+                    {
+                        var idx = partidasLote.IndexOf(p);
+                        var originalGame = gamesList[importadas + idx];
+                        var movs = GenerarMovimientos(originalGame, p.Id);
+                        movimientosLote.AddRange(movs);
+                    }
+                    
+                    if (movimientosLote.Count > 0)
+                    {
+                        _context.Movimientos.AddRange(movimientosLote);
+                        await _context.SaveChangesAsync();
+                    }
+                    
+                    importadas += partidasLote.Count;
                     Console.WriteLine($"Importadas {importadas}/{gamesList.Count} partidas de {jugador.Nombre}...");
+                    
+                    partidasLote.Clear();
+                    movimientosLote.Clear();
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error importando partida {i + 1}: {ex.Message}");
+                Console.WriteLine($"Error en partida {i + 1}: {ex.Message}");
             }
         }
 

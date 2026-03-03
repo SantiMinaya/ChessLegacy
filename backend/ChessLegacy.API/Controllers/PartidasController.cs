@@ -30,7 +30,8 @@ public class PartidasController : ControllerBase
             Resultado = p.Resultado ?? "",
             CodigoECO = p.CodigoECO,
             NombreApertura = p.AperturaNombre ?? "",
-            PGN = p.PGN
+            PGN = p.PGN,
+            ColorJugador = p.ColorJugador ?? "Blancas"
         }).ToList();
 
         return Ok(new
@@ -59,7 +60,8 @@ public class PartidasController : ControllerBase
             Resultado = partida.Resultado ?? "",
             CodigoECO = partida.CodigoECO,
             NombreApertura = partida.AperturaNombre ?? "",
-            PGN = partida.PGN
+            PGN = partida.PGN,
+            ColorJugador = partida.ColorJugador ?? "Blancas"
         });
     }
 

@@ -1,85 +1,133 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { Chessboard } from 'react-chessboard';
+import { Chess } from 'chess.js';
+import { masterStyles } from '../data/masterStyles';
 import './PlayMaster.css';
 
 export default function PlayMaster({ master, onBack }) {
-  const [board, setBoard] = useState(null);
-  const [game, setGame] = useState(null);
+  const [game, setGame] = useState(new Chess());
   const [moveHistory, setMoveHistory] = useState([]);
   const [status, setStatus] = useState('Tu turno - Mueves las blancas');
   const [evaluation, setEvaluation] = useState(0);
+  const [thinking, setThinking] = useState(false);
+  const [score, setScore] = useState({ precision: 0, style: 0, total: 0 });
 
-  useEffect(() => {
-    const Chess = window.Chess;
-    const newGame = new Chess();
-    setGame(newGame);
+  const makeMove = async (sourceSquare, targetSquare) => {
+    if (thinking) return false;
 
-    const config = {
-      draggable: true,
-      position: 'start',
-      onDragStart: (source, piece) => {
-        if (newGame.game_over()) return false;
-        if (piece.search(/^b/) !== -1) return false;
-      },
-      onDrop: async (source, target) => {
-        const move = newGame.move({ from: source, to: target, promotion: 'q' });
-        if (move === null) return 'snapback';
+    const gameCopy = new Chess(game.fen());
+    const move = gameCopy.move({
+      from: sourceSquare,
+      to: targetSquare,
+      promotion: 'q'
+    });
 
-        setMoveHistory(prev => [...prev, move]);
-        setGame(new Chess(newGame.fen()));
-        
-        if (newGame.game_over()) {
-          updateStatus(newGame);
-          return;
-        }
+    if (move === null) return false;
 
-        setTimeout(() => makeMasterMove(newGame), 250);
-      },
-      onSnapEnd: () => {
-        if (board) board.position(newGame.fen());
-      },
-      pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png'
-    };
+    setGame(gameCopy);
+    setMoveHistory([...moveHistory, move]);
 
-    const newBoard = window.Chessboard('playBoard', config);
-    setBoard(newBoard);
+    if (gameCopy.isGameOver()) {
+      updateStatus(gameCopy);
+      return true;
+    }
 
-    return () => {
-      if (newBoard) newBoard.destroy();
-    };
-  }, []);
+    setThinking(true);
+    setTimeout(() => makeMasterMove(gameCopy), 500);
+    return true;
+  };
 
   const makeMasterMove = async (currentGame) => {
     setStatus(`🤔 ${master.name} pensando...`);
-    
+
     try {
-      const response = await fetch('http://localhost:5000/api/juego/mejor-movimiento', {
+      const response = await fetch('http://localhost:5000/api/analisis/evaluar', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ fen: currentGame.fen() })
       });
 
       const data = await response.json();
-      const move = currentGame.move(data.movimiento, { sloppy: true });
+      
+      // Obtener movimientos legales
+      const moves = currentGame.moves({ verbose: true });
+      
+      // Seleccionar movimiento según estilo del maestro
+      const selectedMove = selectMoveByStyle(moves, master.id, data.evaluacion);
+      
+      const move = currentGame.move(selectedMove);
       
       if (move) {
-        board.position(currentGame.fen());
+        setGame(new Chess(currentGame.fen()));
         setMoveHistory(prev => [...prev, move]);
         setEvaluation(data.evaluacion);
-        setGame(new Chess(currentGame.fen()));
       }
-      
+
+      setThinking(false);
       updateStatus(currentGame);
     } catch (error) {
       setStatus('❌ Error: ' + error.message);
+      setThinking(false);
     }
   };
 
+  const selectMoveByStyle = (moves, masterId, baseEval) => {
+    const style = masterStyles[masterId];
+    if (!style || moves.length === 0) return moves[0];
+
+    // Evaluar cada movimiento según el estilo
+    const scoredMoves = moves.map(move => {
+      let score = 0;
+
+      // Bonificaciones según estilo
+      if (move.flags.includes('c')) score += style.preferences.attackWeight * 50; // Captura
+      if (move.flags.includes('e')) score += style.preferences.attackWeight * 40; // En passant
+      if (move.san.includes('+')) score += style.preferences.attackWeight * 80; // Jaque
+      if (move.san.includes('#')) score += 1000; // Jaque mate
+      
+      // Desarrollo de piezas
+      if (move.piece !== 'p' && move.from[1] === '1') {
+        score += style.preferences.developmentWeight * 30;
+      }
+
+      // Control del centro
+      if (['e4', 'e5', 'd4', 'd5'].includes(move.to)) {
+        score += style.preferences.centerControlWeight * 40;
+      }
+
+      // Sacrificios (capturas donde perdemos material)
+      const pieceValues = { p: 1, n: 3, b: 3, r: 5, q: 9, k: 0 };
+      if (move.flags.includes('c') && move.captured) {
+        const captureValue = pieceValues[move.captured];
+        const pieceValue = pieceValues[move.piece];
+        if (captureValue < pieceValue) {
+          score += style.preferences.sacrificeBonus * 60;
+        }
+      }
+
+      // Añadir aleatoriedad según precisión del maestro
+      const randomness = (1 - (style.preferences.accuracy || 0.8)) * 100;
+      score += Math.random() * randomness;
+
+      return { move, score };
+    });
+
+    // Ordenar y seleccionar
+    scoredMoves.sort((a, b) => b.score - a.score);
+    
+    // Los maestros más tácticos consideran más opciones
+    const topN = Math.ceil(moves.length * (1 - style.preferences.positionalWeight) * 0.3) || 1;
+    const topMoves = scoredMoves.slice(0, Math.max(1, topN));
+    
+    return topMoves[Math.floor(Math.random() * topMoves.length)].move;
+  };
+
   const updateStatus = (currentGame) => {
-    if (currentGame.in_checkmate()) {
+    if (currentGame.isCheckmate()) {
       setStatus(currentGame.turn() === 'w' ? `🎉 ¡${master.name} gana por jaque mate!` : '🎉 ¡Ganaste!');
-    } else if (currentGame.in_draw()) {
+    } else if (currentGame.isDraw()) {
       setStatus('🤝 Empate');
-    } else if (currentGame.in_check()) {
+    } else if (currentGame.isCheck()) {
       setStatus(currentGame.turn() === 'w' ? '⚠️ ¡Jaque! - Tu turno' : `⚠️ ¡Jaque a ${master.name}!`);
     } else {
       setStatus(currentGame.turn() === 'w' ? '♟️ Tu turno' : `⏳ Turno de ${master.name}...`);
@@ -87,29 +135,49 @@ export default function PlayMaster({ master, onBack }) {
   };
 
   const resetGame = () => {
-    const newGame = new Chess();
-    setGame(newGame);
-    board.start();
+    setGame(new Chess());
     setMoveHistory([]);
     setEvaluation(0);
     setStatus('Tu turno - Mueves las blancas');
+    setScore({ precision: 0, style: 0, total: 0 });
+    setThinking(false);
   };
+
+  const styleInfo = masterStyles[master.id];
 
   return (
     <div className="play-master">
       <button className="back-btn" onClick={onBack}>← Volver</button>
       
-      <div className="play-header" style={{ borderTopColor: master.color }}>
+      <div className="play-header">
         <img src={master.photo} alt={master.name} />
         <div>
           <h1>Jugando contra {master.name}</h1>
-          <p>{master.style}</p>
+          <p>{styleInfo?.description || master.style}</p>
         </div>
       </div>
 
       <div className="play-container">
+        <div className="eval-bar-vertical">
+          <div 
+            className="eval-fill-vertical" 
+            style={{ 
+              height: `${Math.min(100, Math.max(0, 50 - evaluation / 20))}%`,
+              background: '#000'
+            }} 
+          />
+          <div className="eval-text">{(evaluation / 100).toFixed(1)}</div>
+        </div>
+
         <div className="board-section">
-          <div id="playBoard"></div>
+          <div className="opponent-name">{master.name}</div>
+          <Chessboard
+            position={game.fen()}
+            onPieceDrop={makeMove}
+            boardWidth={500}
+            arePiecesDraggable={!thinking && !game.isGameOver()}
+          />
+          <div className="player-name">Tú</div>
           <div className="controls">
             <button onClick={resetGame}>🔄 Nueva Partida</button>
           </div>
@@ -117,15 +185,47 @@ export default function PlayMaster({ master, onBack }) {
 
         <div className="info-section">
           <div className="status-box">{status}</div>
+          
+          <div className="style-info-box">
+            <h3>Estilo de {master.name}</h3>
+            <div className="style-bars">
+              <div className="style-bar">
+                <span>Ataque</span>
+                <div className="bar">
+                  <div className="fill" style={{ width: `${styleInfo?.preferences.attackWeight * 100}%` }} />
+                </div>
+              </div>
+              <div className="style-bar">
+                <span>Táctica</span>
+                <div className="bar">
+                  <div className="fill" style={{ width: `${styleInfo?.preferences.tacticalComplexity * 100}%` }} />
+                </div>
+              </div>
+              <div className="style-bar">
+                <span>Posicional</span>
+                <div className="bar">
+                  <div className="fill" style={{ width: `${styleInfo?.preferences.positionalWeight * 100}%` }} />
+                </div>
+              </div>
+              <div className="style-bar">
+                <span>Sacrificios</span>
+                <div className="bar">
+                  <div className="fill" style={{ width: `${styleInfo?.preferences.sacrificeBonus * 100}%` }} />
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div className="eval-box">
-            <h3>Evaluación</h3>
+            <h3>Evaluación Detallada</h3>
             <div className="eval-value">{(evaluation / 100).toFixed(2)}</div>
           </div>
+
           <div className="history-box">
-            <h3>Movimientos</h3>
+            <h3>Movimientos ({moveHistory.length})</h3>
             <div className="moves">
               {moveHistory.map((move, i) => (
-                <span key={i}>
+                <span key={i} className={i % 2 === 0 ? 'white-move' : 'black-move'}>
                   {i % 2 === 0 ? `${Math.ceil((i + 1) / 2)}. ` : ''}
                   {move.san}{' '}
                 </span>

@@ -7,11 +7,17 @@ namespace ChessLegacy.API.Controllers;
 [Route("api/[controller]")]
 public class ImportController : ControllerBase
 {
-    private readonly PgnImporterAdvanced _importer;
+    private readonly SimplePgnImporter _importer;
 
-    public ImportController(PgnImporterAdvanced importer)
+    public ImportController(SimplePgnImporter importer)
     {
         _importer = importer;
+    }
+
+    [HttpGet("test")]
+    public ActionResult Test()
+    {
+        return Ok(new { mensaje = "API funcionando correctamente" });
     }
 
     [HttpPost("importar-todos")]
@@ -45,7 +51,7 @@ public class ImportController : ControllerBase
 
             try
             {
-                var importadas = await _importer.ImportarPgnCompleto(pgnPath, jugadorId, limite);
+                var importadas = await _importer.ImportarPgn(pgnPath, jugadorId, limite);
                 totalImportadas += importadas;
                 resultados.Add(new { maestro = nombre, status = "Importado", partidas = importadas });
             }

@@ -33,6 +33,9 @@ public class PartidaRepository
         if (!string.IsNullOrEmpty(filtros.Evento))
             query = query.Where(p => p.Evento.Contains(filtros.Evento));
 
+        if (!string.IsNullOrEmpty(filtros.Oponente))
+            query = query.Where(p => p.Oponente.Contains(filtros.Oponente));
+
         if (filtros.AnioDesde.HasValue)
             query = query.Where(p => p.Anio >= filtros.AnioDesde.Value);
 

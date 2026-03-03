@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import PlayMaster from './PlayMaster';
-import FamousGames from './FamousGames';
+import PartidasFamosas from '../pages/PartidasFamosas';
 import StyleTraining from './StyleTraining';
 import Biography from './Biography';
+import Estadisticas from './Estadisticas';
 import './MasterDetail.css';
 
 export default function MasterDetail({ master, onBack }) {
@@ -13,7 +14,7 @@ export default function MasterDetail({ master, onBack }) {
   }
   
   if (mode === 'games') {
-    return <FamousGames master={master} onBack={() => setMode(null)} />;
+    return <PartidasFamosas jugadorId={master.id} jugadorNombre={master.name} onBack={() => setMode(null)} />;
   }
   
   if (mode === 'training') {
@@ -22,6 +23,10 @@ export default function MasterDetail({ master, onBack }) {
   
   if (mode === 'bio') {
     return <Biography master={master} onBack={() => setMode(null)} />;
+  }
+
+  if (mode === 'stats') {
+    return <Estadisticas jugadorId={master.id} jugadorNombre={master.name} onBack={() => setMode(null)} />;
   }
 
   return (
@@ -78,7 +83,8 @@ export default function MasterDetail({ master, onBack }) {
           <h2>Entrenar con {master.name}</h2>
           <div className="action-buttons">
             <button className="action-btn primary" onClick={() => setMode('play')}>🎮 Jugar Contra {master.name}</button>
-            <button className="action-btn" onClick={() => setMode('games')}>📚 Ver Partidas Famosas</button>
+            <button className="action-btn" onClick={() => setMode('games')}>📚 Ver Partidas</button>
+            <button className="action-btn" onClick={() => setMode('stats')}>📊 Estadísticas y Analytics</button>
             <button className="action-btn" onClick={() => setMode('training')}>🎯 Entrenar Estilo</button>
             <button className="action-btn" onClick={() => setMode('bio')}>📖 Biografía Completa</button>
           </div>

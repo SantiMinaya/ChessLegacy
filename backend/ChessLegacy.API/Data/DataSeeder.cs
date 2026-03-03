@@ -46,7 +46,67 @@ public static class DataSeeder
             PesoControlCentro = 0.9
         };
 
-        context.Jugadores.AddRange(tal, capablanca, kasparov);
+        var fischer = new Jugador
+        {
+            Nombre = "Bobby Fischer",
+            AnioNacimiento = 1943,
+            Pais = "Estados Unidos",
+            PesoSacrificio = 0.5,
+            PesoAtaqueRey = 0.7,
+            PesoSimplificacion = 0.6,
+            PesoFinales = 0.8,
+            PesoControlCentro = 0.85
+        };
+
+        var karpov = new Jugador
+        {
+            Nombre = "Anatoly Karpov",
+            AnioNacimiento = 1951,
+            Pais = "Rusia",
+            PesoSacrificio = 0.3,
+            PesoAtaqueRey = 0.5,
+            PesoSimplificacion = 0.8,
+            PesoFinales = 0.85,
+            PesoControlCentro = 0.9
+        };
+
+        var alekhine = new Jugador
+        {
+            Nombre = "Alexander Alekhine",
+            AnioNacimiento = 1892,
+            Pais = "Rusia",
+            PesoSacrificio = 0.8,
+            PesoAtaqueRey = 0.85,
+            PesoSimplificacion = 0.4,
+            PesoFinales = 0.6,
+            PesoControlCentro = 0.7
+        };
+
+        var petrosian = new Jugador
+        {
+            Nombre = "Tigran Petrosian",
+            AnioNacimiento = 1929,
+            Pais = "Armenia",
+            PesoSacrificio = 0.2,
+            PesoAtaqueRey = 0.4,
+            PesoSimplificacion = 0.9,
+            PesoFinales = 0.75,
+            PesoControlCentro = 0.85
+        };
+
+        var carlsen = new Jugador
+        {
+            Nombre = "Magnus Carlsen",
+            AnioNacimiento = 1990,
+            Pais = "Noruega",
+            PesoSacrificio = 0.4,
+            PesoAtaqueRey = 0.6,
+            PesoSimplificacion = 0.7,
+            PesoFinales = 0.95,
+            PesoControlCentro = 0.8
+        };
+
+        context.Jugadores.AddRange(tal, capablanca, kasparov, fischer, karpov, alekhine, petrosian, carlsen);
         await context.SaveChangesAsync();
 
         await CargarPgnsSimple(context, tal.Id, "Tal.pgn");

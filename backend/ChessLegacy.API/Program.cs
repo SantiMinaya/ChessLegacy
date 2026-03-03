@@ -20,7 +20,7 @@ builder.Services.AddSingleton(new ChessLegacy.API.Engine.MotorPersonalizado(stoc
 builder.Services.AddSingleton<ChessLegacy.API.Engine.SimpleChessEngine>();
 builder.Services.AddScoped<ChessLegacy.API.Services.AnalisisService>();
 builder.Services.AddScoped<ChessLegacy.API.Services.PgnImporter>();
-builder.Services.AddScoped<ChessLegacy.API.Services.PgnImporterAdvanced>();
+builder.Services.AddScoped<ChessLegacy.API.Services.SimplePgnImporter>();
 builder.Services.AddScoped<ChessLegacy.API.Repositories.JugadorRepository>();
 builder.Services.AddScoped<ChessLegacy.API.Repositories.PosicionRepository>();
 builder.Services.AddScoped<ChessLegacy.API.Repositories.PartidaRepository>();

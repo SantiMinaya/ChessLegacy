@@ -8,7 +8,7 @@ public class Partida
     public string Oponente { get; set; } = string.Empty;
     public int Anio { get; set; }
     public string Evento { get; set; } = string.Empty;
-    public string CodigoECO { get; set; } = string.Empty;
+    public string? CodigoECO { get; set; }
     public string? AperturaNombre { get; set; }
     public string? VarianteNombre { get; set; }
     public string? Resultado { get; set; } // 1-0, 0-1, 1/2-1/2

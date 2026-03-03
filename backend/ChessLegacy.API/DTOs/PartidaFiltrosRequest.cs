@@ -7,6 +7,7 @@ public class PartidaFiltrosRequest
     public string? NombreApertura { get; set; }
     public string? Variante { get; set; }
     public string? Evento { get; set; }
+    public string? Oponente { get; set; }
     public int? AnioDesde { get; set; }
     public int? AnioHasta { get; set; }
     public string? Resultado { get; set; }
@@ -25,4 +26,5 @@ public class PartidaResponse
     public string CodigoECO { get; set; } = string.Empty;
     public string NombreApertura { get; set; } = string.Empty;
     public string PGN { get; set; } = string.Empty;
+    public string ColorJugador { get; set; } = string.Empty;
 }
