@@ -92,9 +92,11 @@
 ## 📋 Pendiente
 
 ### Entrenamiento
-- [ ] Progreso persistente — localStorage con % acierto por apertura y sesiones
+- [ ] **Guardar sesiones automáticamente** — Conectar los 3 modos de entrenamiento con `POST /api/progreso/sesion` para que logros y progreso funcionen de verdad
+- [ ] **Notificación de logro desbloqueado** — Toast/popup al conseguir un logro nuevo tras una sesión
+- [ ] **Racha diaria** — Contador de días consecutivos practicando con calendario visual en el perfil
 - [ ] Repetición espaciada — priorizar aperturas falladas en el random
-- [ ] Modo difícil en "Adivina" — menos movimientos mostrados, sin variante en opciones
+- [ ] Modo difícil en "Adivina" — menos movimientos mostrados, sin variante en las opciones
 
 ### Nuevos modos de juego
 - [ ] Puzzles tácticos históricos — posiciones de las 20.000 partidas con combinación ganadora
@@ -108,9 +110,9 @@
 - [ ] Historial de partidas jugadas contra maestros
 
 ### UX / Experiencia
+- [ ] **Partida del día** — Posición histórica destacada en la Home con contexto histórico, diferente cada día
 - [ ] Loading states y spinners
 - [ ] Responsive design para móviles
-- [ ] Partida del día en la Home
 - [ ] Búsqueda global (maestros, partidas, aperturas)
 
 ### Deuda técnica

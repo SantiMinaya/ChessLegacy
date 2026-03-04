@@ -23,3 +23,13 @@ export const aperturasAPI = {
   getAprendizaje: (apertura, variante) => axios.get(`${API_URL}/aperturas/aprendizaje`, { params: { apertura, variante } }),
   getAprendizajeRandom: () => axios.get(`${API_URL}/aperturas/aprendizaje/random`),
 };
+
+export const authAPI = {
+  login: (username, password) => axios.post(`${API_URL}/auth/login`, { username, password }),
+  register: (username, password) => axios.post(`${API_URL}/auth/register`, { username, password }),
+};
+
+export const progresoAPI = {
+  get: (token) => axios.get(`${API_URL}/progreso`, { headers: { Authorization: `Bearer ${token}` } }),
+  guardarSesion: (token, data) => axios.post(`${API_URL}/progreso/sesion`, data, { headers: { Authorization: `Bearer ${token}` } }),
+};

@@ -1,12 +1,22 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
 import MasterDetail from './components/MasterDetail';
+import LoginPage from './pages/LoginPage';
 import { chessMasters } from './data/masters';
+import { useAuth } from './context/AuthContext';
 import './App.css';
 
 function App() {
+  const { user, logout } = useAuth();
+
+  if (!user) return <LoginPage />;
+
   return (
     <BrowserRouter>
+      <div className="app-header">
+        <span className="app-header-user">👤 {user.username}</span>
+        <button className="app-header-logout" onClick={logout}>Cerrar sesión</button>
+      </div>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/master/:id" element={<MasterDetailWrapper />} />

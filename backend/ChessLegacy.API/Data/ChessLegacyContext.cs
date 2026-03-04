@@ -13,6 +13,9 @@ public class ChessLegacyContext : DbContext
     public DbSet<Intento> Intentos { get; set; }
     public DbSet<Movimiento> Movimientos { get; set; }
     public DbSet<Apertura> Aperturas { get; set; }
+    public DbSet<Usuario> Usuarios { get; set; }
+    public DbSet<ProgresoApertura> Progresos { get; set; }
+    public DbSet<LogroUsuario> Logros { get; set; }
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -72,6 +75,26 @@ public class ChessLegacyContext : DbContext
             entity.Property(e => e.ECO).HasMaxLength(10);
             entity.Property(e => e.Nombre).IsRequired().HasMaxLength(200);
             entity.HasIndex(e => e.Nombre);
+        });
+
+        modelBuilder.Entity<Usuario>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.HasIndex(e => e.Username).IsUnique();
+        });
+
+        modelBuilder.Entity<ProgresoApertura>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.HasOne(e => e.Usuario).WithMany(u => u.Progresos).HasForeignKey(e => e.UsuarioId);
+            entity.HasIndex(e => new { e.UsuarioId, e.Apertura, e.Variante }).IsUnique();
+        });
+
+        modelBuilder.Entity<LogroUsuario>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.HasOne(e => e.Usuario).WithMany(u => u.Logros).HasForeignKey(e => e.UsuarioId);
+            entity.HasIndex(e => new { e.UsuarioId, e.Codigo }).IsUnique();
         });
     }
 }
