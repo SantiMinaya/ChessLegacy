@@ -30,7 +30,7 @@ public class PartidasController : ControllerBase
             Resultado = p.Resultado ?? "",
             CodigoECO = p.CodigoECO,
             NombreApertura = p.AperturaNombre ?? "",
-            PGN = p.PGN,
+            Pgn = p.PGN,
             ColorJugador = p.ColorJugador ?? "Blancas"
         }).ToList();
 
@@ -44,7 +44,7 @@ public class PartidasController : ControllerBase
         });
     }
 
-    [HttpGet("{id}")]
+    [HttpGet("{id:int}")]
     public async Task<ActionResult> GetPartida(int id)
     {
         var partida = await _repository.GetByIdAsync(id);
@@ -60,7 +60,28 @@ public class PartidasController : ControllerBase
             Resultado = partida.Resultado ?? "",
             CodigoECO = partida.CodigoECO,
             NombreApertura = partida.AperturaNombre ?? "",
-            PGN = partida.PGN,
+            Pgn = partida.PGN,
+            ColorJugador = partida.ColorJugador ?? "Blancas"
+        });
+    }
+
+    [HttpGet("buscar-por-pgn")]
+    public async Task<ActionResult> BuscarPorPgn([FromQuery] int jugadorId, [FromQuery] string pgnStart)
+    {
+        var partida = await _repository.BuscarPorPgnStart(jugadorId, pgnStart);
+        if (partida == null) return NotFound();
+
+        return Ok(new PartidaResponse
+        {
+            Id = partida.Id,
+            Evento = partida.Evento,
+            Sitio = "",
+            Anio = partida.Anio,
+            Oponente = partida.Oponente,
+            Resultado = partida.Resultado ?? "",
+            CodigoECO = partida.CodigoECO,
+            NombreApertura = partida.AperturaNombre ?? "",
+            Pgn = partida.PGN,
             ColorJugador = partida.ColorJugador ?? "Blancas"
         });
     }

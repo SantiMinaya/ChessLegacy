@@ -56,6 +56,18 @@ public class PartidaRepository
         return (partidas, total);
     }
 
+    public async Task<Partida?> BuscarPorPgnStart(int jugadorId, string pgnStart)
+    {
+        var normalizado = NormalizarPgn(pgnStart);
+        var candidatas = await _context.Partidas
+            .Where(p => p.JugadorId == jugadorId)
+            .ToListAsync();
+        return candidatas.FirstOrDefault(p => NormalizarPgn(p.PGN).StartsWith(normalizado));
+    }
+
+    private static string NormalizarPgn(string pgn) =>
+        System.Text.RegularExpressions.Regex.Replace(pgn, @"\s+", " ").Trim();
+
     public async Task<Partida?> GetByIdAsync(int id)
     {
         return await _context.Partidas.FindAsync(id);

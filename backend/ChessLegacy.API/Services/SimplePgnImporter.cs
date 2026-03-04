@@ -109,25 +109,61 @@ public class SimplePgnImporter
         return "Negras";
     }
 
+    private static readonly Dictionary<string, string> _aliasJugadores = new(StringComparer.OrdinalIgnoreCase)
+    {
+        // Korchnoi
+        { "Kortschnoj, Viktor", "Korchnoi, Viktor" },
+        { "Kortchnoi, Viktor",  "Korchnoi, Viktor" },
+        { "Korchnoi,V",         "Korchnoi, Viktor" },
+        // Kasparov
+        { "Kasparov, Gary",     "Kasparov, Garry" },
+        { "Kasparov, G.",       "Kasparov, Garry" },
+        { "Kasparov,G",         "Kasparov, Garry" },
+        { "Kasparov,Georgy",    "Kasparov, Garry" },
+        // Karpov
+        { "Karpov, Anantoly2",  "Karpov, Anatoly" },
+        { "Karpov,An",          "Karpov, Anatoly" },
+        { "Karpov,Ana",         "Karpov, Anatoly" },
+        // Carlsen
+        { "Carlsen,M",          "Carlsen, Magnus" },
+        { "Carlsen,Magnus",     "Carlsen, Magnus" },
+        // Kramnik
+        { "Kramnik,V",          "Kramnik, Vladimir" },
+        // Spassky
+        { "Spassky,B",          "Spassky, Boris V" },
+        // Anand
+        { "Anand,V",            "Anand, Viswanathan" },
+        { "Anand,V2",           "Anand, Viswanathan" },
+        // Smyslov
+        { "Smyslov,V",          "Smyslov, Vassily" },
+    };
+
+    private static string NormalizarNombre(string nombre)
+    {
+        foreach (var alias in _aliasJugadores)
+            if (nombre.Contains(alias.Key, StringComparison.OrdinalIgnoreCase))
+                return nombre.Replace(alias.Key, alias.Value, StringComparison.OrdinalIgnoreCase);
+        return nombre;
+    }
+
     private string DeterminarOponente(string white, string black, string jugador)
     {
         if (string.IsNullOrEmpty(white) && string.IsNullOrEmpty(black))
             return "Desconocido";
         
-        // Extraer apellido del jugador (última palabra del nombre completo)
         var apellidoJugador = jugador.Split(' ').Last();
-        
-        // Extraer apellido de white y black (primera parte antes de la coma)
         var apellidoWhite = white.Split(',')[0].Trim();
         var apellidoBlack = black.Split(',')[0].Trim();
         
+        string oponente;
         if (apellidoWhite.Equals(apellidoJugador, StringComparison.OrdinalIgnoreCase))
-            return string.IsNullOrEmpty(black) ? "Desconocido" : black;
-        
-        if (apellidoBlack.Equals(apellidoJugador, StringComparison.OrdinalIgnoreCase))
-            return string.IsNullOrEmpty(white) ? "Desconocido" : white;
-        
-        return string.IsNullOrEmpty(black) ? white : black;
+            oponente = string.IsNullOrEmpty(black) ? "Desconocido" : black;
+        else if (apellidoBlack.Equals(apellidoJugador, StringComparison.OrdinalIgnoreCase))
+            oponente = string.IsNullOrEmpty(white) ? "Desconocido" : white;
+        else
+            oponente = string.IsNullOrEmpty(black) ? white : black;
+
+        return NormalizarNombre(oponente);
     }
 
     private string ExtraerValor(string linea)

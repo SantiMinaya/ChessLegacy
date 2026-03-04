@@ -12,7 +12,19 @@ public class StockfishEngine
         _stockfishPath = stockfishPath;
     }
 
-    public async Task<(string bestMove, int evaluation)> AnalyzePosition(string fen)
+    private static readonly Dictionary<string, int> MasterContempt = new()
+    {
+        { "tal",        100 },  // Agresivo, evita tablas a toda costa
+        { "kasparov",    80 },  // Muy agresivo, busca complicaciones
+        { "alekhine",    70 },  // Combinaciones profundas
+        { "fischer",     40 },  // Preciso pero busca ganar
+        { "carlsen",     20 },  // Universal, ligeramente activo
+        { "capablanca",   0 },  // Equilibrado, técnico
+        { "karpov",     -20 },  // Posicional, acepta simplificaciones
+        { "petrosian",  -50 },  // Defensivo, acepta tablas
+    };
+
+    public async Task<(string bestMove, int evaluation)> AnalyzePosition(string fen, string? maestro = null)
     {
         return await Task.Run(() =>
         {
@@ -54,9 +66,13 @@ public class StockfishEngine
                     if (line.Contains("uciok")) break;
                 }
 
+                // Aplicar personalidad del maestro
+                if (maestro != null && MasterContempt.TryGetValue(maestro.ToLower(), out int contempt))
+                    process.StandardInput.WriteLine($"setoption name Contempt value {contempt}");
+
                 // Analizar posición
                 process.StandardInput.WriteLine($"position fen {fen}");
-                process.StandardInput.WriteLine("go depth 10");
+                process.StandardInput.WriteLine("go depth 20");
                 Console.WriteLine("Comandos de análisis enviados");
 
                 string bestMove = "";

@@ -81,7 +81,7 @@ public class PgnImporterAdvanced
         var partida = new Partida
         {
             JugadorId = jugadorId,
-            Oponente = esBlancas ? (game.BlackPlayer ?? "Desconocido") : (game.WhitePlayer ?? "Desconocido"),
+            Oponente = NormalizarNombre(esBlancas ? (game.BlackPlayer ?? "Desconocido") : (game.WhitePlayer ?? "Desconocido")),
             Anio = game.Year ?? 0,
             Evento = game.Event ?? "Desconocido",
             CodigoECO = ObtenerTag(game, "ECO") ?? "",
@@ -148,6 +148,43 @@ public class PgnImporterAdvanced
         }
 
         return movimientos;
+    }
+
+    private static readonly Dictionary<string, string> _aliasJugadores = new(StringComparer.OrdinalIgnoreCase)
+    {
+        // Korchnoi
+        { "Kortschnoj, Viktor", "Korchnoi, Viktor" },
+        { "Kortchnoi, Viktor",  "Korchnoi, Viktor" },
+        { "Korchnoi,V",         "Korchnoi, Viktor" },
+        // Kasparov
+        { "Kasparov, Gary",     "Kasparov, Garry" },
+        { "Kasparov, G.",       "Kasparov, Garry" },
+        { "Kasparov,G",         "Kasparov, Garry" },
+        { "Kasparov,Georgy",    "Kasparov, Garry" },
+        // Karpov
+        { "Karpov, Anantoly2",  "Karpov, Anatoly" },
+        { "Karpov,An",          "Karpov, Anatoly" },
+        { "Karpov,Ana",         "Karpov, Anatoly" },
+        // Carlsen
+        { "Carlsen,M",          "Carlsen, Magnus" },
+        { "Carlsen,Magnus",     "Carlsen, Magnus" },
+        // Kramnik
+        { "Kramnik,V",          "Kramnik, Vladimir" },
+        // Spassky
+        { "Spassky,B",          "Spassky, Boris V" },
+        // Anand
+        { "Anand,V",            "Anand, Viswanathan" },
+        { "Anand,V2",           "Anand, Viswanathan" },
+        // Smyslov
+        { "Smyslov,V",          "Smyslov, Vassily" },
+    };
+
+    private static string NormalizarNombre(string nombre)
+    {
+        foreach (var alias in _aliasJugadores)
+            if (nombre.Contains(alias.Key, StringComparison.OrdinalIgnoreCase))
+                return nombre.Replace(alias.Key, alias.Value, StringComparison.OrdinalIgnoreCase);
+        return nombre;
     }
 
     private string? ObtenerTag(ilf.pgn.Data.Game game, string tagName)

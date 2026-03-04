@@ -19,8 +19,41 @@
 
 .home-header p {
   font-size: 20px;
-  color: #aaa;
+  color: #c0c0c0;
   margin: 0;
+}
+
+.home-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 0;
+  margin-bottom: 40px;
+}
+
+.home-tabs button {
+  padding: 12px 32px;
+  font-size: 16px;
+  border: 2px solid #d4af37;
+  background: transparent;
+  color: #d4af37;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: 'Georgia', serif;
+}
+
+.home-tabs button:first-child {
+  border-radius: 8px 0 0 8px;
+}
+
+.home-tabs button:last-child {
+  border-radius: 0 8px 8px 0;
+  border-left: none;
+}
+
+.home-tabs button.active {
+  background: #d4af37;
+  color: #1a1a2e;
+  font-weight: bold;
 }
 
 .masters-grid {

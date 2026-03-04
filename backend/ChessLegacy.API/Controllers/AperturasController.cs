@@ -20,4 +20,12 @@ public class AperturasController : ControllerBase
         var variantes = AperturaDetectorExtendido.ObtenerVariantes(apertura);
         return Ok(variantes);
     }
+
+    [HttpGet("aprendizaje")]
+    public ActionResult GetAprendizaje([FromQuery] string apertura, [FromQuery] string? variante)
+    {
+        var datos = AperturaDetectorExtendido.ObtenerParaAprendizaje(apertura, variante);
+        if (datos == null) return NotFound();
+        return Ok(datos);
+    }
 }

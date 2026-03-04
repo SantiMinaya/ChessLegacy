@@ -44,18 +44,17 @@ export default function PlayMaster({ master, onBack }) {
       const response = await fetch('http://localhost:5000/api/analisis/evaluar', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ fen: currentGame.fen() })
+        body: JSON.stringify({ fen: currentGame.fen(), maestro: master.name.split(' ').pop() })
       });
 
       const data = await response.json();
       
-      // Obtener movimientos legales
-      const moves = currentGame.moves({ verbose: true });
-      
-      // Seleccionar movimiento según estilo del maestro
-      const selectedMove = selectMoveByStyle(moves, master.id, data.evaluacion);
-      
-      const move = currentGame.move(selectedMove);
+      // Usar directamente el mejor movimiento de Stockfish
+      const move = currentGame.move({
+        from: data.mejorMovimiento.slice(0, 2),
+        to: data.mejorMovimiento.slice(2, 4),
+        promotion: data.mejorMovimiento[4] || 'q'
+      });
       
       if (move) {
         setGame(new Chess(currentGame.fen()));

@@ -1,0 +1,366 @@
+.apertura-training {
+  min-height: 100vh;
+  background: #1a1a2e;
+  color: #e0e0e0;
+  padding: 24px;
+  font-family: inherit;
+}
+
+.apertura-training h1 {
+  color: #d4af37;
+  margin: 0 0 8px;
+  font-size: 2rem;
+}
+
+.subtitle {
+  color: #c0c0c0;
+  margin: 0 0 32px;
+}
+
+/* ── SELECT ── */
+.select-form {
+  max-width: 480px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group label {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #d4af37;
+}
+
+.form-group select {
+  background: #16213e;
+  border: 1px solid #d4af37;
+  color: #e0e0e0;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.color-selector {
+  display: flex;
+  gap: 12px;
+}
+
+.color-selector button {
+  flex: 1;
+  padding: 10px;
+  border-radius: 8px;
+  border: 2px solid #333;
+  background: #16213e;
+  color: #e0e0e0;
+  cursor: pointer;
+  font-size: 15px;
+  transition: all 0.2s;
+}
+
+.color-selector button.active {
+  border-color: #d4af37;
+  background: rgba(212, 175, 55, 0.15);
+  color: #d4af37;
+}
+
+.start-btn {
+  padding: 14px;
+  background: #d4af37;
+  color: #1a1a2e;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.start-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ── PLAYING ── */
+.training-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.training-header h2 {
+  margin: 0;
+  color: #d4af37;
+}
+
+.color-badge {
+  background: rgba(212, 175, 55, 0.15);
+  border: 1px solid #d4af37;
+  color: #d4af37;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+}
+
+.progress-bar {
+  position: relative;
+  background: #16213e;
+  border-radius: 8px;
+  height: 28px;
+  margin-bottom: 24px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+}
+
+.progress-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  background: linear-gradient(90deg, #d4af37, #f0c040);
+  transition: width 0.4s ease;
+  border-radius: 8px;
+}
+
+.progress-bar span {
+  position: relative;
+  z-index: 1;
+  padding-left: 12px;
+  font-size: 13px;
+  font-weight: bold;
+  color: #1a1a2e;
+  text-shadow: 0 0 4px rgba(255,255,255,0.5);
+}
+
+.training-layout {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+.board-wrap {
+  flex-shrink: 0;
+}
+
+.training-sidebar {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 220px;
+}
+
+.feedback-box {
+  padding: 14px 16px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 500;
+  background: #16213e;
+  border-left: 4px solid #555;
+  min-height: 52px;
+  display: flex;
+  align-items: center;
+}
+
+.feedback-box.ok { border-left-color: #4caf50; background: rgba(76, 175, 80, 0.1); }
+.feedback-box.error { border-left-color: #f44336; background: rgba(244, 67, 54, 0.1); }
+.feedback-box.hint { border-left-color: #ff9800; background: rgba(255, 152, 0, 0.1); }
+
+.theory-moves {
+  background: #16213e;
+  border-radius: 8px;
+  padding: 14px;
+}
+
+.theory-moves-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.theory-moves-header h3 {
+  margin: 0;
+}
+
+.toggle-theory-btn {
+  background: transparent;
+  border: 1px solid #d4af37;
+  color: #d4af37;
+  padding: 3px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.2s;
+}
+
+.toggle-theory-btn:hover {
+  background: rgba(212, 175, 55, 0.15);
+}
+
+.theory-moves h3 {
+  margin: 0 0 10px;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #d4af37;
+}
+
+.moves-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.theory-move {
+  font-size: 14px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  opacity: 0.4;
+  transition: all 0.2s;
+}
+
+.theory-move.played {
+  opacity: 1;
+  color: #4caf50;
+}
+
+.theory-move.current {
+  opacity: 1;
+  background: rgba(212, 175, 55, 0.2);
+  color: #d4af37;
+  font-weight: bold;
+}
+
+.move-num {
+  color: #888;
+  margin-right: 2px;
+  font-size: 12px;
+}
+
+.training-stats {
+  display: flex;
+  gap: 16px;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.stat-ok { color: #4caf50; }
+.stat-err { color: #f44336; }
+
+.abandon-btn {
+  padding: 8px;
+  background: transparent;
+  border: 1px solid #555;
+  color: #888;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: all 0.2s;
+}
+
+.abandon-btn:hover {
+  border-color: #f44336;
+  color: #f44336;
+}
+
+/* ── DONE ── */
+.done-screen {
+  max-width: 420px;
+  margin: 60px auto;
+  text-align: center;
+  background: #16213e;
+  border-radius: 16px;
+  padding: 40px 32px;
+  border: 1px solid #d4af37;
+}
+
+.done-icon { font-size: 64px; margin-bottom: 16px; }
+
+.done-screen h2 { color: #d4af37; margin: 0 0 8px; font-size: 1.8rem; }
+.done-screen h3 { margin: 0 0 24px; opacity: 0.8; font-weight: normal; }
+
+.done-stats {
+  display: flex;
+  justify-content: center;
+  gap: 32px;
+  margin-bottom: 20px;
+}
+
+.done-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.done-stat span {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #d4af37;
+}
+
+.done-stat label {
+  font-size: 12px;
+  opacity: 0.6;
+  text-transform: uppercase;
+}
+
+.done-msg {
+  opacity: 0.8;
+  margin-bottom: 28px;
+  line-height: 1.5;
+}
+
+.done-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.done-actions button {
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  transition: opacity 0.2s;
+}
+
+.done-actions button:first-child {
+  background: #d4af37;
+  color: #1a1a2e;
+}
+
+.done-actions button:last-child {
+  background: #16213e;
+  border: 1px solid #d4af37;
+  color: #d4af37;
+}
+
+.back-btn {
+  background: transparent;
+  border: 1px solid #555;
+  color: #aaa;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-bottom: 20px;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.back-btn:hover { border-color: #d4af37; color: #d4af37; }

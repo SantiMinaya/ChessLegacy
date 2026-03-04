@@ -6,13 +6,26 @@ import EvaluationBar from '../components/EvaluationBar';
 import Select from 'react-select';
 import './PartidasFamosas.css';
 
-export default function PartidasFamosas({ jugadorId, jugadorNombre, onBack }) {
+export default function PartidasFamosas({ jugadorId, jugadorNombre, onBack, filtrosIniciales }) {
+  const parseMoves = (pgn) => pgn
+    .replace(/\d+\./g, '')
+    .replace(/[\{\[].*?[\}\]]/g, '')
+    .replace(/1-0|0-1|1\/2-1\/2/g, '')
+    .trim().split(/\s+/).filter(m => m.length > 0);
+
   const [partidas, setPartidas] = useState([]);
   const [partidaActual, setPartidaActual] = useState(null);
   const [position, setPosition] = useState('start');
   const [history, setHistory] = useState([]);
   const [currentMove, setCurrentMove] = useState(0);
-  const [filtros, setFiltros] = useState({ anioDesde: '', anioHasta: '', oponente: '', evento: '', apertura: '', variante: '' });
+  const [filtros, setFiltros] = useState({
+    anioDesde: filtrosIniciales?.anio || '',
+    anioHasta: filtrosIniciales?.anio || '',
+    oponente: filtrosIniciales?.oponente || '',
+    evento: filtrosIniciales?.evento || '',
+    apertura: filtrosIniciales?.apertura || '',
+    variante: filtrosIniciales?.variante || ''
+  });
   const [total, setTotal] = useState(0);
   const [evaluation, setEvaluation] = useState(0);
   const [analizando, setAnalizando] = useState(false);
@@ -42,6 +55,23 @@ export default function PartidasFamosas({ jugadorId, jugadorNombre, onBack }) {
       setVariantes([]);
     }
   }, [aperturaSeleccionada]);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (!partidaActual) return;
+      
+      if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        siguiente();
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        anterior();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [partidaActual, currentMove, history]);
 
   const toggleFavorito = (partidaId) => {
     const newFavoritos = favoritos.includes(partidaId)
@@ -74,7 +104,7 @@ export default function PartidasFamosas({ jugadorId, jugadorNombre, onBack }) {
 
   const cargarPartidas = async () => {
     try {
-      const params = { jugadorId, pageSize: 200 };
+      const params = { jugadorId, pageSize: 10000 };
       if (filtros.anioDesde) params.anioDesde = parseInt(filtros.anioDesde);
       if (filtros.anioHasta) params.anioHasta = parseInt(filtros.anioHasta);
       if (filtros.oponente) params.oponente = filtros.oponente;
@@ -91,6 +121,10 @@ export default function PartidasFamosas({ jugadorId, jugadorNombre, onBack }) {
       
       setPartidas(partidasData);
       setTotal(partidasData.length);
+
+      if (filtrosIniciales && partidasData.length === 1) {
+        seleccionarPartida(partidasData[0]);
+      }
     } catch (error) {
       console.error('Error:', error);
     }
@@ -103,16 +137,7 @@ export default function PartidasFamosas({ jugadorId, jugadorNombre, onBack }) {
 
   const seleccionarPartida = (partida) => {
     setPartidaActual(partida);
-    
-    const moves = partida.pgn
-      .replace(/\d+\./g, '')
-      .replace(/[\{\[].*?[\}\]]/g, '')
-      .replace(/1-0|0-1|1\/2-1\/2/g, '')
-      .trim()
-      .split(/\s+/)
-      .filter(m => m.length > 0);
-    
-    setHistory(moves);
+    setHistory(parseMoves(partida.pgn));
     setCurrentMove(0);
     setPosition('start');
   };

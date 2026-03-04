@@ -25,6 +25,6 @@ public class PartidaResponse
     public string Resultado { get; set; } = string.Empty;
     public string CodigoECO { get; set; } = string.Empty;
     public string NombreApertura { get; set; } = string.Empty;
-    public string PGN { get; set; } = string.Empty;
+    public string Pgn { get; set; } = string.Empty;
     public string ColorJugador { get; set; } = string.Empty;
 }

@@ -192,6 +192,28 @@ public class AperturaDetectorExtendido
             .ToList();
     }
 
+    public static object? ObtenerParaAprendizaje(string apertura, string? variante)
+    {
+        var match = AperturasConVariantes
+            .Where(x => x.Apertura.Equals(apertura, StringComparison.OrdinalIgnoreCase)
+                     && (variante == null || (x.Variante != null && x.Variante.Equals(variante, StringComparison.OrdinalIgnoreCase))))
+            .OrderByDescending(x => x.Movimientos.Length)
+            .FirstOrDefault();
+
+        if (match == null) return null;
+
+        var movimientos = match.Movimientos
+            .Split(' ', StringSplitOptions.RemoveEmptyEntries)
+            .ToList();
+
+        return new
+        {
+            apertura = match.Apertura,
+            variante = match.Variante,
+            movimientos
+        };
+    }
+
     private static string NormalizarMovimientos(string pgn)
     {
         var limpio = pgn
