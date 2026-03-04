@@ -21,4 +21,5 @@ export const aperturasAPI = {
   getAll: () => axios.get(`${API_URL}/aperturas`),
   getVariantes: (apertura) => axios.get(`${API_URL}/aperturas/${encodeURIComponent(apertura)}/variantes`),
   getAprendizaje: (apertura, variante) => axios.get(`${API_URL}/aperturas/aprendizaje`, { params: { apertura, variante } }),
+  getAprendizajeRandom: () => axios.get(`${API_URL}/aperturas/aprendizaje/random`),
 };

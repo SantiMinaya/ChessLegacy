@@ -28,4 +28,12 @@ public class AperturasController : ControllerBase
         if (datos == null) return NotFound();
         return Ok(datos);
     }
+
+    [HttpGet("aprendizaje/random")]
+    public ActionResult GetAprendizajeRandom()
+    {
+        var datos = AperturaDetectorExtendido.ObtenerRandomParaAprendizaje();
+        if (datos == null) return NotFound();
+        return Ok(datos);
+    }
 }

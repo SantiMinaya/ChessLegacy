@@ -2,11 +2,14 @@ import { useState, useEffect, useCallback } from 'react';
 import { Chessboard } from 'react-chessboard';
 import { Chess } from 'chess.js';
 import { aperturasAPI } from '../services/api';
+import ContrarrelojMode from './ContrarrelojMode';
+import AdivinarApertura from './AdivinarApertura';
 import './AperturaTraining.css';
 
 const PHASES = { SELECT: 'select', PLAYING: 'playing', DONE: 'done' };
 
 export default function AperturaTraining({ onBack, hideBack }) {
+  const [subTab, setSubTab] = useState('aprender');
   const [phase, setPhase] = useState(PHASES.SELECT);
   const [aperturas, setAperturas] = useState([]);
   const [variantes, setVariantes] = useState([]);
@@ -61,9 +64,31 @@ export default function AperturaTraining({ onBack, hideBack }) {
       setFeedback(null);
       setStats({ correct: 0, errors: 0 });
       setShowingCorrect(false);
+      setShowTheory(false);
       setPhase(PHASES.PLAYING);
     } catch {
       setFeedback({ type: 'error', msg: 'No se encontró esa apertura/variante.' });
+    }
+  };
+
+  const startRandom = async () => {
+    try {
+      const r = await aperturasAPI.getAprendizajeRandom();
+      const info = r.data;
+      const sanMoves = buildTheoryMoves(info.movimientos);
+      setAperturaInfo(info);
+      setTheoryMoves(sanMoves);
+      setSelectedApertura(info.apertura);
+      setSelectedVariante(info.variante || '');
+      setGame(new Chess());
+      setMoveIndex(0);
+      setFeedback(null);
+      setStats({ correct: 0, errors: 0 });
+      setShowingCorrect(false);
+      setShowTheory(false);
+      setPhase(PHASES.PLAYING);
+    } catch {
+      setFeedback({ type: 'error', msg: 'Error al cargar apertura aleatoria.' });
     }
   };
 
@@ -152,10 +177,39 @@ export default function AperturaTraining({ onBack, hideBack }) {
   const progress = theoryMoves.length > 0 ? Math.round((moveIndex / theoryMoves.length) * 100) : 0;
 
   // ── RENDER SELECT ──
+  if (subTab === 'contrarreloj') return (
+    <div className="apertura-training">
+      {!hideBack && <button className="back-btn" onClick={onBack}>← Volver</button>}
+      <div className="sub-tabs">
+        <button className={subTab === 'aprender' ? 'active' : ''} onClick={() => setSubTab('aprender')}>📖 Aprender</button>
+        <button className={subTab === 'contrarreloj' ? 'active' : ''} onClick={() => setSubTab('contrarreloj')}>⏱️ Contrarreloj</button>
+        <button className={subTab === 'adivinar' ? 'active' : ''} onClick={() => setSubTab('adivinar')}>🤔 Adivina la Apertura</button>
+      </div>
+      <ContrarrelojMode />
+    </div>
+  );
+
+  if (subTab === 'adivinar') return (
+    <div className="apertura-training">
+      {!hideBack && <button className="back-btn" onClick={onBack}>← Volver</button>}
+      <div className="sub-tabs">
+        <button className={subTab === 'aprender' ? 'active' : ''} onClick={() => setSubTab('aprender')}>📖 Aprender</button>
+        <button className={subTab === 'contrarreloj' ? 'active' : ''} onClick={() => setSubTab('contrarreloj')}>⏱️ Contrarreloj</button>
+        <button className={subTab === 'adivinar' ? 'active' : ''} onClick={() => setSubTab('adivinar')}>🤔 Adivina la Apertura</button>
+      </div>
+      <AdivinarApertura />
+    </div>
+  );
+
   if (phase === PHASES.SELECT) {
     return (
       <div className="apertura-training">
         {!hideBack && <button className="back-btn" onClick={onBack}>← Volver</button>}
+        <div className="sub-tabs">
+          <button className={subTab === 'aprender' ? 'active' : ''} onClick={() => setSubTab('aprender')}>📖 Aprender</button>
+          <button className={subTab === 'contrarreloj' ? 'active' : ''} onClick={() => setSubTab('contrarreloj')}>⏱️ Contrarreloj</button>
+          <button className={subTab === 'adivinar' ? 'active' : ''} onClick={() => setSubTab('adivinar')}>🤔 Adivina la Apertura</button>
+        </div>
         <h1>📖 Aprendizaje de Aperturas</h1>
         <p className="subtitle">Selecciona una apertura y aprende la teoría movimiento a movimiento</p>
 
@@ -190,6 +244,9 @@ export default function AperturaTraining({ onBack, hideBack }) {
 
           <button className="start-btn" onClick={startTraining} disabled={!selectedApertura}>
             🚀 Comenzar
+          </button>
+          <button className="random-btn" onClick={startRandom}>
+            🎲 Apertura Aleatoria
           </button>
         </div>
       </div>
@@ -231,6 +288,11 @@ export default function AperturaTraining({ onBack, hideBack }) {
   return (
     <div className="apertura-training">
       {!hideBack && <button className="back-btn" onClick={onBack}>← Volver</button>}
+      <div className="sub-tabs">
+        <button className={subTab === 'aprender' ? 'active' : ''} onClick={() => setSubTab('aprender')}>📖 Aprender</button>
+        <button className={subTab === 'contrarreloj' ? 'active' : ''} onClick={() => setSubTab('contrarreloj')}>⏱️ Contrarreloj</button>
+        <button className={subTab === 'adivinar' ? 'active' : ''} onClick={() => setSubTab('adivinar')}>🤔 Adivina la Apertura</button>
+      </div>
 
       <div className="training-header">
         <h2>{aperturaInfo?.apertura}{aperturaInfo?.variante ? ` — ${aperturaInfo.variante}` : ''}</h2>

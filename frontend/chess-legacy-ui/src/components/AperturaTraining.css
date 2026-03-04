@@ -12,6 +12,32 @@
   font-size: 2rem;
 }
 
+.sub-tabs {
+  display: flex;
+  gap: 0;
+  margin-bottom: 28px;
+}
+
+.sub-tabs button {
+  padding: 10px 24px;
+  font-size: 14px;
+  border: 1px solid #d4af37;
+  background: transparent;
+  color: #d4af37;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.sub-tabs button:first-child { border-radius: 6px 0 0 6px; }
+.sub-tabs button:last-child { border-radius: 0 6px 6px 0; border-left: none; }
+.sub-tabs button:not(:first-child):not(:last-child) { border-left: none; }
+
+.sub-tabs button.active {
+  background: #d4af37;
+  color: #1a1a2e;
+  font-weight: bold;
+}
+
 .subtitle {
   color: #c0c0c0;
   margin: 0 0 32px;
@@ -87,6 +113,22 @@
 .start-btn:disabled {
   opacity: 0.4;
   cursor: not-allowed;
+}
+
+.random-btn {
+  padding: 14px;
+  background: transparent;
+  color: #d4af37;
+  border: 2px solid #d4af37;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.random-btn:hover {
+  background: rgba(212, 175, 55, 0.15);
 }
 
 /* ── PLAYING ── */
