@@ -8,9 +8,11 @@
 - [x] Integración Stockfish
 - [x] API REST completa
 - [x] Importación masiva de PGN (20.550+ partidas)
+- [x] **Importación automática al arrancar** — Si la BD está vacía, el backend importa todos los PGNs sin intervención manual
+- [x] **Limpieza de importadores obsoletos** — Eliminados `PgnImporter`, `PgnImporterAdvanced` e `ImportacionController` (dependían de `pgn.net`, incompatible con .NET 10). Solo queda `SimplePgnImporter`
 
 ### Navegación
-- [x] Tabs principales: "Grandes Maestros" / "Aprender Aperturas"
+- [x] Tabs principales: "Grandes Maestros" / "Aprender Aperturas" / **"Torneo"** / "Mi Perfil"
 - [x] Ordenación de maestros por defecto, año y rating
 
 ### Galería y Perfiles de Maestros
@@ -50,6 +52,8 @@
 - [x] Apertura aleatoria
 - [x] Resumen final con precisión
 - [x] 25+ aperturas con variantes de 20-30 jugadas
+- [x] **Guardar sesión automáticamente al completar** — llama a `POST /api/progreso/sesion` y muestra logros desbloqueados en pantalla de resultado
+- [x] **Repetición espaciada** — el botón "Apertura Aleatoria" prioriza aperturas con peor precisión histórica (peso 1-6 según rendimiento). Endpoint `GET /api/aperturas/aprendizaje/random-espaciado`
 
 #### Modo Contrarreloj ⏱️
 - [x] 10 segundos por movimiento
@@ -86,37 +90,78 @@
 - [x] `GET /api/aperturas/{nombre}/variantes` — Variantes
 - [x] `GET /api/aperturas/aprendizaje` — Línea teórica por apertura/variante
 - [x] `GET /api/aperturas/aprendizaje/random` — Apertura aleatoria
+- [x] `GET /api/aperturas/aprendizaje/random-espaciado` — Apertura ponderada por historial del usuario (requiere JWT)
+
+### Sistema de Usuarios y Progreso
+- [x] Registro y login con JWT + BCrypt
+- [x] Progreso por apertura persistido en BD (`ProgresoApertura`)
+- [x] **Sesiones guardadas automáticamente** al completar cualquier modo de entrenamiento
+- [x] **Racha diaria** — campos `RachaActual`, `MaximaRacha` y `UltimaActividad` en `Usuario`. Se incrementa al practicar en días consecutivos, se reinicia si pasa más de un día
+- [x] Perfil de usuario con stats: racha actual 🔥, máxima racha, sesiones, aciertos, aperturas practicadas, logros
+
+### Sistema de Logros (16 logros)
+#### Entrenamiento (10)
+- [x] 🎓 Primera Apertura — completa tu primera sesión
+- [x] 💯 Perfección — 100% de precisión en una apertura
+- [x] 📚 Estudioso — practica 10 aperturas distintas
+- [x] 🎯 Buen Estudiante — 50 movimientos correctos acumulados
+- [x] 🏅 Experto — 100 movimientos correctos acumulados
+- [x] 👑 Gran Maestro — 500 movimientos correctos acumulados
+- [x] ⚡ Sin Tiempo — contrarreloj sin ningún timeout
+- [x] 🔥 Constante — 5 sesiones de entrenamiento
+- [x] ⭐ Dedicado — 20 sesiones de entrenamiento
+- [x] 🤔 Reconocedor — 5/5 en Adivina la Apertura
+
+#### Torneo (6)
+- [x] 🎪 Debutante — completa tu primer torneo
+- [x] 🏆 Campeón — gana tu primer torneo
+- [x] 🎖️ Veterano — completa 5 torneos
+- [x] 👑 Invicto — gana un torneo sin perder ninguna ronda
+- [x] ⚔️ Conquistador — gana al menos un torneo contra cada uno de los 8 maestros
+- [x] ⚡ Rayo — gana un torneo con control de tiempo bala (≤2 min)
+
+### 🏆 Modo Torneo
+- [x] Selección de rival entre los 8 grandes maestros (con foto y rating)
+- [x] 8 controles de tiempo: Bala (1 min), Bala (2+1), Blitz (3, 3+2, 5), Rápido (10, 15+10), Clásico (30)
+- [x] Incremento por movimiento configurable
+- [x] 5 opciones de rondas: 1, 3, 5, 7 o 10
+- [x] Relojes por jugador con colores: normal → naranja (≤30s) → rojo parpadeante (≤10s)
+- [x] Reloj activo resaltado en dorado
+- [x] Puntuación FIDE: 1 victoria / 0.5 tablas / 0 derrota
+- [x] Pantalla de resultado por ronda con marcador acumulado
+- [x] Pantalla final con trofeo, marcador y resumen ronda a ronda
+- [x] Revancha y nueva configuración desde la pantalla final
+- [x] Botón de abandono de ronda
+- [x] Logros de torneo desbloqueables mostrados al finalizar
+- [x] Resultado guardado en BD via `POST /api/progreso/torneo`
 
 ---
 
 ## 📋 Pendiente
 
 ### Entrenamiento
-- [ ] **Guardar sesiones automáticamente** — Conectar los 3 modos de entrenamiento con `POST /api/progreso/sesion` para que logros y progreso funcionen de verdad
-- [ ] **Notificación de logro desbloqueado** — Toast/popup al conseguir un logro nuevo tras una sesión
-- [ ] **Racha diaria** — Contador de días consecutivos practicando con calendario visual en el perfil
-- [ ] Repetición espaciada — priorizar aperturas falladas en el random
+- [ ] Notificación toast al desbloquear un logro (sin esperar a pantalla de resultado)
 - [ ] Modo difícil en "Adivina" — menos movimientos mostrados, sin variante en las opciones
+- [ ] Guardar sesión en modos Contrarreloj y Adivina (actualmente solo en Modo Aprender)
 
 ### Nuevos modos de juego
 - [ ] Puzzles tácticos históricos — posiciones de las 20.000 partidas con combinación ganadora
 - [ ] Partida comentada — Stockfish con texto explicativo en tiempo real
-- [ ] Modo torneo — match al mejor de 5 contra un maestro
 
 ### Mejoras a lo existente
 - [ ] Exportar PGN de partidas jugadas contra maestros
 - [ ] Buscador de posición por FEN en las 20.000 partidas
 - [ ] Comparar dos maestros (gráfico enfrentado)
 - [ ] Historial de partidas jugadas contra maestros
+- [ ] Calendario visual de racha diaria en el perfil
 
 ### UX / Experiencia
-- [ ] **Partida del día** — Posición histórica destacada en la Home con contexto histórico, diferente cada día
+- [ ] Partida del día — posición histórica destacada en la Home, diferente cada día
 - [ ] Loading states y spinners
 - [ ] Responsive design para móviles
 - [ ] Búsqueda global (maestros, partidas, aperturas)
 
 ### Deuda técnica
-- [ ] Remover dependencia `pgn.net` (no compatible con .NET 10)
 - [ ] Tests unitarios y de integración
 - [ ] Documentación Swagger/Scalar
 - [ ] Variables de entorno para configuración
@@ -126,5 +171,5 @@
 
 ## 📊 Progreso General
 
-**Completado:** ~80%
-**Pendiente:** ~20%
+**Completado:** ~92%
+**Pendiente:** ~8%

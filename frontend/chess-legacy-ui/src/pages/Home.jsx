@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { chessMasters } from '../data/masters';
 import AperturaTraining from '../components/AperturaTraining';
 import PerfilUsuario from '../components/PerfilUsuario';
+import TournamentMode from '../components/TournamentMode';
 import './Home.css';
 
 export default function Home() {
@@ -27,10 +28,12 @@ export default function Home() {
       <div className="home-tabs">
         <button className={tab === 'masters' ? 'active' : ''} onClick={() => setTab('masters')}>👑 Grandes Maestros</button>
         <button className={tab === 'openings' ? 'active' : ''} onClick={() => setTab('openings')}>📖 Aprender Aperturas</button>
+        <button className={tab === 'tournament' ? 'active' : ''} onClick={() => setTab('tournament')}>🏆 Torneo</button>
         <button className={tab === 'perfil' ? 'active' : ''} onClick={() => setTab('perfil')}>👤 Mi Perfil</button>
       </div>
 
       {tab === 'openings' && <AperturaTraining onBack={() => setTab('masters')} hideBack />}
+      {tab === 'tournament' && <TournamentMode onBack={() => setTab('masters')} />}
       {tab === 'perfil' && <PerfilUsuario />}
 
       {tab === 'masters' && (

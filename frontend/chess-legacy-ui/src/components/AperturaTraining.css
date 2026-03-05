@@ -406,3 +406,25 @@
 }
 
 .back-btn:hover { border-color: #d4af37; color: #d4af37; }
+
+/* ── NUEVOS LOGROS ── */
+.nuevos-logros {
+  background: rgba(212, 175, 55, 0.1);
+  border: 1px solid #d4af37;
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 16px;
+  text-align: left;
+}
+
+.nuevos-logros h4 {
+  margin: 0 0 10px;
+  color: #d4af37;
+  font-size: 15px;
+}
+
+.logro-nuevo {
+  font-size: 14px;
+  padding: 4px 0;
+  color: #e0e0e0;
+}

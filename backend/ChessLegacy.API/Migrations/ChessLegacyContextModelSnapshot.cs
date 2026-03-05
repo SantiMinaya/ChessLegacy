@@ -332,6 +332,15 @@ namespace ChessLegacy.API.Migrations
                     b.Property<DateTime>("CreadoEn")
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("RachaActual")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("MaximaRacha")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime?>("UltimaActividad")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("PasswordHash")
                         .IsRequired()
                         .HasColumnType("TEXT");

@@ -200,6 +200,14 @@ public class AperturaDetectorExtendido
         return new { apertura = random.Apertura, variante = random.Variante, movimientos };
     }
 
+    public static List<(string apertura, string? variante)> ObtenerTodosConVariante()
+    {
+        return AperturasConVariantes
+            .Where(x => x.Variante != null)
+            .Select(x => (x.Apertura, (string?)x.Variante))
+            .ToList();
+    }
+
     public static object? ObtenerParaAprendizaje(string apertura, string? variante)
     {
         var match = AperturasConVariantes

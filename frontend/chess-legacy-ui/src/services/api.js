@@ -22,6 +22,7 @@ export const aperturasAPI = {
   getVariantes: (apertura) => axios.get(`${API_URL}/aperturas/${encodeURIComponent(apertura)}/variantes`),
   getAprendizaje: (apertura, variante) => axios.get(`${API_URL}/aperturas/aprendizaje`, { params: { apertura, variante } }),
   getAprendizajeRandom: () => axios.get(`${API_URL}/aperturas/aprendizaje/random`),
+  getAprendizajeEspaciado: (token) => axios.get(`${API_URL}/aperturas/aprendizaje/random-espaciado`, { headers: { Authorization: `Bearer ${token}` } }),
 };
 
 export const authAPI = {
@@ -32,4 +33,5 @@ export const authAPI = {
 export const progresoAPI = {
   get: (token) => axios.get(`${API_URL}/progreso`, { headers: { Authorization: `Bearer ${token}` } }),
   guardarSesion: (token, data) => axios.post(`${API_URL}/progreso/sesion`, data, { headers: { Authorization: `Bearer ${token}` } }),
+  guardarTorneo: (token, data) => axios.post(`${API_URL}/progreso/torneo`, data, { headers: { Authorization: `Bearer ${token}` } }),
 };
