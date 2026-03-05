@@ -5,6 +5,7 @@ import { aperturasAPI, progresoAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import ContrarrelojMode from './ContrarrelojMode';
 import AdivinarApertura from './AdivinarApertura';
+import ArbolAperturas from './ArbolAperturas';
 import './AperturaTraining.css';
 
 const PHASES = { SELECT: 'select', PLAYING: 'playing', DONE: 'done' };
@@ -198,14 +199,19 @@ export default function AperturaTraining({ onBack, hideBack }) {
   }, [phase]);
 
   // ── RENDER SELECT ──
+  const subTabsBar = (
+    <div className="sub-tabs">
+      <button className={subTab === 'aprender' ? 'active' : ''} onClick={() => setSubTab('aprender')}>📖 Aprender</button>
+      <button className={subTab === 'contrarreloj' ? 'active' : ''} onClick={() => setSubTab('contrarreloj')}>⏱️ Contrarreloj</button>
+      <button className={subTab === 'adivinar' ? 'active' : ''} onClick={() => setSubTab('adivinar')}>🤔 Adivina la Apertura</button>
+      <button className={subTab === 'arbol' ? 'active' : ''} onClick={() => setSubTab('arbol')}>📊 Progreso</button>
+    </div>
+  );
+
   if (subTab === 'contrarreloj') return (
     <div className="apertura-training">
       {!hideBack && <button className="back-btn" onClick={onBack}>← Volver</button>}
-      <div className="sub-tabs">
-        <button className={subTab === 'aprender' ? 'active' : ''} onClick={() => setSubTab('aprender')}>📖 Aprender</button>
-        <button className={subTab === 'contrarreloj' ? 'active' : ''} onClick={() => setSubTab('contrarreloj')}>⏱️ Contrarreloj</button>
-        <button className={subTab === 'adivinar' ? 'active' : ''} onClick={() => setSubTab('adivinar')}>🤔 Adivina la Apertura</button>
-      </div>
+      {subTabsBar}
       <ContrarrelojMode />
     </div>
   );
@@ -213,12 +219,16 @@ export default function AperturaTraining({ onBack, hideBack }) {
   if (subTab === 'adivinar') return (
     <div className="apertura-training">
       {!hideBack && <button className="back-btn" onClick={onBack}>← Volver</button>}
-      <div className="sub-tabs">
-        <button className={subTab === 'aprender' ? 'active' : ''} onClick={() => setSubTab('aprender')}>📖 Aprender</button>
-        <button className={subTab === 'contrarreloj' ? 'active' : ''} onClick={() => setSubTab('contrarreloj')}>⏱️ Contrarreloj</button>
-        <button className={subTab === 'adivinar' ? 'active' : ''} onClick={() => setSubTab('adivinar')}>🤔 Adivina la Apertura</button>
-      </div>
+      {subTabsBar}
       <AdivinarApertura />
+    </div>
+  );
+
+  if (subTab === 'arbol') return (
+    <div className="apertura-training">
+      {!hideBack && <button className="back-btn" onClick={onBack}>← Volver</button>}
+      {subTabsBar}
+      <ArbolAperturas />
     </div>
   );
 
@@ -226,11 +236,7 @@ export default function AperturaTraining({ onBack, hideBack }) {
     return (
       <div className="apertura-training">
         {!hideBack && <button className="back-btn" onClick={onBack}>← Volver</button>}
-        <div className="sub-tabs">
-          <button className={subTab === 'aprender' ? 'active' : ''} onClick={() => setSubTab('aprender')}>📖 Aprender</button>
-          <button className={subTab === 'contrarreloj' ? 'active' : ''} onClick={() => setSubTab('contrarreloj')}>⏱️ Contrarreloj</button>
-          <button className={subTab === 'adivinar' ? 'active' : ''} onClick={() => setSubTab('adivinar')}>🤔 Adivina la Apertura</button>
-        </div>
+        {subTabsBar}
         <h1>📖 Aprendizaje de Aperturas</h1>
         <p className="subtitle">Selecciona una apertura y aprende la teoría movimiento a movimiento</p>
 
@@ -317,11 +323,7 @@ export default function AperturaTraining({ onBack, hideBack }) {
   return (
     <div className="apertura-training">
       {!hideBack && <button className="back-btn" onClick={onBack}>← Volver</button>}
-      <div className="sub-tabs">
-        <button className={subTab === 'aprender' ? 'active' : ''} onClick={() => setSubTab('aprender')}>📖 Aprender</button>
-        <button className={subTab === 'contrarreloj' ? 'active' : ''} onClick={() => setSubTab('contrarreloj')}>⏱️ Contrarreloj</button>
-        <button className={subTab === 'adivinar' ? 'active' : ''} onClick={() => setSubTab('adivinar')}>🤔 Adivina la Apertura</button>
-      </div>
+      {subTabsBar}
 
       <div className="training-header">
         <h2>{aperturaInfo?.apertura}{aperturaInfo?.variante ? ` — ${aperturaInfo.variante}` : ''}</h2>
