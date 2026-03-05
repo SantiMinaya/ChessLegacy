@@ -265,4 +265,4 @@ MIT License
 
 ---
 
-Hecho con ♟️ y ☕
+Desarrollado para la asignatura de Desarrollo de Servicios Web y para uso personal, principalmente para estudiar aperturas de ajedrez 😁
