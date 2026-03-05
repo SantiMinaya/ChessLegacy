@@ -55,10 +55,12 @@ export default function AperturaTraining({ onBack, hideBack }) {
     return sanMoves;
   }, []);
 
-  const startTraining = async () => {
-    if (!selectedApertura) return;
+  const startTraining = async (apertura, variante) => {
+    const ap = apertura || selectedApertura;
+    const va = variante !== undefined ? variante : selectedVariante;
+    if (!ap) return;
     try {
-      const r = await aperturasAPI.getAprendizaje(selectedApertura, selectedVariante || undefined);
+      const r = await aperturasAPI.getAprendizaje(ap, va || undefined);
       const info = r.data;
       const sanMoves = buildTheoryMoves(info.movimientos);
       setAperturaInfo(info);
@@ -70,6 +72,7 @@ export default function AperturaTraining({ onBack, hideBack }) {
       setShowingCorrect(false);
       setShowTheory(false);
       setPhase(PHASES.PLAYING);
+      setSubTab('aprender');
     } catch {
       setFeedback({ type: 'error', msg: 'No se encontró esa apertura/variante.' });
     }
@@ -198,6 +201,12 @@ export default function AperturaTraining({ onBack, hideBack }) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase]);
 
+  const handlePracticar = (apertura, variante) => {
+    setSelectedApertura(apertura);
+    setSelectedVariante(variante);
+    startTraining(apertura, variante);
+  };
+
   // ── RENDER SELECT ──
   const subTabsBar = (
     <div className="sub-tabs">
@@ -228,7 +237,7 @@ export default function AperturaTraining({ onBack, hideBack }) {
     <div className="apertura-training">
       {!hideBack && <button className="back-btn" onClick={onBack}>← Volver</button>}
       {subTabsBar}
-      <ArbolAperturas />
+      <ArbolAperturas onPracticar={handlePracticar} />
     </div>
   );
 

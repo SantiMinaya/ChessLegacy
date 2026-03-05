@@ -18,7 +18,7 @@ function getEstado(progreso) {
 const ESTADO_ICON = { 'sin-empezar': '○', 'a-medias': '◑', 'completada': '●' };
 const ESTADO_LABEL = { 'sin-empezar': 'Sin empezar', 'a-medias': 'En progreso', 'completada': 'Completada' };
 
-export default function ArbolAperturas() {
+export default function ArbolAperturas({ onPracticar }) {
   const { user } = useAuth();
   const [aperturas, setAperturas] = useState([]);
   const [selected, setSelected] = useState('');
@@ -27,9 +27,15 @@ export default function ArbolAperturas() {
   const [movimientos, setMovimientos] = useState([]);
   const [loading, setLoading] = useState(false);
   const [progresos, setProgresos] = useState([]);
+  const [totalVariantes, setTotalVariantes] = useState(0);
 
   useEffect(() => {
-    aperturasAPI.getAll().then(r => setAperturas(r.data)).catch(() => {});
+    aperturasAPI.getAll().then(r => {
+      setAperturas(r.data);
+      // Cargar variantes de todas las aperturas para el resumen global
+      Promise.all(r.data.map(a => aperturasAPI.getVariantes(a).then(rv => rv.data.length).catch(() => 0)))
+        .then(counts => setTotalVariantes(counts.reduce((a, b) => a + b, 0)));
+    }).catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -62,6 +68,15 @@ export default function ArbolAperturas() {
     setLoading(false);
   };
 
+  // Resumen global
+  const completadas = progresos.filter(p =>
+    !p.apertura.startsWith('__') && getEstado(p) === 'completada'
+  ).length;
+  const enProgreso = progresos.filter(p =>
+    !p.apertura.startsWith('__') && getEstado(p) === 'a-medias'
+  ).length;
+  const globalPct = totalVariantes > 0 ? Math.round(completadas / totalVariantes * 100) : 0;
+
   // Conteo de estados para la apertura seleccionada
   const counts = variantes.reduce((acc, v) => {
     const e = getEstado(getProgreso(v));
@@ -89,6 +104,25 @@ export default function ArbolAperturas() {
           {aperturas.map(a => <option key={a} value={a}>{a}</option>)}
         </select>
       </div>
+
+      {/* Resumen global */}
+      {user && totalVariantes > 0 && (
+        <div className="arbol-resumen-global">
+          <div className="resumen-barra-wrap">
+            <div className="resumen-barra">
+              <div className="resumen-fill completada" style={{ width: `${globalPct}%` }} />
+              <div className="resumen-fill a-medias" style={{ width: `${Math.round(enProgreso / totalVariantes * 100)}%` }} />
+            </div>
+            <span className="resumen-pct">{globalPct}%</span>
+          </div>
+          <div className="resumen-stats">
+            <span className="leyenda-item completada">● {completadas} completadas</span>
+            <span className="leyenda-item a-medias">◑ {enProgreso} en progreso</span>
+            <span className="leyenda-item sin-empezar">○ {totalVariantes - completadas - enProgreso} sin empezar</span>
+            <span className="resumen-total">de {totalVariantes} variantes totales</span>
+          </div>
+        </div>
+      )}
 
       {selected && (
         <div className="arbol-container">
@@ -164,7 +198,14 @@ export default function ArbolAperturas() {
           {/* Panel de movimientos */}
           {selectedVariante && (
             <div className="arbol-moves-panel">
-              <h3>{selected} — {selectedVariante}</h3>
+              <div className="arbol-moves-header">
+                <h3>{selected} — {selectedVariante}</h3>
+                {onPracticar && (
+                  <button className="arbol-practicar-btn" onClick={() => onPracticar(selected, selectedVariante)}>
+                    🚀 Practicar
+                  </button>
+                )}
+              </div>
               {loading ? (
                 <span className="arbol-loading">Cargando...</span>
               ) : (
