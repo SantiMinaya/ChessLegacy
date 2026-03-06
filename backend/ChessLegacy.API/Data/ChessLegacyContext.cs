@@ -87,7 +87,7 @@ public class ChessLegacyContext : DbContext
         {
             entity.HasKey(e => e.Id);
             entity.HasOne(e => e.Usuario).WithMany(u => u.Progresos).HasForeignKey(e => e.UsuarioId);
-            entity.HasIndex(e => new { e.UsuarioId, e.Apertura, e.Variante }).IsUnique();
+            entity.HasIndex(e => new { e.UsuarioId, e.Apertura, e.Variante, e.Color }).IsUnique();
         });
 
         modelBuilder.Entity<LogroUsuario>(entity =>

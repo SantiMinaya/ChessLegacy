@@ -8,17 +8,24 @@ const NODE_H = 44;
 const H_GAP = 200;
 const V_GAP = 64;
 
-// Estado de progreso por variante
-function getEstado(progreso) {
-  if (!progreso || progreso.sesiones === 0) return 'sin-empezar';
-  const pct = progreso.intentos > 0 ? progreso.aciertos / progreso.intentos : 0;
-  return (pct === 1 && progreso.sesiones >= 3) ? 'completada' : 'a-medias';
+// Estado de progreso por variante considerando ambos colores
+function getEstadoColor(prog) {
+  if (!prog || prog.sesiones === 0) return 'sin-empezar';
+  return prog.sesionesPerfectas >= 3 ? 'completada' : 'a-medias';
+}
+
+function getEstado(progWhite, progBlack) {
+  const w = getEstadoColor(progWhite);
+  const b = getEstadoColor(progBlack);
+  if (w === 'completada' && b === 'completada') return 'completada';
+  if (w === 'sin-empezar' && b === 'sin-empezar') return 'sin-empezar';
+  return 'a-medias';
 }
 
 const ESTADO_ICON = { 'sin-empezar': '○', 'a-medias': '◑', 'completada': '●' };
 const ESTADO_LABEL = { 'sin-empezar': 'Sin empezar', 'a-medias': 'En progreso', 'completada': 'Completada' };
 
-export default function ArbolAperturas({ onPracticar }) {
+export default function ArbolAperturas({ onPracticar, refreshKey = 0 }) {
   const { user } = useAuth();
   const [aperturas, setAperturas] = useState([]);
   const [selected, setSelected] = useState('');
@@ -43,7 +50,7 @@ export default function ArbolAperturas({ onPracticar }) {
     progresoAPI.get(user.token)
       .then(r => setProgresos(r.data.progresos || []))
       .catch(() => {});
-  }, [user]);
+  }, [user, refreshKey]);
 
   useEffect(() => {
     if (!selected) { setVariantes([]); setSelectedVariante(null); setMovimientos([]); return; }
@@ -54,8 +61,11 @@ export default function ArbolAperturas({ onPracticar }) {
     setMovimientos([]);
   }, [selected]);
 
-  const getProgreso = (variante) =>
-    progresos.find(p => p.apertura === selected && p.variante === variante);
+  const getProgreso = (variante, color) =>
+    progresos.find(p => p.apertura === selected && p.variante === variante && p.color === color);
+
+  const getEstadoVariante = (variante) =>
+    getEstado(getProgreso(variante, 'white'), getProgreso(variante, 'black'));
 
   const handleVarianteClick = async (variante) => {
     if (selectedVariante === variante) { setSelectedVariante(null); setMovimientos([]); return; }
@@ -68,18 +78,28 @@ export default function ArbolAperturas({ onPracticar }) {
     setLoading(false);
   };
 
-  // Resumen global
-  const completadas = progresos.filter(p =>
-    !p.apertura.startsWith('__') && getEstado(p) === 'completada'
-  ).length;
-  const enProgreso = progresos.filter(p =>
-    !p.apertura.startsWith('__') && getEstado(p) === 'a-medias'
-  ).length;
+  // Resumen global: una variante completada = ambos colores con 3 sesiones perfectas
+  const aperturasUnicas = [...new Set(
+    progresos.filter(p => !p.apertura.startsWith('__')).map(p => `${p.apertura}|||${p.variante}`)
+  )];
+  const completadas = aperturasUnicas.filter(key => {
+    const [ap, va] = key.split('|||');
+    const w = progresos.find(p => p.apertura === ap && p.variante === va && p.color === 'white');
+    const b = progresos.find(p => p.apertura === ap && p.variante === va && p.color === 'black');
+    return getEstadoColor(w) === 'completada' && getEstadoColor(b) === 'completada';
+  }).length;
+  const enProgreso = aperturasUnicas.filter(key => {
+    const [ap, va] = key.split('|||');
+    const w = progresos.find(p => p.apertura === ap && p.variante === va && p.color === 'white');
+    const b = progresos.find(p => p.apertura === ap && p.variante === va && p.color === 'black');
+    const e = getEstado(w, b);
+    return e === 'a-medias';
+  }).length;
   const globalPct = totalVariantes > 0 ? Math.round(completadas / totalVariantes * 100) : 0;
 
   // Conteo de estados para la apertura seleccionada
   const counts = variantes.reduce((acc, v) => {
-    const e = getEstado(getProgreso(v));
+    const e = getEstadoVariante(v);
     acc[e] = (acc[e] || 0) + 1;
     return acc;
   }, {});
@@ -136,7 +156,7 @@ export default function ArbolAperturas({ onPracticar }) {
           <svg width={svgW} height={svgH} className="arbol-svg">
             {/* Líneas desde raíz a variantes */}
             {variantes.map((v, i) => {
-              const estado = getEstado(getProgreso(v));
+              const estado = getEstadoVariante(v);
               const vY = i * V_GAP + NODE_H / 2;
               const rY = rootY + NODE_H / 2;
               const rX2 = rootX + NODE_W;
@@ -164,9 +184,11 @@ export default function ArbolAperturas({ onPracticar }) {
               const vY = i * V_GAP;
               const vX = rootX + NODE_W + H_GAP;
               const isActive = selectedVariante === v;
-              const estado = getEstado(getProgreso(v));
-              const prog = getProgreso(v);
-              const pct = prog?.intentos > 0 ? Math.round(prog.aciertos / prog.intentos * 100) : null;
+              const estado = getEstadoVariante(v);
+              const progW = getProgreso(v, 'white');
+              const progB = getProgreso(v, 'black');
+              const estadoW = getEstadoColor(progW);
+              const estadoB = getEstadoColor(progB);
               return (
                 <g
                   key={v}
@@ -175,14 +197,15 @@ export default function ArbolAperturas({ onPracticar }) {
                   className="arbol-variante-group"
                 >
                   <rect width={NODE_W} height={NODE_H} rx="8" className={`arbol-node variante-node ${isActive ? 'active' : ''} node-${estado}`} />
-                  <text x={28} y={NODE_H / 2 - 5} dominantBaseline="middle" className={`arbol-node-text ${isActive ? 'active' : ''}`} fontSize="11">
+                  <text x={10} y={NODE_H / 2 - 6} dominantBaseline="middle" className={`arbol-node-text ${isActive ? 'active' : ''}`} fontSize="11">
                     {v.length > 16 ? v.slice(0, 14) + '…' : v}
                   </text>
-                  <text x={28} y={NODE_H / 2 + 9} dominantBaseline="middle" className={`arbol-estado-text estado-${estado}`} fontSize="10">
-                    {pct !== null ? `${pct}% precisión` : ESTADO_LABEL[estado]}
+                  {/* Indicadores de color blancas/negras */}
+                  <text x={10} y={NODE_H / 2 + 9} dominantBaseline="middle" className={`arbol-estado-text estado-${estadoW}`} fontSize="9">
+                    ♔ {estadoW === 'completada' ? '✓✓✓' : estadoW === 'a-medias' ? `${progW?.sesionesPerfectas ?? 0}/3` : '—'}
                   </text>
-                  <text x={10} y={NODE_H / 2 + 1} textAnchor="middle" dominantBaseline="middle" className={`arbol-estado-icon estado-${estado}`} fontSize="14">
-                    {ESTADO_ICON[estado]}
+                  <text x={NODE_W / 2 + 4} y={NODE_H / 2 + 9} dominantBaseline="middle" className={`arbol-estado-text estado-${estadoB}`} fontSize="9">
+                    ♚ {estadoB === 'completada' ? '✓✓✓' : estadoB === 'a-medias' ? `${progB?.sesionesPerfectas ?? 0}/3` : '—'}
                   </text>
                 </g>
               );

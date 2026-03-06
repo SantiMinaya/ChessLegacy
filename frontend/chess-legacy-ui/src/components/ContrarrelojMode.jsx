@@ -1,12 +1,14 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Chessboard } from 'react-chessboard';
 import { Chess } from 'chess.js';
-import { aperturasAPI } from '../services/api';
+import { aperturasAPI, progresoAPI } from '../services/api';
+import { useAuth } from '../context/AuthContext';
 
 const SECONDS_PER_MOVE = 10;
 const PHASES = { SELECT: 'select', PLAYING: 'playing', DONE: 'done' };
 
 export default function ContrarrelojMode() {
+  const { user } = useAuth();
   const [phase, setPhase] = useState(PHASES.SELECT);
   const [color, setColor] = useState('white');
   const [game, setGame] = useState(new Chess());
@@ -108,6 +110,22 @@ export default function ContrarrelojMode() {
       setPhase(PHASES.PLAYING);
     } catch { setFeedback({ type: 'error', msg: 'Error cargando apertura.' }); }
   };
+
+  // Guardar sesión al completar
+  useEffect(() => {
+    if (phase !== PHASES.DONE || !user?.token || !aperturaInfo) return;
+    const total = stats.correct + stats.errors;
+    progresoAPI.guardarSesion(user.token, {
+      apertura: aperturaInfo.apertura,
+      variante: aperturaInfo.variante || null,
+      color,
+      intentos: total,
+      aciertos: stats.correct,
+      modo: 'contrarreloj',
+      timeouts: stats.timeouts,
+    }).catch(() => {});
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phase]);
 
   const onPieceDrop = (from, to) => {
     if (phase !== PHASES.PLAYING || showingCorrect) return false;

@@ -1,15 +1,19 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Chessboard } from 'react-chessboard';
 import { Chess } from 'chess.js';
-import { aperturasAPI } from '../services/api';
+import { aperturasAPI, progresoAPI } from '../services/api';
+import { useAuth } from '../context/AuthContext';
 import ContrarrelojMode from './ContrarrelojMode';
 import AdivinarApertura from './AdivinarApertura';
+import ArbolAperturas from './ArbolAperturas';
 import './AperturaTraining.css';
 
 const PHASES = { SELECT: 'select', PLAYING: 'playing', DONE: 'done' };
 
 export default function AperturaTraining({ onBack, hideBack }) {
+  const { user } = useAuth();
   const [subTab, setSubTab] = useState('aprender');
+  const [progresoKey, setProgresoKey] = useState(0);
   const [phase, setPhase] = useState(PHASES.SELECT);
   const [aperturas, setAperturas] = useState([]);
   const [variantes, setVariantes] = useState([]);
@@ -114,6 +118,21 @@ export default function AperturaTraining({ onBack, hideBack }) {
     }, 600);
   }, [theoryMoves]);
 
+  // Guardar sesión al completar
+  useEffect(() => {
+    if (phase !== PHASES.DONE || !user?.token || !aperturaInfo) return;
+    const total = stats.correct + stats.errors;
+    progresoAPI.guardarSesion(user.token, {
+      apertura: aperturaInfo.apertura,
+      variante: aperturaInfo.variante || null,
+      color,
+      intentos: total,
+      aciertos: stats.correct,
+      modo: 'aprender',
+    }).then(() => setProgresoKey(k => k + 1)).catch(() => {});
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phase]);
+
   // Al cambiar moveIndex, si no es mi turno, jugar automáticamente
   useEffect(() => {
     if (phase !== PHASES.PLAYING || showingCorrect) return;
@@ -182,6 +201,7 @@ export default function AperturaTraining({ onBack, hideBack }) {
       <button className={subTab === 'aprender' ? 'active' : ''} onClick={() => setSubTab('aprender')}>📖 Aprender</button>
       <button className={subTab === 'contrarreloj' ? 'active' : ''} onClick={() => setSubTab('contrarreloj')}>⏱️ Contrarreloj</button>
       <button className={subTab === 'adivinar' ? 'active' : ''} onClick={() => setSubTab('adivinar')}>🤔 Adivina la Apertura</button>
+      <button className={subTab === 'progreso' ? 'active' : ''} onClick={() => setSubTab('progreso')}>📊 Progreso</button>
     </div>
   );
 
@@ -198,6 +218,17 @@ export default function AperturaTraining({ onBack, hideBack }) {
       {!hideBack && <button className="back-btn" onClick={onBack}>← Volver</button>}
       {subTabsBar}
       <AdivinarApertura />
+    </div>
+  );
+
+  if (subTab === 'progreso') return (
+    <div className="apertura-training">
+      {!hideBack && <button className="back-btn" onClick={onBack}>← Volver</button>}
+      {subTabsBar}
+      <ArbolAperturas
+        refreshKey={progresoKey}
+        onPracticar={(ap, va) => { setSelectedApertura(ap); setSelectedVariante(va); setSubTab('aprender'); }}
+      />
     </div>
   );
 

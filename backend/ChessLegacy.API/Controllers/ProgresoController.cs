@@ -71,17 +71,19 @@ public class ProgresoController : ControllerBase
     public async Task<IActionResult> GuardarSesion([FromBody] SesionRequest req)
     {
         var progreso = await _db.Progresos.FirstOrDefaultAsync(p =>
-            p.UsuarioId == UserId && p.Apertura == req.Apertura && p.Variante == req.Variante);
+            p.UsuarioId == UserId && p.Apertura == req.Apertura && p.Variante == req.Variante && p.Color == req.Color);
 
         if (progreso == null)
         {
-            progreso = new ProgresoApertura { UsuarioId = UserId, Apertura = req.Apertura, Variante = req.Variante };
+            progreso = new ProgresoApertura { UsuarioId = UserId, Apertura = req.Apertura, Variante = req.Variante, Color = req.Color };
             _db.Progresos.Add(progreso);
         }
 
         progreso.Intentos += req.Intentos;
         progreso.Aciertos += req.Aciertos;
         progreso.Sesiones++;
+        if (req.Intentos > 0 && req.Aciertos == req.Intentos)
+            progreso.SesionesPerfectas++;
         progreso.UltimaSesion = DateTime.UtcNow;
 
         // Actualizar racha
@@ -209,5 +211,5 @@ public class ProgresoController : ControllerBase
     }
 }
 
-public record SesionRequest(string Apertura, string? Variante, int Intentos, int Aciertos, string Modo = "aprender", int Timeouts = 0);
+public record SesionRequest(string Apertura, string? Variante, string Color, int Intentos, int Aciertos, string Modo = "aprender", int Timeouts = 0);
 public record TorneoRequest(string Maestro, bool Ganado, int RondasPerdidas, int MinutosPorRonda);

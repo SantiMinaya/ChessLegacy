@@ -168,7 +168,12 @@
 }
 
 /* Panel de movimientos */
-.arbol-moves-header {
+.arbol-moves-panel {
+  background: #16213e;
+  border: 1px solid #333;
+  border-radius: 10px;
+  padding: 16px;
+}
   display: flex;
   justify-content: space-between;
   align-items: center;
