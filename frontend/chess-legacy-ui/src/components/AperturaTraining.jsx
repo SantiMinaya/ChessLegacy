@@ -1,17 +1,14 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Chessboard } from 'react-chessboard';
 import { Chess } from 'chess.js';
-import { aperturasAPI, progresoAPI } from '../services/api';
-import { useAuth } from '../context/AuthContext';
+import { aperturasAPI } from '../services/api';
 import ContrarrelojMode from './ContrarrelojMode';
 import AdivinarApertura from './AdivinarApertura';
-import ArbolAperturas from './ArbolAperturas';
 import './AperturaTraining.css';
 
 const PHASES = { SELECT: 'select', PLAYING: 'playing', DONE: 'done' };
 
 export default function AperturaTraining({ onBack, hideBack }) {
-  const { user } = useAuth();
   const [subTab, setSubTab] = useState('aprender');
   const [phase, setPhase] = useState(PHASES.SELECT);
   const [aperturas, setAperturas] = useState([]);
@@ -29,7 +26,6 @@ export default function AperturaTraining({ onBack, hideBack }) {
   const [showingCorrect, setShowingCorrect] = useState(false);
   const [aperturaInfo, setAperturaInfo] = useState(null);
   const [showTheory, setShowTheory] = useState(false);
-  const [nuevosLogros, setNuevosLogros] = useState([]);
 
   useEffect(() => {
     aperturasAPI.getAll().then(r => setAperturas(r.data)).catch(() => {});
@@ -55,12 +51,10 @@ export default function AperturaTraining({ onBack, hideBack }) {
     return sanMoves;
   }, []);
 
-  const startTraining = async (apertura, variante) => {
-    const ap = apertura || selectedApertura;
-    const va = variante !== undefined ? variante : selectedVariante;
-    if (!ap) return;
+  const startTraining = async () => {
+    if (!selectedApertura) return;
     try {
-      const r = await aperturasAPI.getAprendizaje(ap, va || undefined);
+      const r = await aperturasAPI.getAprendizaje(selectedApertura, selectedVariante || undefined);
       const info = r.data;
       const sanMoves = buildTheoryMoves(info.movimientos);
       setAperturaInfo(info);
@@ -72,7 +66,6 @@ export default function AperturaTraining({ onBack, hideBack }) {
       setShowingCorrect(false);
       setShowTheory(false);
       setPhase(PHASES.PLAYING);
-      setSubTab('aprender');
     } catch {
       setFeedback({ type: 'error', msg: 'No se encontró esa apertura/variante.' });
     }
@@ -80,9 +73,7 @@ export default function AperturaTraining({ onBack, hideBack }) {
 
   const startRandom = async () => {
     try {
-      const r = user?.token
-        ? await aperturasAPI.getAprendizajeEspaciado(user.token)
-        : await aperturasAPI.getAprendizajeRandom();
+      const r = await aperturasAPI.getAprendizajeRandom();
       const info = r.data;
       const sanMoves = buildTheoryMoves(info.movimientos);
       setAperturaInfo(info);
@@ -185,35 +176,12 @@ export default function AperturaTraining({ onBack, hideBack }) {
 
   const progress = theoryMoves.length > 0 ? Math.round((moveIndex / theoryMoves.length) * 100) : 0;
 
-  // Guardar sesión al llegar a DONE
-  useEffect(() => {
-    if (phase !== PHASES.DONE || !aperturaInfo || !user?.token) return;
-    const total = stats.correct + stats.errors;
-    progresoAPI.guardarSesion(user.token, {
-      apertura: aperturaInfo.apertura,
-      variante: aperturaInfo.variante || null,
-      intentos: total,
-      aciertos: stats.correct,
-      modo: 'aprender',
-    }).then(r => {
-      if (r.data.nuevosLogros?.length > 0) setNuevosLogros(r.data.nuevosLogros);
-    }).catch(() => {});
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [phase]);
-
-  const handlePracticar = (apertura, variante) => {
-    setSelectedApertura(apertura);
-    setSelectedVariante(variante);
-    startTraining(apertura, variante);
-  };
-
   // ── RENDER SELECT ──
   const subTabsBar = (
     <div className="sub-tabs">
       <button className={subTab === 'aprender' ? 'active' : ''} onClick={() => setSubTab('aprender')}>📖 Aprender</button>
       <button className={subTab === 'contrarreloj' ? 'active' : ''} onClick={() => setSubTab('contrarreloj')}>⏱️ Contrarreloj</button>
       <button className={subTab === 'adivinar' ? 'active' : ''} onClick={() => setSubTab('adivinar')}>🤔 Adivina la Apertura</button>
-      <button className={subTab === 'arbol' ? 'active' : ''} onClick={() => setSubTab('arbol')}>📊 Progreso</button>
     </div>
   );
 
@@ -230,14 +198,6 @@ export default function AperturaTraining({ onBack, hideBack }) {
       {!hideBack && <button className="back-btn" onClick={onBack}>← Volver</button>}
       {subTabsBar}
       <AdivinarApertura />
-    </div>
-  );
-
-  if (subTab === 'arbol') return (
-    <div className="apertura-training">
-      {!hideBack && <button className="back-btn" onClick={onBack}>← Volver</button>}
-      {subTabsBar}
-      <ArbolAperturas onPracticar={handlePracticar} />
     </div>
   );
 
@@ -309,17 +269,9 @@ export default function AperturaTraining({ onBack, hideBack }) {
              pct >= 80 ? 'Muy bien. Practica un poco más para memorizarla.' :
              'Sigue practicando, la repetición es clave en aperturas.'}
           </p>
-          {nuevosLogros.length > 0 && (
-            <div className="nuevos-logros">
-              <h4>🏆 ¡Logros desbloqueados!</h4>
-              {nuevosLogros.map(l => (
-                <div key={l.codigo} className="logro-nuevo">{l.emoji} {l.nombre} — {l.descripcion}</div>
-              ))}
-            </div>
-          )}
           <div className="done-actions">
             <button onClick={startTraining}>🔄 Repetir</button>
-            <button onClick={() => { setNuevosLogros([]); reset(); }}>📖 Otra apertura</button>
+            <button onClick={reset}>📖 Otra apertura</button>
           </div>
         </div>
       </div>
