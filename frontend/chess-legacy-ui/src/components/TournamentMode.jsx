@@ -5,6 +5,7 @@ import { chessMasters } from '../data/masters';
 import { progresoAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { useBoardTheme } from '../context/BoardThemeContext';
+import { useChessInput } from '../hooks/useChessInput';
 import './TournamentMode.css';
 
 const TIME_CONTROLS = [
@@ -157,6 +158,7 @@ export default function TournamentMode({ onBack }) {
 
       setActiveTimer('player');
       setStatus(g2.isCheck() ? '⚠️ ¡Jaque! Tu turno' : '♟️ Tu turno');
+      await tryExecutePremove(g2);
     } catch {
       setStatus('❌ Error de conexión');
     } finally {
@@ -189,7 +191,16 @@ export default function TournamentMode({ onBack }) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase]);
 
-  // ── CONFIG ──
+  const isPlayerTurn = game.turn() === 'w' && !thinking;
+
+  const executeMove = useCallback(async (from, to) => {
+    return makeMove(from, to);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [game, thinking, phase]);
+
+  const { onSquareClick, onPieceDrop, customSquareStyles, tryExecutePremove } = useChessInput(
+    game, playerColor, isPlayerTurn, executeMove
+  );
   if (phase === PHASES.CONFIG) return (
     <div className="tournament">
       <button className="t-back" onClick={onBack}>← Volver</button>
@@ -316,7 +327,6 @@ export default function TournamentMode({ onBack }) {
   }
 
   // ── PLAYING ──
-  const isPlayerTurn = game.turn() === 'w' && !thinking;
   return (
     <div className="tournament">
       <div className="t-top-bar">
@@ -334,7 +344,9 @@ export default function TournamentMode({ onBack }) {
 
           <Chessboard
             position={game.fen()}
-            onPieceDrop={makeMove}
+            onPieceDrop={onPieceDrop}
+            onSquareClick={onSquareClick}
+            customSquareStyles={customSquareStyles}
             boardOrientation={playerColor}
             boardWidth={480}
             arePiecesDraggable={isPlayerTurn}

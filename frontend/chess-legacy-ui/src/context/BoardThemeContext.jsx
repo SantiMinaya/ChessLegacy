@@ -25,9 +25,13 @@ export function BoardThemeProvider({ children }) {
   const [pieceSet, setPieceSetState] = useState(
     () => localStorage.getItem('pieceSet') || 'default'
   );
+  const [showLegalMoves, setShowLegalMovesState] = useState(
+    () => localStorage.getItem('showLegalMoves') !== 'false'
+  );
 
   const setBoardTheme = (t) => { localStorage.setItem('boardTheme', t); setBoardThemeState(t); };
   const setPieceSet  = (s) => { localStorage.setItem('pieceSet', s);  setPieceSetState(s); };
+  const setShowLegalMoves = (v) => { localStorage.setItem('showLegalMoves', v); setShowLegalMovesState(v); };
 
   const boardProps = {
     customDarkSquareStyle:  { backgroundColor: BOARD_THEMES[boardTheme]?.dark  ?? '#b58863' },
@@ -36,7 +40,7 @@ export function BoardThemeProvider({ children }) {
   };
 
   return (
-    <BoardThemeContext.Provider value={{ boardTheme, setBoardTheme, pieceSet, setPieceSet, boardProps }}>
+    <BoardThemeContext.Provider value={{ boardTheme, setBoardTheme, pieceSet, setPieceSet, showLegalMoves, setShowLegalMoves, boardProps }}>
       {children}
     </BoardThemeContext.Provider>
   );

@@ -28,7 +28,7 @@ const TODOS_LOGROS = Object.keys(LOGROS_INFO);
 
 export default function PerfilUsuario() {
   const { user } = useAuth();
-  const { boardTheme, setBoardTheme, pieceSet, setPieceSet } = useBoardTheme();
+  const { boardTheme, setBoardTheme, pieceSet, setPieceSet, showLegalMoves, setShowLegalMoves } = useBoardTheme();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -106,6 +106,23 @@ export default function PerfilUsuario() {
             );
           })}
         </div>
+
+        <p style={{ color: '#888', fontSize: 13, margin: '28px 0 12px' }}>Opciones de juego</p>
+        <label style={{ display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer', fontSize: 14, color: '#e0e0e0' }}>
+          <div
+            onClick={() => setShowLegalMoves(!showLegalMoves)}
+            style={{
+              width: 44, height: 24, borderRadius: 12, cursor: 'pointer', transition: 'background 0.2s',
+              background: showLegalMoves ? '#d4af37' : '#444', position: 'relative', flexShrink: 0,
+            }}
+          >
+            <div style={{
+              position: 'absolute', top: 3, left: showLegalMoves ? 23 : 3,
+              width: 18, height: 18, borderRadius: '50%', background: '#fff', transition: 'left 0.2s',
+            }} />
+          </div>
+          Mostrar casillas disponibles al seleccionar pieza
+        </label>
       </div>
 
       <div className="perfil-section">

@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { Chessboard } from 'react-chessboard';
 import { Chess } from 'chess.js';
 import { masterStyles } from '../data/masterStyles';
 import { useBoardTheme } from '../context/BoardThemeContext';
+import { useChessInput } from '../hooks/useChessInput';
 import './PlayMaster.css';
 
 export default function PlayMaster({ master, onBack }) {
@@ -14,26 +15,24 @@ export default function PlayMaster({ master, onBack }) {
   const [thinking, setThinking] = useState(false);
   const [score, setScore] = useState({ precision: 0, style: 0, total: 0 });
 
+  const executeMove = useCallback(async (from, to) => {
+    if (thinking) return false;
+    return makeMove(from, to);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [thinking, game]);
+
+  const { onSquareClick, onPieceDrop, customSquareStyles, tryExecutePremove } = useChessInput(
+    game, 'white', !thinking && !game.isGameOver(), executeMove
+  );
+
   const makeMove = async (sourceSquare, targetSquare) => {
     if (thinking) return false;
-
     const gameCopy = new Chess(game.fen());
-    const move = gameCopy.move({
-      from: sourceSquare,
-      to: targetSquare,
-      promotion: 'q'
-    });
-
+    const move = gameCopy.move({ from: sourceSquare, to: targetSquare, promotion: 'q' });
     if (move === null) return false;
-
     setGame(gameCopy);
-    setMoveHistory([...moveHistory, move]);
-
-    if (gameCopy.isGameOver()) {
-      updateStatus(gameCopy);
-      return true;
-    }
-
+    setMoveHistory(prev => [...prev, move]);
+    if (gameCopy.isGameOver()) { updateStatus(gameCopy); return true; }
     setThinking(true);
     setTimeout(() => makeMasterMove(gameCopy), 500);
     return true;
@@ -59,13 +58,16 @@ export default function PlayMaster({ master, onBack }) {
       });
       
       if (move) {
-        setGame(new Chess(currentGame.fen()));
+        const newGame = new Chess(currentGame.fen());
+        setGame(newGame);
         setMoveHistory(prev => [...prev, move]);
         setEvaluation(data.evaluacion);
+        setThinking(false);
+        updateStatus(newGame);
+        await tryExecutePremove(newGame);
+      } else {
+        setThinking(false);
       }
-
-      setThinking(false);
-      updateStatus(currentGame);
     } catch (error) {
       setStatus('❌ Error: ' + error.message);
       setThinking(false);
@@ -174,7 +176,9 @@ export default function PlayMaster({ master, onBack }) {
           <div className="opponent-name">{master.name}</div>
           <Chessboard
             position={game.fen()}
-            onPieceDrop={makeMove}
+            onPieceDrop={onPieceDrop}
+            onSquareClick={onSquareClick}
+            customSquareStyles={customSquareStyles}
             boardWidth={500}
             arePiecesDraggable={!thinking && !game.isGameOver()}
             {...boardProps}
