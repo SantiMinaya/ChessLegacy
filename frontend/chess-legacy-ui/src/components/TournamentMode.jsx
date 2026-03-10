@@ -4,6 +4,7 @@ import { Chess } from 'chess.js';
 import { chessMasters } from '../data/masters';
 import { progresoAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import { useBoardTheme } from '../context/BoardThemeContext';
 import './TournamentMode.css';
 
 const TIME_CONTROLS = [
@@ -23,6 +24,7 @@ const PHASES = { CONFIG: 'config', PLAYING: 'playing', ROUND_END: 'round_end', T
 
 export default function TournamentMode({ onBack }) {
   const { user } = useAuth();
+  const { boardProps } = useBoardTheme();
   const [nuevosLogros, setNuevosLogros] = useState([]);
   // Config
   const [selectedMaster, setSelectedMaster] = useState(chessMasters[0]);
@@ -336,6 +338,7 @@ export default function TournamentMode({ onBack }) {
             boardOrientation={playerColor}
             boardWidth={480}
             arePiecesDraggable={isPlayerTurn}
+            {...boardProps}
           />
 
           <div className={`${timeClass(playerTime)} player-clock ${activeTimer === 'player' ? 'active' : ''}`}>

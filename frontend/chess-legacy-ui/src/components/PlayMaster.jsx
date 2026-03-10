@@ -2,9 +2,11 @@ import { useState } from 'react';
 import { Chessboard } from 'react-chessboard';
 import { Chess } from 'chess.js';
 import { masterStyles } from '../data/masterStyles';
+import { useBoardTheme } from '../context/BoardThemeContext';
 import './PlayMaster.css';
 
 export default function PlayMaster({ master, onBack }) {
+  const { boardProps } = useBoardTheme();
   const [game, setGame] = useState(new Chess());
   const [moveHistory, setMoveHistory] = useState([]);
   const [status, setStatus] = useState('Tu turno - Mueves las blancas');
@@ -175,6 +177,7 @@ export default function PlayMaster({ master, onBack }) {
             onPieceDrop={makeMove}
             boardWidth={500}
             arePiecesDraggable={!thinking && !game.isGameOver()}
+            {...boardProps}
           />
           <div className="player-name">Tú</div>
           <div className="controls">

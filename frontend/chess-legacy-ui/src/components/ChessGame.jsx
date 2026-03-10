@@ -2,10 +2,12 @@ import { useState } from 'react';
 import { Chessboard } from 'react-chessboard';
 import { Chess } from 'chess.js';
 import axios from 'axios';
+import { useBoardTheme } from '../context/BoardThemeContext';
 
 const API_URL = 'http://localhost:5000/api';
 
 export default function ChessGame({ onBack }) {
+  const { boardProps } = useBoardTheme();
   const [game, setGame] = useState(new Chess());
 
   async function makeMove(sourceSquare, targetSquare) {
@@ -57,6 +59,7 @@ export default function ChessGame({ onBack }) {
         position={game.fen()} 
         onPieceDrop={makeMove}
         boardOrientation="white"
+        {...boardProps}
       />
       <button onClick={() => setGame(new Chess())} style={{marginTop: '10px'}}>Nueva Partida</button>
     </div>

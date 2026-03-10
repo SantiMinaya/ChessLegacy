@@ -6,12 +6,14 @@ import { useAuth } from '../context/AuthContext';
 import ContrarrelojMode from './ContrarrelojMode';
 import AdivinarApertura from './AdivinarApertura';
 import ArbolAperturas from './ArbolAperturas';
+import { useBoardTheme } from '../context/BoardThemeContext';
 import './AperturaTraining.css';
 
 const PHASES = { SELECT: 'select', PLAYING: 'playing', DONE: 'done' };
 
 export default function AperturaTraining({ onBack, hideBack }) {
   const { user } = useAuth();
+  const { boardProps } = useBoardTheme();
   const [subTab, setSubTab] = useState('aprender');
   const [progresoKey, setProgresoKey] = useState(0);
   const [phase, setPhase] = useState(PHASES.SELECT);
@@ -335,6 +337,7 @@ export default function AperturaTraining({ onBack, hideBack }) {
             boardOrientation={color}
             boardWidth={480}
             arePiecesDraggable={myTurn}
+            {...boardProps}
           />
         </div>
 

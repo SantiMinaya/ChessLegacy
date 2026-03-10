@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { progresoAPI } from '../services/api';
+import { useBoardTheme, BOARD_THEMES, PIECE_SETS } from '../context/BoardThemeContext';
+import { CUSTOM_PIECE_SETS } from '../data/pieceSets';
 import './PerfilUsuario.css';
 
 const LOGROS_INFO = {
@@ -25,7 +27,8 @@ const LOGROS_INFO = {
 const TODOS_LOGROS = Object.keys(LOGROS_INFO);
 
 export default function PerfilUsuario() {
-  const { user, updateFoto } = useAuth();
+  const { user } = useAuth();
+  const { boardTheme, setBoardTheme, pieceSet, setPieceSet } = useBoardTheme();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -69,6 +72,40 @@ export default function PerfilUsuario() {
         <div className="perfil-stat"><span>{totalAciertos}</span><label>Aciertos</label></div>
         <div className="perfil-stat"><span>{aperturasDistintas}</span><label>Aperturas</label></div>
         <div className="perfil-stat"><span>{logrosObtenidos.size}/{TODOS_LOGROS.length}</span><label>Logros</label></div>
+      </div>
+
+      <div className="perfil-section">
+        <h3>🎨 Apariencia del Tablero</h3>
+        <p style={{ color: '#888', fontSize: 13, margin: '0 0 16px' }}>Tema del tablero</p>
+        <div className="apariencia-grid">
+          {Object.entries(BOARD_THEMES).map(([key, theme]) => {
+            const cells = Array.from({ length: 16 }, (_, i) => (Math.floor(i/4) + i%4) % 2 === 0 ? theme.light : theme.dark);
+            return (
+              <div key={key} className="apariencia-item" onClick={() => setBoardTheme(key)}>
+                <div className={`apariencia-preview ${boardTheme === key ? 'selected' : ''}`}>
+                  {cells.map((c, i) => <div key={i} className="apariencia-preview-cell" style={{ background: c }} />)}
+                </div>
+                <span className={`apariencia-label ${boardTheme === key ? 'selected' : ''}`}>{theme.name}</span>
+              </div>
+            );
+          })}
+        </div>
+        <p style={{ color: '#888', fontSize: 13, margin: '20px 0 12px' }}>Set de piezas</p>
+        <div className="piezas-grid">
+          {Object.entries(PIECE_SETS).map(([key, set]) => {
+            const wK = CUSTOM_PIECE_SETS[key]?.wK;
+            const bK = CUSTOM_PIECE_SETS[key]?.bK;
+            return (
+              <div key={key} className="apariencia-item" onClick={() => setPieceSet(key)}>
+                <div className={`pieza-preview ${pieceSet === key ? 'selected' : ''}`}>
+                  {wK ? wK({ squareWidth: 36 }) : <span style={{fontSize:32}}>♔</span>}
+                  {bK ? bK({ squareWidth: 36 }) : <span style={{fontSize:32}}>♚</span>}
+                </div>
+                <span className={`apariencia-label ${pieceSet === key ? 'selected' : ''}`}>{set.name}</span>
+              </div>
+            );
+          })}
+        </div>
       </div>
 
       <div className="perfil-section">

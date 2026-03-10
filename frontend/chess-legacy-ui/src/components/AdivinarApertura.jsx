@@ -2,10 +2,12 @@ import { useState, useEffect, useCallback } from 'react';
 import { Chessboard } from 'react-chessboard';
 import { Chess } from 'chess.js';
 import { aperturasAPI } from '../services/api';
+import { useBoardTheme } from '../context/BoardThemeContext';
 
 const TOTAL_ROUNDS = 5;
 
 export default function AdivinarApertura() {
+  const { boardProps } = useBoardTheme();
   const [allVariantes, setAllVariantes] = useState([]); // [{apertura, variante, movimientos}]
   const [round, setRound] = useState(0);
   const [game, setGame] = useState(new Chess());
@@ -117,7 +119,7 @@ export default function AdivinarApertura() {
 
       <div className="training-layout">
         <div className="board-wrap">
-          <Chessboard position={game.fen()} boardWidth={480} arePiecesDraggable={false} />
+          <Chessboard position={game.fen()} boardWidth={480} arePiecesDraggable={false} {...boardProps} />
         </div>
 
         <div className="training-sidebar">
