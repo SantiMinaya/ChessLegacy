@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { progresoAPI } from '../services/api';
 import { useBoardTheme, BOARD_THEMES, PIECE_SETS } from '../context/BoardThemeContext';
 import { CUSTOM_PIECE_SETS } from '../data/pieceSets';
+import CalendarioRacha from './CalendarioRacha';
 import './PerfilUsuario.css';
 
 const LOGROS_INFO = {
@@ -31,13 +32,27 @@ export default function PerfilUsuario() {
   const { boardTheme, setBoardTheme, pieceSet, setPieceSet, showLegalMoves, setShowLegalMoves } = useBoardTheme();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [partidas, setPartidas] = useState([]);
 
   useEffect(() => {
     progresoAPI.get(user.token)
       .then(r => setData(r.data))
       .catch(() => setData({ progresos: [], logros: [] }))
       .finally(() => setLoading(false));
+    progresoAPI.getPartidas(user.token)
+      .then(r => setPartidas(r.data))
+      .catch(() => {});
   }, [user.token]);
+
+  const exportPgn = (pgn, maestro, fecha) => {
+    const blob = new Blob([pgn], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `vs_${maestro.replace(' ', '_')}_${fecha.slice(0,10)}.pgn`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
 
   if (loading) return <p style={{ color: '#c0c0c0', textAlign: 'center', padding: 40 }}>⏳ Cargando perfil...</p>;
 
@@ -72,6 +87,11 @@ export default function PerfilUsuario() {
         <div className="perfil-stat"><span>{totalAciertos}</span><label>Aciertos</label></div>
         <div className="perfil-stat"><span>{aperturasDistintas}</span><label>Aperturas</label></div>
         <div className="perfil-stat"><span>{logrosObtenidos.size}/{TODOS_LOGROS.length}</span><label>Logros</label></div>
+      </div>
+
+      <div className="perfil-section">
+        <h3>📅 Actividad</h3>
+        <CalendarioRacha />
       </div>
 
       <div className="perfil-section">
@@ -153,6 +173,7 @@ export default function PerfilUsuario() {
           <h3>📖 Progreso por Apertura</h3>
           <div className="progreso-lista">
             {progresos
+              .filter(p => !p.apertura.startsWith('__torneo__'))
               .sort((a, b) => b.sesiones - a.sesiones)
               .map(p => {
                 const pct = p.intentos > 0 ? Math.round((p.aciertos / p.intentos) * 100) : 0;
@@ -172,6 +193,26 @@ export default function PerfilUsuario() {
                   </div>
                 );
               })}
+          </div>
+        </div>
+      )}
+
+      {partidas.length > 0 && (
+        <div className="perfil-section">
+          <h3>⚔️ Historial vs Maestros</h3>
+          <div className="historial-lista">
+            {partidas.map(p => (
+              <div key={p.id} className="historial-item">
+                <div className="historial-resultado" data-result={p.resultado}>
+                  {p.resultado === 'win' ? '🏆' : p.resultado === 'draw' ? '🤝' : '💀'}
+                </div>
+                <div className="historial-info">
+                  <span className="historial-maestro">{p.maestro}</span>
+                  <span className="historial-meta">{p.totalMovimientos} movimientos · {new Date(p.fechaJugada).toLocaleDateString('es-ES')}</span>
+                </div>
+                <button className="historial-pgn-btn" onClick={() => exportPgn(p.pgn, p.maestro, p.fechaJugada)}>📥 PGN</button>
+              </div>
+            ))}
           </div>
         </div>
       )}

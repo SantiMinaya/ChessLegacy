@@ -3,6 +3,7 @@ using System;
 using ChessLegacy.API.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ChessLegacy.API.Migrations
 {
     [DbContext(typeof(ChessLegacyContext))]
-    partial class ChessLegacyContextModelSnapshot : ModelSnapshot
+    [Migration("20260311085311_AddActividadDiaria")]
+    partial class AddActividadDiaria
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.3");
@@ -279,40 +282,6 @@ namespace ChessLegacy.API.Migrations
                     b.ToTable("Partidas");
                 });
 
-            modelBuilder.Entity("ChessLegacy.API.Models.PartidaJugada", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<DateTime>("FechaJugada")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Maestro")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Pgn")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Resultado")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("TotalMovimientos")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("UsuarioId")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UsuarioId", "FechaJugada");
-
-                    b.ToTable("PartidasJugadas");
-                });
-
             modelBuilder.Entity("ChessLegacy.API.Models.Posicion", b =>
                 {
                     b.Property<int>("Id")
@@ -477,17 +446,6 @@ namespace ChessLegacy.API.Migrations
                     b.Navigation("Apertura");
 
                     b.Navigation("Jugador");
-                });
-
-            modelBuilder.Entity("ChessLegacy.API.Models.PartidaJugada", b =>
-                {
-                    b.HasOne("ChessLegacy.API.Models.Usuario", "Usuario")
-                        .WithMany()
-                        .HasForeignKey("UsuarioId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Usuario");
                 });
 
             modelBuilder.Entity("ChessLegacy.API.Models.Posicion", b =>

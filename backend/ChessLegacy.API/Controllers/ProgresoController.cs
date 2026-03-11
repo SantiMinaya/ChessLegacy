@@ -93,13 +93,16 @@ public class ProgresoController : ControllerBase
             var hoy = DateTime.UtcNow.Date;
             var ultimaFecha = usuario.UltimaActividad?.Date;
             if (ultimaFecha == null || ultimaFecha < hoy.AddDays(-1))
-                usuario.RachaActual = 1;           // primera vez o racha rota
+                usuario.RachaActual = 1;
             else if (ultimaFecha < hoy)
-                usuario.RachaActual++;             // día consecutivo nuevo
-            // si ultimaFecha == hoy: ya practicó hoy, no cambia
+                usuario.RachaActual++;
             usuario.UltimaActividad = DateTime.UtcNow;
             if (usuario.RachaActual > usuario.MaximaRacha)
                 usuario.MaximaRacha = usuario.RachaActual;
+
+            var hoyOnly = DateOnly.FromDateTime(hoy);
+            if (!await _db.ActividadesDiarias.AnyAsync(a => a.UsuarioId == UserId && a.Fecha == hoyOnly))
+                _db.ActividadesDiarias.Add(new ActividadDiaria { UsuarioId = UserId, Fecha = hoyOnly });
         }
 
         await _db.SaveChangesAsync();
@@ -157,6 +160,10 @@ public class ProgresoController : ControllerBase
             else if (ultimaFecha < hoy) usuario.RachaActual++;
             usuario.UltimaActividad = DateTime.UtcNow;
             if (usuario.RachaActual > usuario.MaximaRacha) usuario.MaximaRacha = usuario.RachaActual;
+
+            var hoyOnly = DateOnly.FromDateTime(hoy);
+            if (!await _db.ActividadesDiarias.AnyAsync(a => a.UsuarioId == UserId && a.Fecha == hoyOnly))
+                _db.ActividadesDiarias.Add(new ActividadDiaria { UsuarioId = UserId, Fecha = hoyOnly });
         }
         await _db.SaveChangesAsync();
 
@@ -209,7 +216,45 @@ public class ProgresoController : ControllerBase
         await _db.SaveChangesAsync();
         return Ok(new { nuevosLogros = nuevos, rachaActual = usuario?.RachaActual ?? 0 });
     }
+
+    [HttpGet("calendario")]
+    public async Task<IActionResult> GetCalendario()
+    {
+        var desde = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-364));
+        var dias = await _db.ActividadesDiarias
+            .Where(a => a.UsuarioId == UserId && a.Fecha >= desde)
+            .Select(a => a.Fecha.ToString("yyyy-MM-dd"))
+            .ToListAsync();
+        return Ok(dias);
+    }
+
+    [HttpPost("partida")]
+    public async Task<IActionResult> GuardarPartida([FromBody] PartidaJugadaRequest req)
+    {
+        _db.PartidasJugadas.Add(new PartidaJugada
+        {
+            UsuarioId = UserId,
+            Maestro = req.Maestro,
+            Resultado = req.Resultado,
+            Pgn = req.Pgn,
+            TotalMovimientos = req.TotalMovimientos,
+        });
+        await _db.SaveChangesAsync();
+        return Ok();
+    }
+
+    [HttpGet("partidas")]
+    public async Task<IActionResult> GetPartidas()
+    {
+        var partidas = await _db.PartidasJugadas
+            .Where(p => p.UsuarioId == UserId)
+            .OrderByDescending(p => p.FechaJugada)
+            .Select(p => new { p.Id, p.Maestro, p.Resultado, p.TotalMovimientos, p.FechaJugada, p.Pgn })
+            .ToListAsync();
+        return Ok(partidas);
+    }
 }
 
 public record SesionRequest(string Apertura, string? Variante, string Color, int Intentos, int Aciertos, string Modo = "aprender", int Timeouts = 0);
 public record TorneoRequest(string Maestro, bool Ganado, int RondasPerdidas, int MinutosPorRonda);
+public record PartidaJugadaRequest(string Maestro, string Resultado, string Pgn, int TotalMovimientos);

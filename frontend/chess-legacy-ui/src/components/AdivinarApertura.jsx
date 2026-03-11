@@ -1,14 +1,16 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Chessboard } from 'react-chessboard';
 import { Chess } from 'chess.js';
-import { aperturasAPI } from '../services/api';
+import { aperturasAPI, progresoAPI } from '../services/api';
 import { useBoardTheme } from '../context/BoardThemeContext';
+import { useAuth } from '../context/AuthContext';
 
 const TOTAL_ROUNDS = 5;
 
 export default function AdivinarApertura() {
   const { boardProps } = useBoardTheme();
-  const [allVariantes, setAllVariantes] = useState([]); // [{apertura, variante, movimientos}]
+  const { user } = useAuth();
+  const [allVariantes, setAllVariantes] = useState([]);
   const [round, setRound] = useState(0);
   const [game, setGame] = useState(new Chess());
   const [currentEntry, setCurrentEntry] = useState(null);
@@ -79,13 +81,31 @@ export default function AdivinarApertura() {
     if (selected) return;
     setSelected(opt);
     const correct = `${currentEntry.apertura} — ${currentEntry.variante}`;
-    if (opt === correct) setScore(s => s + 1);
+    const isCorrect = opt === correct;
+    if (isCorrect) setScore(s => s + 1);
     setPhase('answered');
   };
 
   const handleNext = () => {
-    setRound(r => r + 1);
-    if (round + 1 >= TOTAL_ROUNDS) { setPhase('done'); return; }
+    const nextRoundNum = round + 1;
+    if (nextRoundNum >= TOTAL_ROUNDS) {
+      const finalScore = score + (selected === `${currentEntry.apertura} — ${currentEntry.variante}` ? 1 : 0);
+      if (user?.token) {
+        progresoAPI.guardarSesion(user.token, {
+          apertura: 'Adivina la Apertura',
+          variante: null,
+          color: 'white',
+          intentos: TOTAL_ROUNDS,
+          aciertos: finalScore,
+          modo: 'adivinar',
+          timeouts: 0,
+        }).catch(() => {});
+      }
+      setRound(nextRoundNum);
+      setPhase('done');
+      return;
+    }
+    setRound(nextRoundNum);
     setPhase('playing');
     nextRound(allVariantes);
   };

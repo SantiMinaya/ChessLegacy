@@ -34,4 +34,7 @@ export const progresoAPI = {
   get: (token) => axios.get(`${API_URL}/progreso`, { headers: { Authorization: `Bearer ${token}` } }),
   guardarSesion: (token, data) => axios.post(`${API_URL}/progreso/sesion`, data, { headers: { Authorization: `Bearer ${token}` } }),
   guardarTorneo: (token, data) => axios.post(`${API_URL}/progreso/torneo`, data, { headers: { Authorization: `Bearer ${token}` } }),
+  getCalendario: (token) => axios.get(`${API_URL}/progreso/calendario`, { headers: { Authorization: `Bearer ${token}` } }),
+  guardarPartida: (token, data) => axios.post(`${API_URL}/progreso/partida`, data, { headers: { Authorization: `Bearer ${token}` } }),
+  getPartidas: (token) => axios.get(`${API_URL}/progreso/partidas`, { headers: { Authorization: `Bearer ${token}` } }),
 };

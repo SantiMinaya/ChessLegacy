@@ -1,19 +1,23 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { Chessboard } from 'react-chessboard';
 import { Chess } from 'chess.js';
 import { masterStyles } from '../data/masterStyles';
 import { useBoardTheme } from '../context/BoardThemeContext';
 import { useChessInput } from '../hooks/useChessInput';
+import { progresoAPI } from '../services/api';
+import { useAuth } from '../context/AuthContext';
 import './PlayMaster.css';
 
 export default function PlayMaster({ master, onBack }) {
   const { boardProps } = useBoardTheme();
+  const { user } = useAuth();
   const [game, setGame] = useState(new Chess());
   const [moveHistory, setMoveHistory] = useState([]);
   const [status, setStatus] = useState('Tu turno - Mueves las blancas');
   const [evaluation, setEvaluation] = useState(0);
   const [thinking, setThinking] = useState(false);
   const [score, setScore] = useState({ precision: 0, style: 0, total: 0 });
+  const savedRef = useRef(false);
 
   const executeMove = useCallback(async (from, to) => {
     if (thinking) return false;
@@ -30,15 +34,16 @@ export default function PlayMaster({ master, onBack }) {
     const gameCopy = new Chess(game.fen());
     const move = gameCopy.move({ from: sourceSquare, to: targetSquare, promotion: 'q' });
     if (move === null) return false;
+    const newHistory = [...moveHistory, move];
     setGame(gameCopy);
-    setMoveHistory(prev => [...prev, move]);
-    if (gameCopy.isGameOver()) { updateStatus(gameCopy); return true; }
+    setMoveHistory(newHistory);
+    if (gameCopy.isGameOver()) { updateStatus(gameCopy, newHistory); return true; }
     setThinking(true);
-    setTimeout(() => makeMasterMove(gameCopy), 500);
+    setTimeout(() => makeMasterMove(gameCopy, newHistory), 500);
     return true;
   };
 
-  const makeMasterMove = async (currentGame) => {
+  const makeMasterMove = async (currentGame, currentHistory) => {
     setStatus(`🤔 ${master.name} pensando...`);
 
     try {
@@ -49,21 +54,20 @@ export default function PlayMaster({ master, onBack }) {
       });
 
       const data = await response.json();
-      
-      // Usar directamente el mejor movimiento de Stockfish
       const move = currentGame.move({
         from: data.mejorMovimiento.slice(0, 2),
         to: data.mejorMovimiento.slice(2, 4),
         promotion: data.mejorMovimiento[4] || 'q'
       });
-      
+
       if (move) {
+        const newHistory = [...currentHistory, move];
         const newGame = new Chess(currentGame.fen());
         setGame(newGame);
-        setMoveHistory(prev => [...prev, move]);
+        setMoveHistory(newHistory);
         setEvaluation(data.evaluacion);
         setThinking(false);
-        updateStatus(newGame);
+        updateStatus(newGame, newHistory);
         await tryExecutePremove(newGame);
       } else {
         setThinking(false);
@@ -125,11 +129,57 @@ export default function PlayMaster({ master, onBack }) {
     return topMoves[Math.floor(Math.random() * topMoves.length)].move;
   };
 
-  const updateStatus = (currentGame) => {
+  const buildPgn = (moves, masterName) => {
+    const date = new Date().toISOString().slice(0, 10).replace(/-/g, '.');
+    const header = `[Event "Chess Legacy"]
+[Date "${date}"]
+[White "Tú"]
+[Black "${masterName}"]
+
+`;
+    const pairs = [];
+    for (let i = 0; i < moves.length; i += 2) {
+      const num = Math.floor(i / 2) + 1;
+      pairs.push(`${num}. ${moves[i].san}${moves[i + 1] ? ' ' + moves[i + 1].san : ''}`);
+    }
+    return header + pairs.join(' ');
+  };
+
+  const exportPgn = (moves) => {
+    const pgn = buildPgn(moves, master.name);
+    const blob = new Blob([pgn], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `vs_${master.name.replace(' ', '_')}_${new Date().toISOString().slice(0,10)}.pgn`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const updateStatus = (currentGame, moves) => {
     if (currentGame.isCheckmate()) {
-      setStatus(currentGame.turn() === 'w' ? `🎉 ¡${master.name} gana por jaque mate!` : '🎉 ¡Ganaste!');
+      const userWon = currentGame.turn() === 'b';
+      setStatus(userWon ? '🎉 ¡Ganaste!' : `🎉 ¡${master.name} gana por jaque mate!`);
+      if (user?.token && !savedRef.current) {
+        savedRef.current = true;
+        progresoAPI.guardarPartida(user.token, {
+          maestro: master.name,
+          resultado: userWon ? 'win' : 'loss',
+          pgn: buildPgn(moves, master.name),
+          totalMovimientos: moves.length,
+        }).catch(() => {});
+      }
     } else if (currentGame.isDraw()) {
       setStatus('🤝 Empate');
+      if (user?.token && !savedRef.current) {
+        savedRef.current = true;
+        progresoAPI.guardarPartida(user.token, {
+          maestro: master.name,
+          resultado: 'draw',
+          pgn: buildPgn(moves, master.name),
+          totalMovimientos: moves.length,
+        }).catch(() => {});
+      }
     } else if (currentGame.isCheck()) {
       setStatus(currentGame.turn() === 'w' ? '⚠️ ¡Jaque! - Tu turno' : `⚠️ ¡Jaque a ${master.name}!`);
     } else {
@@ -144,6 +194,7 @@ export default function PlayMaster({ master, onBack }) {
     setStatus('Tu turno - Mueves las blancas');
     setScore({ precision: 0, style: 0, total: 0 });
     setThinking(false);
+    savedRef.current = false;
   };
 
   const styleInfo = masterStyles[master.id];
@@ -165,7 +216,7 @@ export default function PlayMaster({ master, onBack }) {
           <div 
             className="eval-fill-vertical" 
             style={{ 
-              height: `${Math.min(100, Math.max(0, 50 - evaluation / 20))}%`,
+              height: `${Math.min(100, Math.max(0, 50 + evaluation / 20))}%`,
               background: '#000'
             }} 
           />
@@ -186,6 +237,9 @@ export default function PlayMaster({ master, onBack }) {
           <div className="player-name">Tú</div>
           <div className="controls">
             <button onClick={resetGame}>🔄 Nueva Partida</button>
+            {moveHistory.length > 0 && (
+              <button onClick={() => exportPgn(moveHistory)}>📥 Exportar PGN</button>
+            )}
           </div>
         </div>
 
