@@ -149,6 +149,13 @@ public class AperturaDetectorExtendido
         new() { Apertura = "Catalan", Variante = "Open", Movimientos = "d4 Nf6 c4 e6 g3 d5 Bg2 dxc4 Nf3 a6 Ne5 c5 Na3 cxd4 Naxc4 Bc5 O-O O-O Qb3 Bd5" },
         new() { Apertura = "Catalan", Variante = "Closed", Movimientos = "d4 Nf6 c4 e6 g3 d5 Bg2 Be7 Nf3 O-O O-O dxc4 Qc2 a6 Qxc4 b5 Qc2 Bb7 Bd2 Nbd7 Rc1" },
         new() { Apertura = "Catalan", Variante = null, Movimientos = "d4 Nf6 c4 e6 g3" },
+
+        // SISTEMA LONDRES
+        new() { Apertura = "Sistema Londres", Variante = "Clásica", Movimientos = "d4 d5 Nf3 Nf6 Bf4 e6 e3 Bd6 Bg3 O-O Nbd2 c5 c3 Nc6 Bd3 Bxg3 hxg3 Qe7 Ne5 Nd7 Nxd7 Bxd7 dxc5 Qxc5 e4" },
+        new() { Apertura = "Sistema Londres", Variante = "vs Fianchetto", Movimientos = "d4 Nf6 Nf3 g6 Bf4 Bg7 e3 O-O Be2 d6 h3 c5 c3 Nc6 O-O Qb6 Qb3 Qxb3 axb3 cxd4 exd4" },
+        new() { Apertura = "Sistema Londres", Variante = "vs India de Rey", Movimientos = "d4 Nf6 Nf3 g6 Bf4 Bg7 e3 O-O Be2 d6 O-O Nbd7 h3 c5 c3 b6 Nbd2 Bb7 Bh2 Re8 a4" },
+        new() { Apertura = "Sistema Londres", Variante = "Agresiva", Movimientos = "d4 d5 Bf4 Nf6 e3 e6 Nf3 c5 c3 Nc6 Nbd2 Bd6 Bg3 O-O Bd3 Bxg3 hxg3 b6 Ne5 Bb7 f4 Ne7 g4" },
+        new() { Apertura = "Sistema Londres", Variante = null, Movimientos = "d4 d5 Nf3 Nf6 Bf4" },
     };
 
     public static (string? apertura, string? variante) DetectarAperturaYVariante(string pgn)

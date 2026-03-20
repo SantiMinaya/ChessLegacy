@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace ChessLegacy.API.Migrations;
 
-public partial class AddFotoToUsuario : Migration
+public partial class AddFotoToUsuarioOld : Migration
 {
     protected override void Up(MigrationBuilder migrationBuilder)
     {

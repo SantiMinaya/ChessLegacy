@@ -1,6 +1,6 @@
 .home {
   min-height: 100vh;
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
   padding: 60px 20px;
 }
 
@@ -9,19 +9,8 @@
   margin-bottom: 60px;
 }
 
-.home-header h1 {
-  font-size: 56px;
-  color: #fff;
-  margin: 0 0 16px 0;
-  font-weight: 700;
-  font-family: 'Georgia', serif;
-}
-
-.home-header p {
-  font-size: 20px;
-  color: #c0c0c0;
-  margin: 0;
-}
+.home-header h1 { font-size: 56px; color: var(--text-primary); margin: 0 0 16px 0; font-weight: 700; font-family: Georgia, serif; }
+.home-header p  { font-size: 20px; color: var(--text-secondary); margin: 0; }
 
 .home-tabs {
   display: flex;
@@ -33,12 +22,12 @@
 .home-tabs button {
   padding: 12px 32px;
   font-size: 16px;
-  border: 2px solid #d4af37;
+  border: 2px solid var(--accent);
   background: transparent;
-  color: #d4af37;
+  color: var(--accent);
   cursor: pointer;
-  transition: all 0.2s;
-  font-family: 'Georgia', serif;
+  transition: all var(--transition);
+  font-family: Georgia, serif;
 }
 
 .home-tabs button:first-child {
@@ -54,11 +43,7 @@
   border-left: none;
 }
 
-.home-tabs button.active {
-  background: #d4af37;
-  color: #1a1a2e;
-  font-weight: bold;
-}
+.home-tabs button.active { background: var(--accent); color: var(--accent-text); font-weight: bold; }
 
 .masters-grid {
   max-width: 1400px;
@@ -70,18 +55,18 @@
 }
 
 .master-card {
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--bg-card);
   border-radius: 20px;
   overflow: hidden;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all var(--transition);
   border: 2px solid transparent;
 }
 
 .master-card:hover {
   transform: translateY(-10px);
-  border-color: #d4af37;
-  box-shadow: 0 20px 40px rgba(212, 175, 55, 0.2);
+  border-color: var(--accent);
+  box-shadow: 0 20px 40px var(--shadow);
 }
 
 .master-card img {
@@ -101,34 +86,10 @@
   text-align: center;
 }
 
-.card-content h3 {
-  color: #fff;
-  font-size: 22px;
-  margin: 0 0 8px 0;
-  font-family: 'Georgia', serif;
-}
-
-.card-content .years {
-  color: #888;
-  font-size: 14px;
-  margin: 0 0 4px 0;
-}
-
-.card-content .nationality {
-  color: #aaa;
-  font-size: 14px;
-  margin: 0 0 16px 0;
-}
-
-.card-content .rating {
-  display: inline-block;
-  background: linear-gradient(135deg, #d4af37, #f4e5b8);
-  color: #000;
-  padding: 8px 20px;
-  border-radius: 20px;
-  font-weight: bold;
-  font-size: 15px;
-}
+.card-content h3 { color: var(--text-primary); font-size: 22px; margin: 0 0 8px 0; font-family: Georgia, serif; }
+.card-content .years { color: var(--text-muted); font-size: 14px; margin: 0 0 4px 0; }
+.card-content .nationality { color: var(--text-secondary); font-size: 14px; margin: 0 0 16px 0; }
+.card-content .rating { display: inline-block; background: linear-gradient(135deg, var(--accent), var(--accent-hover)); color: var(--accent-text); padding: 8px 20px; border-radius: 20px; font-weight: bold; font-size: 15px; }
 
 @media (max-width: 768px) {
   .home-header h1 {

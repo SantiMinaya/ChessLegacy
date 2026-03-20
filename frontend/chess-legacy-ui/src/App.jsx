@@ -4,16 +4,32 @@ import MasterDetail from './components/MasterDetail';
 import LoginPage from './pages/LoginPage';
 import { chessMasters } from './data/masters';
 import { useAuth } from './context/AuthContext';
+import { useTheme, TEMAS } from './context/ThemeContext';
 import './App.css';
 
 function App() {
   const { user, logout } = useAuth();
+  const { tema, setTema } = useTheme();
 
   if (!user) return <LoginPage />;
+
+  // Ciclo rápido entre temas con un botón
+  const temasKeys = Object.keys(TEMAS);
+  const nextTema = () => {
+    const idx = temasKeys.indexOf(tema);
+    setTema(temasKeys[(idx + 1) % temasKeys.length]);
+  };
 
   return (
     <BrowserRouter>
       <div className="app-header">
+        <button
+          onClick={nextTema}
+          title={`Tema: ${TEMAS[tema]?.nombre}`}
+          style={{ background: 'transparent', border: '1px solid var(--border)', color: 'var(--accent)', padding: '4px 10px', borderRadius: 6, fontSize: 16, cursor: 'pointer' }}
+        >
+          {TEMAS[tema]?.emoji}
+        </button>
         <span className="app-header-user">👤 {user.username}</span>
         <button className="app-header-logout" onClick={logout}>Cerrar sesión</button>
       </div>

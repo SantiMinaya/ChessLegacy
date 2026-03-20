@@ -6,6 +6,8 @@ export const partidasAPI = {
   getAll: (params = {}) => axios.get(`${API_URL}/partidas`, { params }),
   getById: (id) => axios.get(`${API_URL}/partidas/${id}`),
   buscarPorPgn: (jugadorId, pgnStart) => axios.get(`${API_URL}/partidas/buscar-por-pgn`, { params: { jugadorId, pgnStart } }),
+  getDelDia: () => axios.get(`${API_URL}/partidas/del-dia`),
+  buscarPorFen: (fen) => axios.get(`${API_URL}/partidas/buscar-fen`, { params: { fen } }),
 };
 
 export const jugadoresAPI = {
@@ -37,4 +39,7 @@ export const progresoAPI = {
   getCalendario: (token) => axios.get(`${API_URL}/progreso/calendario`, { headers: { Authorization: `Bearer ${token}` } }),
   guardarPartida: (token, data) => axios.post(`${API_URL}/progreso/partida`, data, { headers: { Authorization: `Bearer ${token}` } }),
   getPartidas: (token) => axios.get(`${API_URL}/progreso/partidas`, { headers: { Authorization: `Bearer ${token}` } }),
+  getClasificacion: () => axios.get(`${API_URL}/clasificacion`),
+  subirFoto: (token, fotoBase64) => axios.post(`${API_URL}/progreso/foto`, { fotoBase64 }, { headers: { Authorization: `Bearer ${token}` } }),
+  registrarLogro: (token, codigo) => axios.post(`${API_URL}/progreso/logro`, { codigo }, { headers: { Authorization: `Bearer ${token}` } }),
 };

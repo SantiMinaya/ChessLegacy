@@ -6,11 +6,32 @@ import { useBoardTheme } from '../context/BoardThemeContext';
 import { useChessInput } from '../hooks/useChessInput';
 import { progresoAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
+import AnalisisPartida from './AnalisisPartida';
 import './PlayMaster.css';
+
+function getComentario(evalCentipawns, isCheck, isCapture, moveCount) {
+  if (isCheck) return '⚠️ ¡Jaque! El rey está en peligro.';
+  const e = evalCentipawns / 100;
+  if (moveCount <= 6) return '📖 Fase de apertura — desarrolla tus piezas y controla el centro.';
+  if (moveCount <= 20) {
+    if (Math.abs(e) < 0.3) return '⚖️ Posición equilibrada. Ambos bandos tienen chances.';
+    if (e > 1.5) return '✅ Blancas tienen ventaja clara. Busca un plan concreto.';
+    if (e < -1.5) return '⚠️ Negras tienen ventaja. Defiende con precisión.';
+    if (e > 0.5) return '🔼 Blancas tienen ligera ventaja posicional.';
+    if (e < -0.5) return '🔽 Negras tienen ligera ventaja posicional.';
+    return '⚖️ Posición equilibrada con juego dinámico.';
+  }
+  if (Math.abs(e) > 3) return e > 0 ? '🏆 Ventaja decisiva para blancas.' : '🏆 Ventaja decisiva para negras.';
+  if (isCapture) return '⚔️ Intercambio de material. Evalúa si la estructura mejora.';
+  if (Math.abs(e) < 0.2) return '🤝 Posición muy equilibrada. Cada movimiento cuenta.';
+  return e > 0 ? '📈 Blancas mantienen la iniciativa.' : '📉 Negras presionan.';
+}
 
 export default function PlayMaster({ master, onBack }) {
   const { boardProps } = useBoardTheme();
   const { user } = useAuth();
+  const { playSound } = useToast();
   const [game, setGame] = useState(new Chess());
   const [moveHistory, setMoveHistory] = useState([]);
   const [status, setStatus] = useState('Tu turno - Mueves las blancas');
@@ -18,6 +39,11 @@ export default function PlayMaster({ master, onBack }) {
   const [thinking, setThinking] = useState(false);
   const [score, setScore] = useState({ precision: 0, style: 0, total: 0 });
   const savedRef = useRef(false);
+  const [showAnalisis, setShowAnalisis] = useState(false);
+  const [blindfold, setBlindfold] = useState(false);
+  const [finishedMoves, setFinishedMoves] = useState([]);
+  const [comentario, setComentario] = useState('📖 Fase de apertura — desarrolla tus piezas y controla el centro.');
+  const [dificultad, setDificultad] = useState('normal'); // facil | normal | dificil
 
   const executeMove = useCallback(async (from, to) => {
     if (thinking) return false;
@@ -50,7 +76,7 @@ export default function PlayMaster({ master, onBack }) {
       const response = await fetch('http://localhost:5000/api/analisis/evaluar', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ fen: currentGame.fen(), maestro: master.name.split(' ').pop() })
+        body: JSON.stringify({ fen: currentGame.fen(), maestro: master.name.split(' ').pop(), profundidad: dificultad === 'facil' ? 3 : dificultad === 'normal' ? 8 : 15 })
       });
 
       const data = await response.json();
@@ -67,6 +93,8 @@ export default function PlayMaster({ master, onBack }) {
         setMoveHistory(newHistory);
         setEvaluation(data.evaluacion);
         setThinking(false);
+        playSound(move.flags.includes('c') ? 'capture' : newGame.isCheck() ? 'check' : 'move');
+        setComentario(getComentario(data.evaluacion, newGame.isCheck(), move.flags.includes('c'), newHistory.length));
         updateStatus(newGame, newHistory);
         await tryExecutePremove(newGame);
       } else {
@@ -162,6 +190,8 @@ export default function PlayMaster({ master, onBack }) {
       setStatus(userWon ? '🎉 ¡Ganaste!' : `🎉 ¡${master.name} gana por jaque mate!`);
       if (user?.token && !savedRef.current) {
         savedRef.current = true;
+        const finalMoves = moves;
+        setFinishedMoves(finalMoves);
         progresoAPI.guardarPartida(user.token, {
           maestro: master.name,
           resultado: userWon ? 'win' : 'loss',
@@ -173,6 +203,7 @@ export default function PlayMaster({ master, onBack }) {
       setStatus('🤝 Empate');
       if (user?.token && !savedRef.current) {
         savedRef.current = true;
+        setFinishedMoves(moves);
         progresoAPI.guardarPartida(user.token, {
           maestro: master.name,
           resultado: 'draw',
@@ -195,11 +226,14 @@ export default function PlayMaster({ master, onBack }) {
     setScore({ precision: 0, style: 0, total: 0 });
     setThinking(false);
     savedRef.current = false;
+    setFinishedMoves([]);
+    setShowAnalisis(false);
   };
 
   const styleInfo = masterStyles[master.id];
 
   return (
+    <>
     <div className="play-master">
       <button className="back-btn" onClick={onBack}>← Volver</button>
       
@@ -225,21 +259,61 @@ export default function PlayMaster({ master, onBack }) {
 
         <div className="board-section">
           <div className="opponent-name">{master.name}</div>
-          <Chessboard
-            position={game.fen()}
-            onPieceDrop={onPieceDrop}
-            onSquareClick={onSquareClick}
-            customSquareStyles={customSquareStyles}
-            boardWidth={500}
-            arePiecesDraggable={!thinking && !game.isGameOver()}
-            {...boardProps}
-          />
-          <div className="player-name">Tú</div>
-          <div className="controls">
-            <button onClick={resetGame}>🔄 Nueva Partida</button>
-            {moveHistory.length > 0 && (
-              <button onClick={() => exportPgn(moveHistory)}>📥 Exportar PGN</button>
+          <div style={{ position: 'relative' }}>
+            <Chessboard
+              position={game.fen()}
+              onPieceDrop={onPieceDrop}
+              onSquareClick={onSquareClick}
+              customSquareStyles={customSquareStyles}
+              boardWidth={500}
+              arePiecesDraggable={!thinking && !game.isGameOver()}
+              {...boardProps}
+            />
+            {blindfold && (
+              <div style={{
+                position: 'absolute', inset: 0,
+                background: 'rgba(20,20,40,0.92)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                borderRadius: 4, cursor: 'pointer', fontSize: 14, color: '#d4af37',
+                flexDirection: 'column', gap: 8,
+              }} onClick={() => {}}>
+                <span style={{ fontSize: 40 }}>🙈</span>
+                <span>Modo Blindfold</span>
+                <span style={{ fontSize: 12, color: '#888' }}>Escribe el movimiento abajo</span>
+              </div>
             )}
+          </div>
+          <div className="player-name">Tú</div>
+          {blindfold && (
+            <BlindfoldInput game={game} onMove={(from, to) => makeMove(from, to)} disabled={thinking || game.isGameOver()} />
+          )}
+          <div className="controls" style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <div style={{ display: 'flex', gap: 6, justifyContent: 'center', marginBottom: 4 }}>
+              {[['facil','🐣 Fácil'],['normal','⚔️ Normal'],['dificil','👿 Difícil']].map(([v,l]) => (
+                <button key={v} onClick={() => setDificultad(v)} style={{
+                  flex: 1, padding: '6px', borderRadius: 6, fontSize: 12, fontWeight: dificultad === v ? 'bold' : 'normal',
+                  background: dificultad === v ? 'var(--accent)' : 'transparent',
+                  border: '1px solid var(--accent)', color: dificultad === v ? 'var(--accent-text)' : 'var(--accent)',
+                  cursor: 'pointer',
+                }}>{l}</button>
+              ))}
+            </div>
+              <button onClick={resetGame} style={{ flex: 1 }}>🔄 Nueva</button>
+              <button
+                onClick={() => setBlindfold(b => !b)}
+                style={{ flex: 1, background: blindfold ? 'rgba(212,175,55,0.3)' : undefined }}
+              >
+                {blindfold ? '👁 Ver tablero' : '🙈 Blindfold'}
+              </button>
+            </div>
+            <div style={{ display: 'flex', gap: 8 }}>
+              {moveHistory.length > 0 && (
+                <button onClick={() => exportPgn(moveHistory)} style={{ flex: 1 }}>📥 PGN</button>
+              )}
+              {(finishedMoves.length > 0 || game.isGameOver()) && moveHistory.length > 0 && (
+                <button onClick={() => setShowAnalisis(true)} style={{ flex: 1, background: 'rgba(76,175,80,0.2)', borderColor: '#4caf50', color: '#4caf50' }}>🔍 Analizar</button>
+              )}
+            </div>
           </div>
         </div>
 
@@ -279,6 +353,9 @@ export default function PlayMaster({ master, onBack }) {
           <div className="eval-box">
             <h3>Evaluación Detallada</h3>
             <div className="eval-value">{(evaluation / 100).toFixed(2)}</div>
+            <div style={{ marginTop: 10, fontSize: 13, color: '#c0c0c0', lineHeight: 1.5, borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: 10 }}>
+              {comentario}
+            </div>
           </div>
 
           <div className="history-box">
@@ -295,5 +372,52 @@ export default function PlayMaster({ master, onBack }) {
         </div>
       </div>
     </div>
+
+    {showAnalisis && (
+      <AnalisisPartida
+        moves={finishedMoves.length > 0 ? finishedMoves : moveHistory}
+        masterName={master.name}
+        onClose={() => setShowAnalisis(false)}
+      />
+    )}
+    </>
+  );
+}
+
+function BlindfoldInput({ game, onMove, disabled }) {
+  const [input, setInput] = useState('');
+  const [error, setError] = useState(false);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!input.trim() || disabled) return;
+    const g = new Chess(game.fen());
+    const move = g.move(input.trim());
+    if (!move) { setError(true); setTimeout(() => setError(false), 800); return; }
+    onMove(move.from, move.to);
+    setInput('');
+    setError(false);
+  };
+
+  return (
+    <form onSubmit={handleSubmit} style={{ display: 'flex', gap: 8, marginTop: 8, width: 500 }}>
+      <input
+        value={input}
+        onChange={e => { setInput(e.target.value); setError(false); }}
+        placeholder="Ej: e4, Nf3, O-O..."
+        disabled={disabled}
+        autoFocus
+        style={{
+          flex: 1, padding: '10px 14px', borderRadius: 8, fontSize: 16,
+          background: error ? 'rgba(244,67,54,0.15)' : 'rgba(255,255,255,0.07)',
+          border: `1px solid ${error ? '#f44336' : 'rgba(212,175,55,0.3)'}`,
+          color: '#e0e0e0', outline: 'none',
+        }}
+      />
+      <button type="submit" disabled={disabled} style={{
+        padding: '10px 18px', borderRadius: 8, background: '#d4af37',
+        border: 'none', fontWeight: 'bold', cursor: 'pointer', fontSize: 15,
+      }}>▶</button>
+    </form>
   );
 }

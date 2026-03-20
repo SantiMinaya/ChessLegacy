@@ -1,17 +1,12 @@
-.perfil {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 0 20px 40px;
-  color: #e0e0e0;
-}
+.perfil { max-width: 800px; margin: 0 auto; padding: 0 20px 40px; color: var(--text-primary); }
 
 .perfil-header {
   display: flex;
   align-items: center;
   gap: 20px;
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(212,175,55,0.3);
-  border-radius: 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--border-radius);
   padding: 24px;
   margin-bottom: 24px;
 }
@@ -61,8 +56,8 @@
 
 .perfil-avatar-wrap:hover .perfil-avatar-overlay { opacity: 1; }
 
-.perfil-header h2 { color: #d4af37; font-size: 1.6rem; margin: 0 0 4px; }
-.perfil-header p  { color: #888; margin: 0; font-size: 14px; }
+.perfil-header h2 { color: var(--accent); font-size: 1.6rem; margin: 0 0 4px; }
+.perfil-header p  { color: var(--text-muted); margin: 0; font-size: 14px; }
 
 .perfil-stats {
   display: grid;
@@ -74,21 +69,20 @@
 .perfil-stat.racha span { color: #ff6b35; }
 
 .perfil-stat {
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(212,175,55,0.2);
-  border-radius: 10px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--border-radius);
   padding: 16px;
   text-align: center;
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
-
-.perfil-stat span { font-size: 1.8rem; font-weight: bold; color: #d4af37; }
-.perfil-stat label { font-size: 12px; color: #888; text-transform: uppercase; letter-spacing: 1px; }
+.perfil-stat span  { font-size: 1.8rem; font-weight: bold; color: var(--accent); }
+.perfil-stat label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
 
 .perfil-section { margin-bottom: 32px; }
-.perfil-section h3 { color: #d4af37; margin: 0 0 16px; font-size: 1.1rem; }
+.perfil-section h3 { color: var(--accent); margin: 0 0 16px; font-size: 1.1rem; }
 
 .logros-grid {
   display: grid;
@@ -106,16 +100,8 @@
   transition: all 0.2s;
 }
 
-.logro-card.obtenido {
-  background: rgba(212,175,55,0.08);
-  border-color: rgba(212,175,55,0.4);
-}
-
-.logro-card.bloqueado {
-  background: rgba(255,255,255,0.02);
-  border-color: rgba(255,255,255,0.08);
-  opacity: 0.5;
-}
+.logro-card.obtenido { background: rgba(212,175,55,0.08); border-color: var(--border); }
+.logro-card.bloqueado { background: var(--bg-card); border-color: var(--border-subtle); opacity: 0.5; }
 
 .logro-emoji { font-size: 28px; flex-shrink: 0; }
 
@@ -132,12 +118,7 @@
 
 .progreso-lista { display: flex; flex-direction: column; gap: 12px; }
 
-.progreso-item {
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 8px;
-  padding: 12px 16px;
-}
+.progreso-item { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--border-radius); padding: 12px 16px; }
 
 .progreso-nombre {
   display: flex;
@@ -276,3 +257,41 @@
 }
 
 .historial-pgn-btn:hover { background: rgba(212,175,55,0.1); }
+
+.nivel-badge {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 6px 0 4px;
+  font-size: 15px;
+  font-weight: bold;
+  color: #d4af37;
+}
+
+.nivel-xp {
+  font-size: 12px;
+  color: #888;
+  font-weight: normal;
+}
+
+.nivel-barra-wrap {
+  background: #1e1e2e;
+  border-radius: 6px;
+  height: 8px;
+  overflow: hidden;
+  max-width: 300px;
+  margin-bottom: 4px;
+}
+
+.nivel-barra-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #d4af37, #f0c040);
+  border-radius: 6px;
+  transition: width 0.5s ease;
+}
+
+.nivel-meta {
+  font-size: 11px;
+  color: #555;
+  margin: 0;
+}

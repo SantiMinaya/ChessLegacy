@@ -1,0 +1,65 @@
+.retos-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 32px;
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.retos-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.retos-badge {
+  background: linear-gradient(135deg, #ff6b35, #ff9800);
+  color: #fff;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 4px 10px;
+  border-radius: 20px;
+}
+
+.retos-all-done { font-size: 13px; color: var(--success); }
+
+.retos-lista { display: flex; flex-direction: column; gap: 8px; }
+
+.reto-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  padding: 10px 14px;
+  transition: border-color var(--transition);
+}
+
+.reto-item.done {
+  opacity: 0.5;
+  border-color: rgba(76,175,80,0.3);
+}
+
+.reto-icono { font-size: 20px; flex-shrink: 0; }
+.reto-texto { flex: 1; font-size: 14px; color: var(--text-primary); }
+.reto-xp { font-size: 12px; color: var(--accent); font-weight: bold; white-space: nowrap; }
+
+.reto-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--accent);
+  padding: 5px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  white-space: nowrap;
+  transition: background var(--transition);
+  flex-shrink: 0;
+}
+.reto-btn:hover:not(:disabled) { background: rgba(212,175,55,0.1); }
+.reto-btn:disabled { border-color: rgba(76,175,80,0.4); color: var(--success); cursor: default; }

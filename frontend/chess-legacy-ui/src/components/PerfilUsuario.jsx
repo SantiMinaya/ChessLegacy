@@ -4,6 +4,10 @@ import { progresoAPI } from '../services/api';
 import { useBoardTheme, BOARD_THEMES, PIECE_SETS } from '../context/BoardThemeContext';
 import { CUSTOM_PIECE_SETS } from '../data/pieceSets';
 import CalendarioRacha from './CalendarioRacha';
+import { getNivel } from '../data/niveles';
+import { jsPDF } from 'jspdf';
+import EstadisticasJuego from './EstadisticasJuego';
+import PanelPersonalizacion from './PanelPersonalizacion';
 import './PerfilUsuario.css';
 
 const LOGROS_INFO = {
@@ -22,7 +26,14 @@ const LOGROS_INFO = {
   CINCO_TORNEOS:       { nombre: 'Veterano',             desc: 'Completa 5 torneos',                            emoji: '🎖️' },
   TORNEO_PERFECTO:     { nombre: 'Invicto',              desc: 'Gana un torneo sin perder ninguna ronda',       emoji: '👑' },
   VENCE_TODOS_MAESTROS:{ nombre: 'Conquistador',         desc: 'Gana al menos un torneo contra cada maestro',   emoji: '⚔️' },
-  TORNEO_BALA:         { nombre: 'Rayo',                 desc: 'Gana un torneo con tiempo bala (≤2 min)',       emoji: '⚡' },
+  TORNEO_BALA:         { nombre: 'Rayo',              desc: 'Gana un torneo con tiempo bala (≤2 min)',       emoji: '⚡' },
+  BLINDFOLD_WIN:        { nombre: 'Ciego',             desc: 'Gana una partida en modo blindfold',              emoji: '🙈' },
+  SUPERVIVIENTE_20:     { nombre: 'Superviviente',     desc: 'Llega al puzzle 20 en modo supervivencia',        emoji: '💀' },
+  SPEED_RUNNER:         { nombre: 'Speed Runner',      desc: 'Completa una apertura en menos de 30 segundos',  emoji: '⚡' },
+  SEMANA_COMPLETA:      { nombre: 'Semana Completa',   desc: 'Mantén una racha de 7 días consecutivos',         emoji: '📅' },
+  GEOGRAFO:             { nombre: 'Geógrafo',           desc: 'Acierta 100 casillas en Aprender Casillas',       emoji: '🗺️' },
+  ANALISTA:             { nombre: 'Analista',           desc: 'Analiza 10 partidas post-partida',                emoji: '🔍' },
+  PATRON_MAESTRO:       { nombre: 'Patrón Maestro',     desc: 'Completa los 5 patrones tácticos',                emoji: '🧩' },
 };
 
 const TODOS_LOGROS = Object.keys(LOGROS_INFO);
@@ -33,6 +44,8 @@ export default function PerfilUsuario() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [partidas, setPartidas] = useState([]);
+  const [foto, setFoto] = useState(null);
+  const [subiendoFoto, setSubiendoFoto] = useState(false);
 
   useEffect(() => {
     progresoAPI.get(user.token)
@@ -44,6 +57,22 @@ export default function PerfilUsuario() {
       .catch(() => {});
   }, [user.token]);
 
+  const handleFoto = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setSubiendoFoto(true);
+    const reader = new FileReader();
+    reader.onload = async (ev) => {
+      const base64 = ev.target.result;
+      try {
+        await progresoAPI.subirFoto(user.token, base64);
+        setFoto(base64);
+      } catch {}
+      setSubiendoFoto(false);
+    };
+    reader.readAsDataURL(file);
+  };
+
   const exportPgn = (pgn, maestro, fecha) => {
     const blob = new Blob([pgn], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
@@ -54,9 +83,46 @@ export default function PerfilUsuario() {
     URL.revokeObjectURL(url);
   };
 
+  const exportarPDF = () => {
+    if (!data) return;
+    const { progresos, logros, rachaActual, maximaRacha, xp: xpVal = 0 } = data;
+    const nivel = getNivel(xpVal);
+    const logrosObt = new Set(logros.map(l => l.codigo));
+    const totAciertos = progresos.reduce((s, p) => s + p.aciertos, 0);
+    const totSesiones = progresos.reduce((s, p) => s + p.sesiones, 0);
+    const apDistintas = new Set(progresos.map(p => p.apertura)).size;
+    const doc = new jsPDF();
+    doc.setFontSize(20);
+    doc.setTextColor(212, 175, 55);
+    doc.text('Chess Legacy — Estadísticas', 20, 20);
+    doc.setFontSize(12);
+    doc.setTextColor(0, 0, 0);
+    doc.text(`Usuario: ${user.username}`, 20, 35);
+    doc.text(`Nivel: ${nivel.nombre} (${xpVal} XP)`, 20, 43);
+    doc.text(`Racha actual: ${rachaActual} dias`, 20, 51);
+    doc.text(`Maxima racha: ${maximaRacha} dias`, 20, 59);
+    doc.text(`Sesiones totales: ${totSesiones}`, 20, 67);
+    doc.text(`Aciertos totales: ${totAciertos}`, 20, 75);
+    doc.text(`Aperturas practicadas: ${apDistintas}`, 20, 83);
+    doc.text(`Logros: ${logrosObt.size}/${TODOS_LOGROS.length}`, 20, 91);
+    doc.setFontSize(14);
+    doc.setTextColor(212, 175, 55);
+    doc.text('Progreso por Apertura', 20, 105);
+    doc.setFontSize(10);
+    doc.setTextColor(0, 0, 0);
+    let y = 115;
+    progresos.filter(p => !p.apertura.startsWith('__torneo__')).slice(0, 20).forEach(p => {
+      const pct = p.intentos > 0 ? Math.round((p.aciertos / p.intentos) * 100) : 0;
+      doc.text(`${p.apertura}${p.variante ? ' - ' + p.variante : ''}: ${pct}% (${p.sesiones} sesiones)`, 20, y);
+      y += 8;
+    });
+    doc.save(`chess-legacy-${user.username}.pdf`);
+  };
+
   if (loading) return <p style={{ color: '#c0c0c0', textAlign: 'center', padding: 40 }}>⏳ Cargando perfil...</p>;
 
-  const { progresos, logros, rachaActual, maximaRacha } = data;
+  const { progresos, logros, rachaActual, maximaRacha, xp = 0 } = data;
+  const nivel = getNivel(xp);
   const logrosObtenidos = new Set(logros.map(l => l.codigo));
   const totalAciertos = progresos.reduce((s, p) => s + p.aciertos, 0);
   const totalSesiones = progresos.reduce((s, p) => s + p.sesiones, 0);
@@ -65,13 +131,39 @@ export default function PerfilUsuario() {
   return (
     <div className="perfil">
       <div className="perfil-header">
-        <div className="perfil-avatar-wrap">
-          <div className="perfil-avatar">♟️</div>
+        <div className="perfil-avatar-wrap" style={{ position: 'relative' }}>
+          {foto
+            ? <img src={foto} alt="avatar" className="perfil-avatar-img" />
+            : <div className="perfil-avatar">♟️</div>
+          }
+          <label style={{ position: 'absolute', inset: 0, borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0)', transition: 'background 0.2s' }}
+            onMouseEnter={e => e.currentTarget.style.background = 'rgba(0,0,0,0.5)'}
+            onMouseLeave={e => e.currentTarget.style.background = 'rgba(0,0,0,0)'}
+          >
+            <span style={{ opacity: 0, fontSize: 20, transition: 'opacity 0.2s' }}
+              onMouseEnter={e => e.currentTarget.style.opacity = 1}
+              onMouseLeave={e => e.currentTarget.style.opacity = 0}
+            >{subiendoFoto ? '⏳' : '📷'}</span>
+            <input type="file" accept="image/*" onChange={handleFoto} style={{ display: 'none' }} />
+          </label>
         </div>
-        <div>
+        <div style={{ flex: 1 }}>
           <h2>{user.username}</h2>
           <p>Miembro de Chess Legacy</p>
+          <div className="nivel-badge">
+            <span>{nivel.emoji} {nivel.nombre}</span>
+            <span className="nivel-xp">{xp} XP</span>
+          </div>
+          <div className="nivel-barra-wrap">
+            <div className="nivel-barra-fill" style={{ width: `${nivel.progreso}%` }} />
+          </div>
+          {nivel.siguiente && (
+            <p className="nivel-meta">{nivel.xpEnNivel} / {nivel.xpParaSiguiente} XP → {nivel.siguiente.emoji} {nivel.siguiente.nombre}</p>
+          )}
         </div>
+        <button onClick={exportarPDF} style={{ background: 'transparent', border: '1px solid rgba(212,175,55,0.4)', color: '#d4af37', padding: '8px 14px', borderRadius: 8, cursor: 'pointer', fontSize: 13, alignSelf: 'flex-start' }}>
+          📄 Exportar PDF
+        </button>
       </div>
 
       <div className="perfil-stats">
@@ -90,8 +182,28 @@ export default function PerfilUsuario() {
       </div>
 
       <div className="perfil-section">
+        <h3>🏆 Tabla de Clasificación</h3>
+        <TablaClasificacion miId={user.id} />
+      </div>
+
+      <div className="perfil-section">
+        <h3>🎯 Misiones Semanales</h3>
+        <MisionesSemanales />
+      </div>
+
+      <div className="perfil-section">
+        <h3>📈 Evolución XP</h3>
+        <GraficoXP progresos={progresos} xpActual={xp} />
+      </div>
+
+      <div className="perfil-section">
         <h3>📅 Actividad</h3>
         <CalendarioRacha />
+      </div>
+
+      <div className="perfil-section">
+        <h3>🎨 Personalización</h3>
+        <PanelPersonalizacion />
       </div>
 
       <div className="perfil-section">
@@ -194,6 +306,13 @@ export default function PerfilUsuario() {
                 );
               })}
           </div>
+        </div>
+      )}
+
+      {partidas.length > 0 && (
+        <div className="perfil-section">
+          <h3>📊 Estadísticas de Juego</h3>
+          <EstadisticasJuego partidas={partidas} />
         </div>
       )}
 

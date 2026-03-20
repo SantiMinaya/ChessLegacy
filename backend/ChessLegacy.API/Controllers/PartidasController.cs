@@ -86,6 +86,41 @@ public class PartidasController : ControllerBase
         });
     }
 
+    [HttpGet("del-dia")]
+    public async Task<ActionResult> GetPartidaDelDia()
+    {
+        var total = await _repository.CountAsync();
+        if (total == 0) return NotFound();
+        // Seed determinista por día del año
+        var seed = DateTime.UtcNow.DayOfYear + DateTime.UtcNow.Year * 365;
+        var idx = seed % total;
+        var partida = await _repository.GetByOffsetAsync(idx);
+        if (partida == null) return NotFound();
+        return Ok(new PartidaResponse
+        {
+            Id = partida.Id, Evento = partida.Evento, Sitio = "",
+            Anio = partida.Anio, Oponente = partida.Oponente,
+            Resultado = partida.Resultado ?? "", CodigoECO = partida.CodigoECO,
+            NombreApertura = partida.AperturaNombre ?? "", Pgn = partida.PGN,
+            ColorJugador = partida.ColorJugador ?? "Blancas"
+        });
+    }
+
+    [HttpGet("buscar-fen")]
+    public async Task<ActionResult> BuscarPorFen([FromQuery] string fen)
+    {
+        if (string.IsNullOrWhiteSpace(fen)) return BadRequest();
+        var partidas = await _repository.BuscarPorFen(fen);
+        return Ok(partidas.Take(10).Select(p => new PartidaResponse
+        {
+            Id = p.Id, Evento = p.Evento, Sitio = "",
+            Anio = p.Anio, Oponente = p.Oponente,
+            Resultado = p.Resultado ?? "", CodigoECO = p.CodigoECO,
+            NombreApertura = p.AperturaNombre ?? "", Pgn = p.PGN,
+            ColorJugador = p.ColorJugador ?? "Blancas"
+        }));
+    }
+
     [HttpGet("eventos")]
     public async Task<ActionResult> GetEventos([FromQuery] int? jugadorId)
     {

@@ -32,6 +32,13 @@ public class ProgresoController : ControllerBase
         ["TORNEO_PERFECTO"]     = ("Invicto",                "Gana un torneo sin perder ninguna ronda",              "👑"),
         ["VENCE_TODOS_MAESTROS"]= ("Conquistador",           "Gana al menos un torneo contra cada maestro",          "⚔️"),
         ["TORNEO_BALA"]         = ("Rayo",                   "Gana un torneo con control de tiempo bala (≤2 min)",   "⚡"),
+        ["BLINDFOLD_WIN"]        = ("Ciego",                  "Gana una partida en modo blindfold",                   "🙈"),
+        ["SUPERVIVIENTE_20"]     = ("Superviviente",           "Llega al puzzle 20 en modo supervivencia",             "💀"),
+        ["SPEED_RUNNER"]         = ("Speed Runner",            "Completa una apertura en menos de 30 segundos",        "⚡"),
+        ["SEMANA_COMPLETA"]      = ("Semana Completa",         "Mantén una racha de 7 días consecutivos",              "📅"),
+        ["GEOGRAFO"]             = ("Geógrafo",               "Acierta 100 casillas en el modo Aprender Casillas",    "🗺️"),
+        ["ANALISTA"]             = ("Analista",               "Analiza 10 partidas post-partida",                     "🔍"),
+        ["PATRON_MAESTRO"]       = ("Patrón Maestro",         "Completa los 5 patrones tácticos",                    "🧩"),
     };
 
     public ProgresoController(ChessLegacyContext db) => _db = db;
@@ -63,7 +70,8 @@ public class ProgresoController : ControllerBase
             progresos,
             logros = logrosDetalle,
             rachaActual = usuario?.RachaActual ?? 0,
-            maximaRacha = usuario?.MaximaRacha ?? 0
+            maximaRacha = usuario?.MaximaRacha ?? 0,
+            xp = usuario?.Xp ?? 0
         });
     }
 
@@ -103,12 +111,15 @@ public class ProgresoController : ControllerBase
             var hoyOnly = DateOnly.FromDateTime(hoy);
             if (!await _db.ActividadesDiarias.AnyAsync(a => a.UsuarioId == UserId && a.Fecha == hoyOnly))
                 _db.ActividadesDiarias.Add(new ActividadDiaria { UsuarioId = UserId, Fecha = hoyOnly });
+
+            // XP: 10 por sesión + 1 por acierto
+            usuario.Xp += 10 + req.Aciertos;
         }
 
         await _db.SaveChangesAsync();
 
         var nuevosLogros = await ComprobarLogros(req);
-        return Ok(new { progreso, nuevosLogros, rachaActual = usuario?.RachaActual ?? 0 });
+        return Ok(new { progreso, nuevosLogros, rachaActual = usuario?.RachaActual ?? 0, xp = usuario?.Xp ?? 0 });
     }
 
     private async Task<List<object>> ComprobarLogros(SesionRequest req)
@@ -164,6 +175,9 @@ public class ProgresoController : ControllerBase
             var hoyOnly = DateOnly.FromDateTime(hoy);
             if (!await _db.ActividadesDiarias.AnyAsync(a => a.UsuarioId == UserId && a.Fecha == hoyOnly))
                 _db.ActividadesDiarias.Add(new ActividadDiaria { UsuarioId = UserId, Fecha = hoyOnly });
+
+            // XP: 20 por torneo + 30 si ganó
+            usuario.Xp += req.Ganado ? 50 : 20;
         }
         await _db.SaveChangesAsync();
 
@@ -253,8 +267,48 @@ public class ProgresoController : ControllerBase
             .ToListAsync();
         return Ok(partidas);
     }
+
+    [HttpGet("/api/clasificacion")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetClasificacion()
+    {
+        var top = await _db.Usuarios
+            .OrderByDescending(u => u.Xp)
+            .Take(50)
+            .Select(u => new {
+                u.Id, u.Username, u.Xp, u.RachaActual, u.MaximaRacha, u.Foto,
+                logros = _db.Logros.Count(l => l.UsuarioId == u.Id),
+                partidas = _db.PartidasJugadas.Count(p => p.UsuarioId == u.Id),
+                victorias = _db.PartidasJugadas.Count(p => p.UsuarioId == u.Id && p.Resultado == "win")
+            })
+            .ToListAsync();
+        return Ok(top);
+    }
+
+    [HttpPost("foto")]
+    public async Task<IActionResult> SubirFoto([FromBody] FotoRequest req)
+    {
+        var usuario = await _db.Usuarios.FindAsync(UserId);
+        if (usuario == null) return NotFound();
+        usuario.Foto = req.FotoBase64;
+        await _db.SaveChangesAsync();
+        return Ok(new { foto = usuario.Foto });
+    }
+
+    [HttpPost("logro")]
+    public async Task<IActionResult> RegistrarLogro([FromBody] LogroManualRequest req)
+    {
+        var existentes = await _db.Logros.Where(l => l.UsuarioId == UserId).Select(l => l.Codigo).ToListAsync();
+        if (existentes.Contains(req.Codigo)) return Ok(new { nuevo = false });
+        _db.Logros.Add(new LogroUsuario { UsuarioId = UserId, Codigo = req.Codigo });
+        await _db.SaveChangesAsync();
+        Logros.TryGetValue(req.Codigo, out var info);
+        return Ok(new { nuevo = true, codigo = req.Codigo, info.Nombre, info.Emoji, info.Descripcion });
+    }
 }
 
 public record SesionRequest(string Apertura, string? Variante, string Color, int Intentos, int Aciertos, string Modo = "aprender", int Timeouts = 0);
 public record TorneoRequest(string Maestro, bool Ganado, int RondasPerdidas, int MinutosPorRonda);
 public record PartidaJugadaRequest(string Maestro, string Resultado, string Pgn, int TotalMovimientos);
+public record FotoRequest(string FotoBase64);
+public record LogroManualRequest(string Codigo);

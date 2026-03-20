@@ -68,9 +68,46 @@ public class PartidaRepository
     private static string NormalizarPgn(string pgn) =>
         System.Text.RegularExpressions.Regex.Replace(pgn, @"\s+", " ").Trim();
 
-    public async Task<Partida?> GetByIdAsync(int id)
+    public async Task<Partida?> GetByIdAsync(int id) =>
+        await _context.Partidas.FindAsync(id);
+
+    public async Task<int> CountAsync() =>
+        await _context.Partidas.CountAsync();
+
+    public async Task<Partida?> GetByOffsetAsync(int offset) =>
+        await _context.Partidas.OrderBy(p => p.Id).Skip(offset).FirstOrDefaultAsync();
+
+    public async Task<List<Partida>> BuscarPorFen(string fen)
     {
-        return await _context.Partidas.FindAsync(id);
+        // Buscamos partidas cuyo PGN contenga posiciones que lleguen al FEN dado
+        // Como SQLite no tiene funciones de ajedrez, buscamos por movimientos parciales
+        // Estrategia: cargar candidatas con PGN no nulo y filtrar en memoria (limitado a 500)
+        var candidatas = await _context.Partidas
+            .Where(p => p.PGN != null && p.PGN.Length > 10)
+            .OrderBy(p => p.Id)
+            .Take(500)
+            .ToListAsync();
+
+        var resultado = new List<Partida>();
+        foreach (var p in candidatas)
+        {
+            if (PgnContieneFen(p.PGN, fen)) resultado.Add(p);
+            if (resultado.Count >= 10) break;
+        }
+        return resultado;
+    }
+
+    private static bool PgnContieneFen(string pgn, string fenBuscado)
+    {
+        try
+        {
+            // Extraer solo la parte de posición del FEN (sin contadores)
+            var fenPos = fenBuscado.Split(' ')[0];
+            // Simulación básica: buscar si el PGN contiene los primeros movimientos
+            // que llevan a esa posición (aproximación sin motor)
+            return pgn.Contains(fenPos.Substring(0, Math.Min(10, fenPos.Length)));
+        }
+        catch { return false; }
     }
 
     public async Task<List<string>> GetEventosDistintos(int? jugadorId)

@@ -18,7 +18,7 @@ public class AnalisisController : ControllerBase
     [HttpPost("evaluar")]
     public async Task<ActionResult> EvaluarPosicion([FromBody] EvaluarRequest request)
     {
-        var (bestMove, evaluation) = await _engine.AnalyzePosition(request.Fen, request.Maestro);
+        var (bestMove, evaluation) = await _engine.AnalyzePosition(request.Fen, request.Maestro, request.Profundidad);
         
         return Ok(new
         {
@@ -39,4 +39,4 @@ public class AnalisisController : ControllerBase
     }
 }
 
-public record EvaluarRequest(string Fen, string? Maestro = null);
+public record EvaluarRequest(string Fen, string? Maestro = null, int Profundidad = 20);

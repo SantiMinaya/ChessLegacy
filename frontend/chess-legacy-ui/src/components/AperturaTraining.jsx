@@ -3,9 +3,18 @@ import { Chessboard } from 'react-chessboard';
 import { Chess } from 'chess.js';
 import { aperturasAPI, progresoAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 import ContrarrelojMode from './ContrarrelojMode';
 import AdivinarApertura from './AdivinarApertura';
 import ArbolAperturas from './ArbolAperturas';
+import AprendizajeCasillas from './AprendizajeCasillas';
+import PuzzlesTacticos from './PuzzlesTacticos';
+import ModoSupervivencia from './ModoSupervivencia';
+import SpeedRun from './SpeedRun';
+import EndgameTrainer from './EndgameTrainer';
+import ModoEspejo from './ModoEspejo';
+import PatronesTacticos from './PatronesTacticos';
+import BrillantesHistoricos from './BrillantesHistoricos';
 import { useBoardTheme } from '../context/BoardThemeContext';
 import './AperturaTraining.css';
 
@@ -14,6 +23,7 @@ const PHASES = { SELECT: 'select', PLAYING: 'playing', DONE: 'done' };
 export default function AperturaTraining({ onBack, hideBack }) {
   const { user } = useAuth();
   const { boardProps } = useBoardTheme();
+  const { playSound, showLogro } = useToast();
   const [subTab, setSubTab] = useState('aprender');
   const [progresoKey, setProgresoKey] = useState(0);
   const [phase, setPhase] = useState(PHASES.SELECT);
@@ -131,7 +141,10 @@ export default function AperturaTraining({ onBack, hideBack }) {
       intentos: total,
       aciertos: stats.correct,
       modo: 'aprender',
-    }).then(() => setProgresoKey(k => k + 1)).catch(() => {});
+    }).then(r => {
+      setProgresoKey(k => k + 1);
+      r.data?.nuevosLogros?.forEach(l => showLogro(l));
+    }).catch(() => {});
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase]);
 
@@ -162,11 +175,13 @@ export default function AperturaTraining({ onBack, hideBack }) {
       setMoveIndex(moveIndex + 1);
       setStats(s => ({ ...s, correct: s.correct + 1 }));
       setFeedback({ type: 'ok', msg: `✅ ¡Correcto! ${move.san}` });
+      playSound(move.flags.includes('c') ? 'capture' : 'move');
     } else {
       // Incorrecto — mostrar el movimiento correcto
       setStats(s => ({ ...s, errors: s.errors + 1 }));
       setShowingCorrect(true);
       setFeedback({ type: 'error', msg: `❌ Incorrecto. El movimiento teórico es: ${expected}` });
+      playSound('error');
 
       // Mostrar el movimiento correcto en el tablero
       setTimeout(() => {
@@ -202,7 +217,15 @@ export default function AperturaTraining({ onBack, hideBack }) {
     <div className="sub-tabs">
       <button className={subTab === 'aprender' ? 'active' : ''} onClick={() => setSubTab('aprender')}>📖 Aprender</button>
       <button className={subTab === 'contrarreloj' ? 'active' : ''} onClick={() => setSubTab('contrarreloj')}>⏱️ Contrarreloj</button>
-      <button className={subTab === 'adivinar' ? 'active' : ''} onClick={() => setSubTab('adivinar')}>🤔 Adivina la Apertura</button>
+      <button className={subTab === 'adivinar' ? 'active' : ''} onClick={() => setSubTab('adivinar')}>🤔 Adivina</button>
+      <button className={subTab === 'casillas' ? 'active' : ''} onClick={() => setSubTab('casillas')}>🗺️ Casillas</button>
+      <button className={subTab === 'puzzles' ? 'active' : ''} onClick={() => setSubTab('puzzles')}>🧩 Puzzles</button>
+      <button className={subTab === 'patrones' ? 'active' : ''} onClick={() => setSubTab('patrones')}>📌 Patrones</button>
+      <button className={subTab === 'brillantes' ? 'active' : ''} onClick={() => setSubTab('brillantes')}>💎 Brillantes</button>
+      <button className={subTab === 'supervivencia' ? 'active' : ''} onClick={() => setSubTab('supervivencia')}>💀 Supervivencia</button>
+      <button className={subTab === 'speedrun' ? 'active' : ''} onClick={() => setSubTab('speedrun')}>⚡ Speed Run</button>
+      <button className={subTab === 'finales' ? 'active' : ''} onClick={() => setSubTab('finales')}>♟️ Finales</button>
+      <button className={subTab === 'espejo' ? 'active' : ''} onClick={() => setSubTab('espejo')}>🪩 Espejo</button>
       <button className={subTab === 'progreso' ? 'active' : ''} onClick={() => setSubTab('progreso')}>📊 Progreso</button>
     </div>
   );
@@ -220,6 +243,70 @@ export default function AperturaTraining({ onBack, hideBack }) {
       {!hideBack && <button className="back-btn" onClick={onBack}>← Volver</button>}
       {subTabsBar}
       <AdivinarApertura />
+    </div>
+  );
+
+  if (subTab === 'casillas') return (
+    <div className="apertura-training">
+      {!hideBack && <button className="back-btn" onClick={onBack}>← Volver</button>}
+      {subTabsBar}
+      <AprendizajeCasillas />
+    </div>
+  );
+
+  if (subTab === 'puzzles') return (
+    <div className="apertura-training">
+      {!hideBack && <button className="back-btn" onClick={onBack}>← Volver</button>}
+      {subTabsBar}
+      <PuzzlesTacticos />
+    </div>
+  );
+
+  if (subTab === 'patrones') return (
+    <div className="apertura-training">
+      {!hideBack && <button className="back-btn" onClick={onBack}>← Volver</button>}
+      {subTabsBar}
+      <PatronesTacticos />
+    </div>
+  );
+
+  if (subTab === 'brillantes') return (
+    <div className="apertura-training">
+      {!hideBack && <button className="back-btn" onClick={onBack}>← Volver</button>}
+      {subTabsBar}
+      <BrillantesHistoricos />
+    </div>
+  );
+
+  if (subTab === 'supervivencia') return (
+    <div className="apertura-training">
+      {!hideBack && <button className="back-btn" onClick={onBack}>← Volver</button>}
+      {subTabsBar}
+      <ModoSupervivencia />
+    </div>
+  );
+
+  if (subTab === 'speedrun') return (
+    <div className="apertura-training">
+      {!hideBack && <button className="back-btn" onClick={onBack}>← Volver</button>}
+      {subTabsBar}
+      <SpeedRun />
+    </div>
+  );
+
+  if (subTab === 'finales') return (
+    <div className="apertura-training">
+      {!hideBack && <button className="back-btn" onClick={onBack}>← Volver</button>}
+      {subTabsBar}
+      <EndgameTrainer />
+    </div>
+  );
+
+  if (subTab === 'espejo') return (
+    <div className="apertura-training">
+      {!hideBack && <button className="back-btn" onClick={onBack}>← Volver</button>}
+      {subTabsBar}
+      <ModoEspejo />
     </div>
   );
 

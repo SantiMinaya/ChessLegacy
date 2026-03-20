@@ -1,0 +1,181 @@
+.analisis-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.analisis-panel {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 900px;
+  max-height: 90vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.analisis-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.analisis-header h2 { color: var(--accent); margin: 0; font-size: 1.2rem; }
+
+.analisis-close {
+  background: transparent;
+  border: 1px solid var(--border-subtle);
+  color: var(--text-muted);
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all var(--transition);
+}
+.analisis-close:hover { border-color: var(--error); color: var(--error); }
+
+.analisis-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 60px 24px;
+  color: var(--text-secondary);
+}
+
+.analisis-spinner {
+  width: 48px; height: 48px;
+  border: 4px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.analisis-progress-bar {
+  width: 300px; height: 6px;
+  background: var(--bg-primary);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.analisis-progress-bar div {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--accent-hover));
+  transition: width 0.3s ease;
+  border-radius: 3px;
+}
+
+.analisis-resumen {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--border-subtle);
+  flex-wrap: wrap;
+}
+
+.analisis-precision {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: rgba(212,175,55,0.1);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 16px;
+  min-width: 70px;
+}
+.analisis-precision span  { font-size: 1.6rem; font-weight: bold; color: var(--accent); }
+.analisis-precision label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; }
+
+.analisis-resumen-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--bg-card);
+  border: 1px solid;
+  border-radius: 8px;
+  padding: 8px 12px;
+  min-width: 70px;
+}
+.analisis-resumen-item span  { font-size: 14px; font-weight: bold; }
+.analisis-resumen-item label { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+.analisis-content { padding: 0; }
+
+.analisis-body {
+  display: grid;
+  grid-template-columns: 400px 1fr;
+  gap: 0;
+  min-height: 500px;
+}
+
+.analisis-board {
+  padding: 20px;
+  border-right: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.analisis-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.analisis-nav button {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+  width: 36px; height: 36px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background var(--transition);
+}
+.analisis-nav button:hover:not(:disabled) { background: rgba(212,175,55,0.15); }
+.analisis-nav button:disabled { opacity: 0.3; cursor: default; }
+.analisis-nav span { color: var(--text-muted); font-size: 13px; min-width: 50px; text-align: center; }
+
+.analisis-move-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: var(--bg-card);
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.analisis-moves-list {
+  padding: 16px;
+  overflow-y: auto;
+  max-height: 520px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.analisis-move-row {
+  display: grid;
+  grid-template-columns: 28px 1fr 50px;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background var(--transition);
+}
+.analisis-move-row:hover  { background: var(--bg-card); }
+.analisis-move-row.active { background: rgba(212,175,55,0.15); }
+
+.analisis-move-num  { font-size: 12px; color: var(--text-muted); }
+.analisis-move-san  { font-size: 14px; font-weight: 500; }
+.analisis-move-eval { font-size: 12px; color: var(--text-muted); text-align: right; }

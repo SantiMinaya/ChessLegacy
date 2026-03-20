@@ -24,7 +24,7 @@ public class StockfishEngine
         { "petrosian",  -50 },  // Defensivo, acepta tablas
     };
 
-    public async Task<(string bestMove, int evaluation)> AnalyzePosition(string fen, string? maestro = null)
+    public async Task<(string bestMove, int evaluation)> AnalyzePosition(string fen, string? maestro = null, int profundidad = 20)
     {
         return await Task.Run(() =>
         {
@@ -72,7 +72,7 @@ public class StockfishEngine
 
                 // Analizar posición
                 process.StandardInput.WriteLine($"position fen {fen}");
-                process.StandardInput.WriteLine("go depth 20");
+                process.StandardInput.WriteLine($"go depth {profundidad}");
                 Console.WriteLine("Comandos de análisis enviados");
 
                 string bestMove = "";
