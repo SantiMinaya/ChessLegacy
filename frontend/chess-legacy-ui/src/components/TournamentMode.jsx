@@ -193,13 +193,8 @@ export default function TournamentMode({ onBack }) {
 
   const isPlayerTurn = game.turn() === 'w' && !thinking;
 
-  const executeMove = useCallback(async (from, to) => {
-    return makeMove(from, to);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [game, thinking, phase]);
-
   const { onSquareClick, onPieceDrop, customSquareStyles, tryExecutePremove } = useChessInput(
-    game, playerColor, isPlayerTurn, executeMove
+    game, playerColor, isPlayerTurn, makeMove
   );
   if (phase === PHASES.CONFIG) return (
     <div className="tournament">

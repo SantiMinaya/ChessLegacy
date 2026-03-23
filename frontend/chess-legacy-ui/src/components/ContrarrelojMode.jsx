@@ -3,12 +3,14 @@ import { Chessboard } from 'react-chessboard';
 import { Chess } from 'chess.js';
 import { aperturasAPI, progresoAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import { useBoardTheme } from '../context/BoardThemeContext';
 
 const SECONDS_PER_MOVE = 10;
 const PHASES = { SELECT: 'select', PLAYING: 'playing', DONE: 'done' };
 
 export default function ContrarrelojMode() {
   const { user } = useAuth();
+  const { boardProps } = useBoardTheme();
   const [phase, setPhase] = useState(PHASES.SELECT);
   const [color, setColor] = useState('white');
   const [game, setGame] = useState(new Chess());
@@ -238,7 +240,7 @@ export default function ContrarrelojMode() {
 
       <div className="training-layout">
         <div className="board-wrap">
-          <Chessboard position={game.fen()} onPieceDrop={onPieceDrop} boardOrientation={color} boardWidth={480} arePiecesDraggable={myTurn} />
+          <Chessboard position={game.fen()} onPieceDrop={onPieceDrop} boardOrientation={color} boardWidth={480} arePiecesDraggable={myTurn} {...boardProps} />
         </div>
         <div className="training-sidebar">
           <div className={`feedback-box ${feedback?.type || ''}`}>

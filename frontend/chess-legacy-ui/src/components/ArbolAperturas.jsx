@@ -11,7 +11,7 @@ const V_GAP = 64;
 // Estado de progreso por variante considerando ambos colores
 function getEstadoColor(prog) {
   if (!prog || prog.sesiones === 0) return 'sin-empezar';
-  return prog.sesionesPerfectas >= 3 ? 'completada' : 'a-medias';
+  return prog.sesionesPerfectas >= 10 ? 'completada' : 'a-medias';
 }
 
 function getEstado(progWhite, progBlack) {
@@ -23,7 +23,6 @@ function getEstado(progWhite, progBlack) {
 }
 
 const ESTADO_ICON = { 'sin-empezar': '○', 'a-medias': '◑', 'completada': '●' };
-const ESTADO_LABEL = { 'sin-empezar': 'Sin empezar', 'a-medias': 'En progreso', 'completada': 'Completada' };
 
 export default function ArbolAperturas({ onPracticar, refreshKey = 0 }) {
   const { user } = useAuth();
@@ -202,10 +201,10 @@ export default function ArbolAperturas({ onPracticar, refreshKey = 0 }) {
                   </text>
                   {/* Indicadores de color blancas/negras */}
                   <text x={10} y={NODE_H / 2 + 9} dominantBaseline="middle" className={`arbol-estado-text estado-${estadoW}`} fontSize="9">
-                    ♔ {estadoW === 'completada' ? '✓✓✓' : estadoW === 'a-medias' ? `${progW?.sesionesPerfectas ?? 0}/3` : '—'}
+                    ♔ {estadoW === 'completada' ? '✓✓✓' : estadoW === 'a-medias' ? `${progW?.sesionesPerfectas ?? 0}/10` : '—'}
                   </text>
                   <text x={NODE_W / 2 + 4} y={NODE_H / 2 + 9} dominantBaseline="middle" className={`arbol-estado-text estado-${estadoB}`} fontSize="9">
-                    ♚ {estadoB === 'completada' ? '✓✓✓' : estadoB === 'a-medias' ? `${progB?.sesionesPerfectas ?? 0}/3` : '—'}
+                    ♚ {estadoB === 'completada' ? '✓✓✓' : estadoB === 'a-medias' ? `${progB?.sesionesPerfectas ?? 0}/10` : '—'}
                   </text>
                 </g>
               );

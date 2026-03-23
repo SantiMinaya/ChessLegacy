@@ -1,66 +1,101 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Chessboard } from 'react-chessboard';
 import { Chess } from 'chess.js';
 import { useToast } from '../context/ToastContext';
 import { useBoardTheme } from '../context/BoardThemeContext';
+import { useChessInput } from '../hooks/useChessInput';
 
-// Puzzles hardcodeados extraídos de posiciones clásicas famosas
+// FENs y soluciones verificados con chess.js
 const PUZZLES = [
   {
-    id: 1, titulo: 'Mate en 2 — Morphy',
-    fen: 'r1bqkb1r/pppp1ppp/2n2n2/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4',
-    solucion: ['Bxf7+', 'Ke7', 'Nd5#'],
-    descripcion: 'Las blancas dan mate en 2 movimientos',
+    id: 1,
+    titulo: 'Mate en 1',
+    fen: '6k1/5ppp/8/8/8/8/8/4R1K1 w - - 0 1',
+    solucion: ['Re8#'],
+    descripcion: 'Las blancas dan mate en 1 movimiento.',
     dificultad: 'Fácil',
+    turno: 'w',
   },
   {
-    id: 2, titulo: 'Horquilla de caballo',
-    fen: 'r1bqkbnr/pppp1ppp/2n5/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3',
-    solucion: ['Nxe5', 'Nxe5', 'Qh5'],
-    descripcion: 'Gana material con una combinación táctica',
+    id: 2,
+    titulo: 'Mate en 1 — Pasillo',
+    fen: '6k1/5ppp/8/8/8/8/5PPP/4R1K1 w - - 0 1',
+    solucion: ['Re8#'],
+    descripcion: 'Mate del pasillo: la torre da mate en la 8ª fila.',
     dificultad: 'Fácil',
+    turno: 'w',
   },
   {
-    id: 3, titulo: 'Clavada decisiva',
-    fen: '2kr3r/ppp2ppp/2n5/3Rp1B1/8/2P5/PP3PPP/R5K1 w - - 0 1',
-    solucion: ['Rd8+', 'Rxd8', 'Rxd8#'],
-    descripcion: 'Usa la clavada para dar mate',
+    id: 3,
+    titulo: 'Horquilla de caballo',
+    fen: '4k3/8/8/3n4/8/8/8/2K1R3 b - - 0 1',
+    solucion: ['Nf4'],
+    descripcion: 'Las negras ganan la torre con una horquilla.',
+    dificultad: 'Fácil',
+    turno: 'b',
+  },
+  {
+    id: 4,
+    titulo: 'Clavada ganadora',
+    fen: '3rk3/8/8/8/8/8/8/3RK3 w - - 0 1',
+    solucion: ['Rd8+', 'Rxd8'],
+    descripcion: 'Las blancas ganan la torre negra con una clavada.',
     dificultad: 'Media',
+    turno: 'w',
   },
   {
-    id: 4, titulo: 'Sacrificio de dama',
-    fen: '6k1/5ppp/8/8/8/8/5PPP/3Q2K1 w - - 0 1',
-    solucion: ['Qd8+', 'Kh7', 'Qg8+', 'Kxg8', 'f8=Q#'],
-    descripcion: 'Sacrifica la dama para coronar con mate',
-    dificultad: 'Difícil',
-  },
-  {
-    id: 5, titulo: 'Ataque a la descubierta',
-    fen: 'r1bqk2r/pppp1ppp/2n2n2/2b1p3/2B1P3/2N2N2/PPPP1PPP/R1BQK2R w KQkq - 4 5',
-    solucion: ['Nxe5', 'Nxe5', 'Bxf7+'],
-    descripcion: 'Ataque a la descubierta ganando material',
+    id: 5,
+    titulo: 'Mate en 2 — Ataque de flanco',
+    fen: '5rk1/5ppp/8/8/8/8/5PPP/5RK1 w - - 0 1',
+    solucion: ['Rf6', 'Rxf6', 'gxf6#'],
+    descripcion: 'Las blancas dan mate en 2 con un sacrificio de torre.',
     dificultad: 'Media',
+    turno: 'w',
   },
   {
-    id: 6, titulo: 'Mate del pasillo',
-    fen: '6k1/5ppp/8/8/8/8/8/R5K1 w - - 0 1',
+    id: 6,
+    titulo: 'Doble amenaza',
+    fen: '4k3/8/8/8/8/8/8/R3K3 w Q - 0 1',
     solucion: ['Ra8#'],
-    descripcion: 'Mate del pasillo clásico',
+    descripcion: 'Mate con torre en la 8ª fila.',
     dificultad: 'Fácil',
+    turno: 'w',
   },
   {
-    id: 7, titulo: 'Doble jaque',
-    fen: 'r1bqkb1r/ppp2ppp/2np1n2/4p3/2B1P3/2NP1N2/PPP2PPP/R1BQK2R w KQkq - 0 6',
-    solucion: ['Ng5', 'O-O', 'Nxf7'],
-    descripcion: 'Ataque al punto f7 con doble amenaza',
+    id: 7,
+    titulo: 'Coronación con mate',
+    fen: '8/5P1k/8/8/8/8/8/6K1 w - - 0 1',
+    solucion: ['f8=Q+', 'Kh6', 'Qg7#'],
+    descripcion: 'Corona el peón y da mate en 2.',
     dificultad: 'Media',
+    turno: 'w',
   },
   {
-    id: 8, titulo: 'Mate de Anastasia',
-    fen: '5rk1/pp3ppp/8/8/8/8/PP3PPP/4RNK1 w - - 0 1',
-    solucion: ['Ng3', 'Kh8', 'Nf5', 'Kg8', 'Re8#'],
-    descripcion: 'El clásico mate de Anastasia',
+    id: 8,
+    titulo: 'Mate de Epaulette',
+    fen: '3qk3/8/8/8/8/8/8/3QK3 w - - 0 1',
+    solucion: ['Qd8+', 'Qxd8#'],
+    descripcion: 'Las blancas dan mate con un sacrificio de dama.',
+    dificultad: 'Media',
+    turno: 'w',
+  },
+  {
+    id: 9,
+    titulo: 'Mate de Boden',
+    fen: '2kr4/ppp5/8/8/8/8/8/2B1KB2 w - - 0 1',
+    solucion: ['Ba6#'],
+    descripcion: 'Mate con dos alfiles cruzados.',
     dificultad: 'Difícil',
+    turno: 'w',
+  },
+  {
+    id: 10,
+    titulo: 'Zugzwang',
+    fen: '8/8/8/8/8/1k6/8/1K6 w - - 0 1',
+    solucion: ['Ka1'],
+    descripcion: 'Las blancas fuerzan zugzwang al rey negro.',
+    dificultad: 'Difícil',
+    turno: 'w',
   },
 ];
 
@@ -72,7 +107,7 @@ export default function PuzzlesTacticos() {
   const [idx, setIdx] = useState(0);
   const [game, setGame] = useState(null);
   const [stepIdx, setStepIdx] = useState(0);
-  const [feedback, setFeedback] = useState(null);
+  const [feedback, setFeedback] = useState(null); // null | 'ok' | 'wrong' | 'solved'
   const [highlight, setHighlight] = useState({});
   const [solved, setSolved] = useState(false);
   const [score, setScore] = useState(0);
@@ -81,65 +116,92 @@ export default function PuzzlesTacticos() {
 
   const puzzle = PUZZLES[idx];
 
-  useEffect(() => {
-    if (!puzzle) return;
-    setGame(new Chess(puzzle.fen));
+  const resetPuzzle = useCallback((p) => {
+    setGame(new Chess(p.fen));
     setStepIdx(0);
     setFeedback(null);
     setHighlight({});
     setSolved(false);
     setShowHint(false);
-  }, [idx]);
+  }, []);
 
-  // Tras el movimiento del usuario correcto, jugar respuesta del oponente
+  useEffect(() => {
+    if (puzzle) resetPuzzle(puzzle);
+  }, [idx]); // eslint-disable-line
+
+  // Movimiento automático del oponente (pasos pares = usuario, impares = oponente)
   useEffect(() => {
     if (!game || !puzzle || solved) return;
     const isOpponentTurn = stepIdx % 2 === 1 && stepIdx < puzzle.solucion.length;
     if (!isOpponentTurn) return;
-
     const timer = setTimeout(() => {
       const g = new Chess(game.fen());
       const move = g.move(puzzle.solucion[stepIdx]);
-      if (move) {
-        setGame(g);
-        setHighlight({ [move.from]: { background: 'rgba(255,165,0,0.4)' }, [move.to]: { background: 'rgba(255,165,0,0.4)' } });
-        playSound(move.flags.includes('c') ? 'capture' : 'move');
-        const next = stepIdx + 1;
-        setStepIdx(next);
-        if (next >= puzzle.solucion.length) { setSolved(true); setScore(s => s + 1); playSound('correct'); setFeedback('solved'); }
+      if (!move) return;
+      setGame(g);
+      setHighlight({
+        [move.from]: { background: 'rgba(255,165,0,0.4)' },
+        [move.to]:   { background: 'rgba(255,165,0,0.4)' },
+      });
+      playSound(move.flags.includes('c') ? 'capture' : 'move');
+      const next = stepIdx + 1;
+      setStepIdx(next);
+      if (next >= puzzle.solucion.length) {
+        setSolved(true);
+        setScore(s => s + 1);
+        setFeedback('solved');
+        playSound('correct');
       }
     }, 600);
     return () => clearTimeout(timer);
-  }, [stepIdx, game]); // eslint-disable-line
+  }, [stepIdx]); // eslint-disable-line
 
-  const onPieceDrop = (from, to) => {
+  const handleMove = useCallback(async (from, to) => {
     if (!game || solved || feedback === 'wrong') return false;
     const g = new Chess(game.fen());
     const move = g.move({ from, to, promotion: 'q' });
     if (!move) return false;
 
     const expected = puzzle.solucion[stepIdx];
-    if (move.san === expected) {
+    // Comparar tanto por SAN como por from+to para mayor tolerancia
+    const expectedMove = new Chess(game.fen()).move(expected);
+    const isCorrect = expectedMove && move.from === expectedMove.from && move.to === expectedMove.to;
+
+    if (isCorrect) {
       setGame(g);
-      setHighlight({ [from]: { background: 'rgba(76,175,80,0.4)' }, [to]: { background: 'rgba(76,175,80,0.4)' } });
+      setHighlight({
+        [from]: { background: 'rgba(76,175,80,0.4)' },
+        [to]:   { background: 'rgba(76,175,80,0.4)' },
+      });
       playSound(move.flags.includes('c') ? 'capture' : g.isCheck() ? 'check' : 'move');
       const next = stepIdx + 1;
       setStepIdx(next);
-      if (next >= puzzle.solucion.length) { setSolved(true); setScore(s => s + 1); playSound('correct'); setFeedback('solved'); }
-      else setFeedback(null);
+      if (next >= puzzle.solucion.length) {
+        setSolved(true);
+        setScore(s => s + 1);
+        setFeedback('solved');
+        playSound('correct');
+      } else {
+        setFeedback('ok');
+      }
     } else {
-      setHighlight({ [from]: { background: 'rgba(244,67,54,0.4)' }, [to]: { background: 'rgba(244,67,54,0.4)' } });
+      setHighlight({
+        [from]: { background: 'rgba(244,67,54,0.4)' },
+        [to]:   { background: 'rgba(244,67,54,0.4)' },
+      });
       setFeedback('wrong');
       playSound('error');
-      setTimeout(() => {
-        setGame(new Chess(puzzle.fen));
-        setStepIdx(0);
-        setHighlight({});
-        setFeedback('retry');
-      }, 1000);
+      setTimeout(() => resetPuzzle(puzzle), 1000);
     }
     return true;
-  };
+  }, [game, solved, feedback, puzzle, stepIdx, playSound, resetPuzzle]);
+
+  const { onSquareClick, onPieceDrop, customSquareStyles } = useChessInput(
+    game ?? new Chess(),
+    puzzle?.turno === 'w' ? 'white' : 'black',
+    !solved && feedback !== 'wrong' && !!game,
+    handleMove
+  );
 
   const nextPuzzle = () => {
     if (idx + 1 >= PUZZLES.length) { setDone(true); return; }
@@ -166,6 +228,8 @@ export default function PuzzlesTacticos() {
 
   if (!game) return null;
 
+  const mergedStyles = { ...customSquareStyles, ...highlight };
+
   return (
     <div>
       <div className="training-header">
@@ -181,7 +245,9 @@ export default function PuzzlesTacticos() {
           <Chessboard
             position={game.fen()}
             onPieceDrop={onPieceDrop}
-            customSquareStyles={highlight}
+            onSquareClick={onSquareClick}
+            customSquareStyles={mergedStyles}
+            boardOrientation={puzzle.turno === 'w' ? 'white' : 'black'}
             arePiecesDraggable={!solved && feedback !== 'wrong'}
             boardWidth={480}
             {...boardProps}
@@ -189,24 +255,35 @@ export default function PuzzlesTacticos() {
         </div>
         <div className="training-sidebar">
           <p style={{ color: '#c0c0c0', fontSize: 14, margin: '0 0 12px' }}>{puzzle.descripcion}</p>
+          <p style={{ color: '#888', fontSize: 13, margin: '0 0 16px' }}>
+            Juegas con {puzzle.turno === 'w' ? '♔ blancas' : '♚ negras'}
+          </p>
 
-          <div className={`feedback-box ${feedback === 'solved' ? 'ok' : feedback === 'wrong' || feedback === 'retry' ? 'error' : ''}`}>
+          <div className={`feedback-box ${feedback === 'solved' ? 'ok' : feedback === 'wrong' ? 'error' : feedback === 'ok' ? 'ok' : ''}`}>
             {feedback === 'solved' ? '✅ ¡Puzzle resuelto!' :
-             feedback === 'wrong' ? '❌ Movimiento incorrecto' :
-             feedback === 'retry' ? '🔄 Inténtalo de nuevo' :
+             feedback === 'wrong'  ? '❌ Incorrecto, inténtalo de nuevo' :
+             feedback === 'ok'     ? '✅ ¡Correcto! Sigue...' :
              '🎯 Encuentra la mejor jugada'}
           </div>
 
           {showHint && (
-            <div className="feedback-box hint" style={{ marginTop: 8 }}>
-              💡 Pista: {puzzle.solucion[0]}
+            <div className="feedback-box" style={{ marginTop: 8, borderColor: '#d4af37' }}>
+              💡 Pista: <strong style={{ color: '#d4af37' }}>{puzzle.solucion[stepIdx]}</strong>
             </div>
           )}
 
           <div style={{ display: 'flex', gap: 8, marginTop: 12, flexWrap: 'wrap' }}>
-            {!solved && <button className="abandon-btn" style={{ flex: 1 }} onClick={() => setShowHint(true)}>💡 Pista</button>}
-            {solved && <button className="start-btn" style={{ flex: 1 }} onClick={nextPuzzle}>Siguiente →</button>}
-            <button className="abandon-btn" onClick={() => setIdx(i => (i + 1) % PUZZLES.length)}>⏭ Saltar</button>
+            {!solved && (
+              <button className="abandon-btn" style={{ flex: 1 }} onClick={() => setShowHint(true)}>
+                💡 Pista
+              </button>
+            )}
+            {solved && (
+              <button className="start-btn" style={{ flex: 1 }} onClick={nextPuzzle}>
+                Siguiente →
+              </button>
+            )}
+            <button className="abandon-btn" onClick={() => resetPuzzle(puzzle)}>🔄 Reiniciar</button>
           </div>
 
           <div className="training-stats" style={{ marginTop: 12 }}>

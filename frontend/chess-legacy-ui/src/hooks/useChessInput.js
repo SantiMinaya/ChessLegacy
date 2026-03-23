@@ -31,7 +31,7 @@ export function useChessInput(game, playerColor, canMove, onMove) {
       };
     }
     return squares;
-  }, [game]);
+  }, [game, showLegalMoves]);
 
   const clearSelection = useCallback(() => {
     setSelectedSquare(null);
