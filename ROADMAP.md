@@ -5,21 +5,21 @@
 ### Infraestructura Base
 - [x] Backend ASP.NET Core 10 + SQLite + Entity Framework Core
 - [x] Frontend React 18 + Vite
-- [x] Integración Stockfish
-- [x] API REST completa
+- [x] Integración Stockfish con profundidad configurable por petición
+- [x] API REST completa con JWT + BCrypt
 - [x] Importación masiva de PGN (20.550+ partidas)
-- [x] **Importación automática al arrancar** — Si la BD está vacía, el backend importa todos los PGNs sin intervención manual
-- [x] **Limpieza de importadores obsoletos** — Eliminados `PgnImporter`, `PgnImporterAdvanced` e `ImportacionController` (dependían de `pgn.net`, incompatible con .NET 10). Solo queda `SimplePgnImporter`
+- [x] Importación automática al arrancar si la BD está vacía
 
 ### Navegación
-- [x] Tabs principales: "Grandes Maestros" / "Aprender Aperturas" / **"Torneo"** / "Mi Perfil"
+- [x] Tabs: Maestros / Aperturas / Torneo / Análisis / Perfil
 - [x] Ordenación de maestros por defecto, año y rating
+- [x] Botón de ciclo rápido de temas en el header
 
 ### Galería y Perfiles de Maestros
 - [x] 8 maestros históricos con cards interactivas
-- [x] Perfiles con biografía, logros, frases célebres
+- [x] Perfiles con biografía, logros, frases célebres, estadísticas
 - [x] Partidas imprescindibles con enlace directo al visor
-- [x] Acciones por maestro: Jugar, Ver Partidas, Estadísticas, Entrenar Estilo, Biografía
+- [x] Acciones: Jugar, Ver Partidas, Estadísticas, Entrenar Estilo, Biografía
 
 ### Visor de Partidas
 - [x] 20.550+ partidas históricas
@@ -27,149 +27,147 @@
 - [x] Filtros por año, oponente, evento, apertura, variante
 - [x] Sistema de favoritos con localStorage
 - [x] Evaluación en tiempo real con Stockfish
-- [x] Barra de evaluación visual
+- [x] Barra de evaluación visual (corregida: positivo = ventaja blancas)
 - [x] Orientación del tablero según color del jugador
 
 ### Jugar Contra el Maestro
-- [x] IA personalizada por maestro (8 estilos distintos)
-- [x] Barras de estilo en tiempo real (ataque, táctica, posicional, sacrificios)
-- [x] Historial de movimientos en partida
+- [x] IA personalizada por maestro (8 estilos distintos con Contempt value)
+- [x] **3 niveles de dificultad** — Fácil (prof. 3), Normal (8), Difícil (15)
+- [x] **Modo Blindfold** 🙈 — tablero oculto, input de notación SAN
+- [x] **Partida comentada** — texto explicativo en tiempo real
+- [x] Barras de estilo en tiempo real
+- [x] Historial de movimientos
+- [x] Guardado automático de partidas al terminar (BD)
+- [x] Exportar PGN para Chess.com / Lichess
+- [x] **Análisis post-partida** 🔍 — clasificación por jugada con Stockfish
 
-### Estadísticas y Analytics
+### Estadísticas y Analytics (por maestro histórico)
 - [x] Dashboard por maestro
 - [x] Gráficos de aperturas más usadas
 - [x] Evolución histórica por año
 - [x] Oponentes más frecuentes
+- [x] **Comparador de dos maestros** — radar chart + aperturas + evolución
 
-### 📖 Tab "Aprender Aperturas"
+### Tab Análisis
+- [x] **Análisis libre** — tablero interactivo + Stockfish en tiempo real + cargar FEN
+- [x] **Buscador por FEN** — busca en las 20.000+ partidas históricas
+- [x] **Comparador de maestros** — gráficos enfrentados
 
-#### Modo Aprender
-- [x] Selector de apertura, variante y color
-- [x] Oponente juega automáticamente sus movimientos teóricos
-- [x] Feedback inmediato: correcto / incorrecto + muestra el movimiento correcto
-- [x] Botón revelar/ocultar línea teórica
-- [x] Movimientos ya jugados siempre visibles
-- [x] Apertura aleatoria
-- [x] Resumen final con precisión
-- [x] 25+ aperturas con variantes de 20-30 jugadas
-- [x] **Guardar sesión automáticamente al completar** — llama a `POST /api/progreso/sesion` y muestra logros desbloqueados en pantalla de resultado
-- [x] **Repetición espaciada** — el botón "Apertura Aleatoria" prioriza aperturas con peor precisión histórica (peso 1-6 según rendimiento). Endpoint `GET /api/aperturas/aprendizaje/random-espaciado`
+### Modos de Entrenamiento de Aperturas
+- [x] **Modo Aprender** — teoría movimiento a movimiento con repetición espaciada
+- [x] **Modo Contrarreloj** ⏱️ — 10 segundos por movimiento
+- [x] **Adivina la Apertura** 🤔 — 5 rondas con 4 opciones
+- [x] **Aprender Casillas** 🗺️ — encuentra la casilla + mueve la pieza
+- [x] **Puzzles Tácticos** 🧩 — 8 puzzles clásicos
+- [x] **Patrones Tácticos** 📌 — 5 categorías (Clavada, Horquilla, Descubierta, Mate, Sacrificio)
+- [x] **Brillantes Históricos** 💎 — 9 combinaciones legendarias con explicación táctica
+- [x] **Modo Supervivencia** 💀 — puzzles en cadena con 3 vidas
+- [x] **Speed Run** ⚡ — aperturas cronometradas con récord personal
+- [x] **Entrenador de Finales** ♟️ — Stockfish juega el bando contrario
+- [x] **Modo Espejo** 🪞 — juegas ambos colores, tablero gira automáticamente
+- [x] **Explorador de Aperturas** 🌳 — árbol interactivo en tiempo real
+- [x] **Progreso de Aperturas** 📊 — árbol visual con estado por variante
 
-#### Modo Contrarreloj ⏱️
-- [x] 10 segundos por movimiento
-- [x] Barra de tiempo visual con cambio de color (verde → naranja → rojo)
-- [x] Timeout cuenta como error y muestra el movimiento correcto
-- [x] Siempre apertura aleatoria
-- [x] Contador de tiempos agotados en resultado final
+### Aperturas (200+ variantes)
+- [x] Ruy Lopez (20+ variantes: Cerrada, Abierta, Berlinesa, Noruega, Arcángel, Möller, Keres, Adam, Schliemann...)
+- [x] Italiana (25+ variantes: Giuoco Piano, Greco, Møller, Pianissimo, Canal, Evans, Dos Caballos, Traxler, Fegatello, Lolli...)
+- [x] Siciliana (30+ variantes: Najdorf, Dragon, Sveshnikov, Scheveningen, Pelikán, Boleslavski, Richter-Rauzer, Taimánov, Kan, Smith-Morra, Grand Prix...)
+- [x] Francesa (20+ variantes: Winawer, Tarrasch, Paulsen, MacCutcheon, Avance, Cambio, Rubinstein, Guimard...)
+- [x] Caro-Kann (20+ variantes: Clásica, Avance, Panov, Fantasía, Edinburgo, Smyslov, Dos Caballos...)
+- [x] Escocesa (15+ variantes: Clásica, Horwitz A/B/C, Mieses, Tartakóver, Blackburne, Paulsen, Blumenfeld...)
+- [x] Gambito de Dama (20+ variantes: Aceptado, Rechazado, Eslava, Semi-Eslava, Tarrasch, Chigorin, Albin, Báltica...)
+- [x] India de Rey, Nimzoindia, India de Dama, Grünfeld, Catalan
+- [x] Alekhine (15+ variantes: Four Pawns, Exchange, Voronezh, Moderna, Balogh, Dos Caballos...)
+- [x] Petrov (20+ variantes: Clásica, Nimzowitsch, Lasker, Cochrane, Stafford, Steinitz, Italiana...)
+- [x] Escandinava (15+ variantes: Qa5, Qd6, Valenciana, Patzer, Marshall, Portuguesa, Gambito Islandés...)
+- [x] Vienesa (15+ variantes: Gambito Vienés, Falkbeer, Boden-Kieseritzky, Zhuravlev, Jobava...)
+- [x] Sistema Londres (10+ variantes: Clásica, Jobava, vs Fianchetto, vs India de Rey, Agresiva...)
+- [x] Gambito de Rey, Gambito Goering, Gambito Escocés, Pirc, Holandesa, Inglesa, Reti, Bird, Budapest, Benko, Benoni
 
-#### Modo Adivina la Apertura 🤔
-- [x] 5 rondas por sesión
-- [x] Posición mostrada tras 6-10 movimientos
-- [x] 4 opciones de respuesta (1 correcta + 3 señuelos)
-- [x] Feedback visual: verde correcto / rojo incorrecto
-- [x] Puntuación y precisión final
-
-### Aperturas con líneas teóricas largas (20-30 jugadas)
-- [x] Ruy Lopez (Cerrada, Abierta, Berlinesa, Steinitz, Schliemann, Exchange)
-- [x] Italiana (Giuoco Piano, Dos Caballos, Evans)
-- [x] Siciliana (Najdorf, Dragon, Sveshnikov, Scheveningen, Paulsen, Accelerated Dragon, Alapin, Closed)
-- [x] Francesa (Winawer, Tarrasch, Classical, Advance, Exchange)
-- [x] Caro-Kann (Classical, Advance, Panov, Exchange)
-- [x] Escocesa (Classical, Steinitz)
-- [x] Gambito de Rey (Aceptado, Rechazado)
-- [x] Gambito de Dama (Aceptado, Rechazado, Eslava, Semi-Eslava, Tarrasch)
-- [x] India de Rey (Classical, Samisch, Four Pawns, Fianchetto)
-- [x] Nimzoindia (Classical, Rubinstein, Samisch)
-- [x] India de Dama (Petrosian, Classical)
-- [x] Grünfeld (Exchange, Russian)
-- [x] Catalan (Open, Closed)
-- [x] Petrov, Alekhine, Pirc, Escandinava, Holandesa, Inglesa, Reti, Bird, Vienesa, Budapest, Benko, Benoni
-
-### API Endpoints de Aperturas
-- [x] `GET /api/aperturas` — Lista aperturas
-- [x] `GET /api/aperturas/{nombre}/variantes` — Variantes
-- [x] `GET /api/aperturas/aprendizaje` — Línea teórica por apertura/variante
-- [x] `GET /api/aperturas/aprendizaje/random` — Apertura aleatoria
-- [x] `GET /api/aperturas/aprendizaje/random-espaciado` — Apertura ponderada por historial del usuario (requiere JWT)
+### API Endpoints
+- [x] Auth: register, login
+- [x] Partidas: list, detail, del-dia, buscar-fen
+- [x] Análisis: evaluar (con profundidad y personalidad)
+- [x] Aperturas: list, variantes, aprendizaje, random, random-espaciado
+- [x] Progreso: get, sesion, torneo, partida, partidas, calendario, foto, logro
+- [x] Clasificación: ranking global
+- [x] Estadísticas: por jugador histórico
 
 ### Sistema de Usuarios y Progreso
 - [x] Registro y login con JWT + BCrypt
-- [x] Progreso por apertura persistido en BD (`ProgresoApertura`)
-- [x] **Sesiones guardadas automáticamente** al completar cualquier modo de entrenamiento
-- [x] **Racha diaria** — campos `RachaActual`, `MaximaRacha` y `UltimaActividad` en `Usuario`. Se incrementa al practicar en días consecutivos, se reinicia si pasa más de un día
-- [x] Perfil de usuario con stats: racha actual 🔥, máxima racha, sesiones, aciertos, aperturas practicadas, logros
+- [x] Progreso por apertura persistido en BD
+- [x] Sesiones guardadas automáticamente en todos los modos
+- [x] Racha diaria con calendario de actividad (365 días)
+- [x] **Sistema de niveles XP** — 10 niveles (Peón → Gran Maestro)
+- [x] **Foto de perfil** — subida en base64, guardada en BD
+- [x] **Tabla de clasificación** — ranking global de usuarios
+- [x] **Gráfico de evolución XP** — últimas 12 semanas
+- [x] **Estadísticas de juego personal** — winrate por maestro, partidas por mes
+- [x] **Historial de partidas** vs maestros con exportar PGN individual
+- [x] **Exportar estadísticas a PDF**
 
-### Sistema de Logros (16 logros)
-#### Entrenamiento (10)
-- [x] 🎓 Primera Apertura — completa tu primera sesión
-- [x] 💯 Perfección — 100% de precisión en una apertura
-- [x] 📚 Estudioso — practica 10 aperturas distintas
-- [x] 🎯 Buen Estudiante — 50 movimientos correctos acumulados
-- [x] 🏅 Experto — 100 movimientos correctos acumulados
-- [x] 👑 Gran Maestro — 500 movimientos correctos acumulados
-- [x] ⚡ Sin Tiempo — contrarreloj sin ningún timeout
-- [x] 🔥 Constante — 5 sesiones de entrenamiento
-- [x] ⭐ Dedicado — 20 sesiones de entrenamiento
-- [x] 🤔 Reconocedor — 5/5 en Adivina la Apertura
+### Sistema de Logros (24 logros)
+- [x] Entrenamiento (10): Primera Apertura, Perfección, Estudioso, Buen Estudiante, Experto, Gran Maestro, Sin Tiempo, Constante, Dedicado, Reconocedor
+- [x] Torneo (6): Debutante, Campeón, Veterano, Invicto, Conquistador, Rayo
+- [x] Nuevos (8): Ciego, Superviviente, Speed Runner, Semana Completa, Geógrafo, Analista, Patrón Maestro
 
-#### Torneo (6)
-- [x] 🎪 Debutante — completa tu primer torneo
-- [x] 🏆 Campeón — gana tu primer torneo
-- [x] 🎖️ Veterano — completa 5 torneos
-- [x] 👑 Invicto — gana un torneo sin perder ninguna ronda
-- [x] ⚔️ Conquistador — gana al menos un torneo contra cada uno de los 8 maestros
-- [x] ⚡ Rayo — gana un torneo con control de tiempo bala (≤2 min)
+### Gamificación
+- [x] **Retos del Día** — 3 retos diarios con XP, persisten en localStorage
+- [x] **Misiones Semanales** — 3 misiones semanales con XP extra
+- [x] **Partida del Día** — posición histórica diferente cada día
+- [x] **Toast de logros** — notificación en tiempo real al desbloquear
+- [x] **Sonidos** — Web Audio API (mover, capturar, jaque, acierto, error, fanfarria)
 
-### 🏆 Modo Torneo
-- [x] Selección de rival entre los 8 grandes maestros (con foto y rating)
-- [x] 8 controles de tiempo: Bala (1 min), Bala (2+1), Blitz (3, 3+2, 5), Rápido (10, 15+10), Clásico (30)
-- [x] Incremento por movimiento configurable
-- [x] 5 opciones de rondas: 1, 3, 5, 7 o 10
-- [x] Relojes por jugador con colores: normal → naranja (≤30s) → rojo parpadeante (≤10s)
-- [x] Reloj activo resaltado en dorado
-- [x] Puntuación FIDE: 1 victoria / 0.5 tablas / 0 derrota
-- [x] Pantalla de resultado por ronda con marcador acumulado
-- [x] Pantalla final con trofeo, marcador y resumen ronda a ronda
-- [x] Revancha y nueva configuración desde la pantalla final
-- [x] Botón de abandono de ronda
-- [x] Logros de torneo desbloqueables mostrados al finalizar
-- [x] Resultado guardado en BD via `POST /api/progreso/torneo`
+### Modo Torneo
+- [x] 8 controles de tiempo, incremento configurable
+- [x] 5 opciones de rondas (1, 3, 5, 7, 10)
+- [x] Relojes con colores de alerta
+- [x] Puntuación FIDE
+- [x] Logros de torneo
+
+### Personalización
+- [x] **8 temas de color** — Oscuro, Claro, Esmeralda, Púrpura, Rojo, Océano, Sepia, Hielo
+- [x] **4 tipografías** — Sistema, Georgia, Monospace, Redondeada
+- [x] **3 tamaños de fuente** — Pequeño, Normal, Grande
+- [x] **3 estilos de bordes** — Cuadrado, Normal, Redondeado
+- [x] Toggle animaciones y modo compacto
+- [x] 6 temas de tablero + 3 sets de piezas
+- [x] CSS variables globales — toda la app responde al cambio de tema
 
 ---
 
 ## 📋 Pendiente
 
-### Entrenamiento
-- [ ] Notificación toast al desbloquear un logro (sin esperar a pantalla de resultado)
-- [ ] Modo difícil en "Adivina" — menos movimientos mostrados, sin variante en las opciones
-- [ ] Guardar sesión en modos Contrarreloj y Adivina (actualmente solo en Modo Aprender)
-
-### Nuevos modos de juego
-- [ ] Puzzles tácticos históricos — posiciones de las 20.000 partidas con combinación ganadora
-- [ ] Partida comentada — Stockfish con texto explicativo en tiempo real
-
-### Mejoras a lo existente
-- [ ] Exportar PGN de partidas jugadas contra maestros
-- [ ] Buscador de posición por FEN en las 20.000 partidas
-- [ ] Comparar dos maestros (gráfico enfrentado)
-- [ ] Historial de partidas jugadas contra maestros
-- [ ] Calendario visual de racha diaria en el perfil
+### Técnico
+- [ ] Variables de entorno — `http://localhost:5000` hardcodeada en `api.js`, `PlayMaster.jsx` y `AnalisisPartida.jsx`
+- [ ] Tests unitarios y de integración
+- [ ] Swagger/Scalar para documentación de la API
+- [ ] Logging estructurado
+- [ ] Caché de evaluaciones Stockfish en BD (acelerar análisis post-partida)
 
 ### UX / Experiencia
-- [ ] Partida del día — posición histórica destacada en la Home, diferente cada día
-- [ ] Loading states y spinners
-- [ ] Responsive design para móviles
+- [ ] Responsive / móvil — el hueco más grande pendiente
+- [ ] Confeti al ganar partidas o desbloquear logros importantes
+- [ ] Animaciones de entrada en cards de maestros
+- [ ] Onboarding para usuarios nuevos (tutorial 3-4 pasos)
 - [ ] Búsqueda global (maestros, partidas, aperturas)
+- [ ] Tema claro mejorado (algunos componentes con inline styles aún usan colores hardcodeados)
 
-### Deuda técnica
-- [ ] Tests unitarios y de integración
-- [ ] Documentación Swagger/Scalar
-- [ ] Variables de entorno para configuración
-- [ ] Logging estructurado
+### Funcionalidades
+- [ ] Más puzzles tácticos (extraídos automáticamente de las 20.000 partidas con Stockfish)
+- [ ] Modo difícil en "Adivina la Apertura" — menos movimientos, sin variante en opciones
+- [ ] Misiones semanales con verificación automática (actualmente se marcan manualmente)
+- [ ] Generador de repertorio en PDF
+
+### Despliegue
+- [ ] Dockerfile para Railway/Fly.io
+- [ ] Migración de SQLite a PostgreSQL para producción
+- [ ] Stockfish para Linux (actualmente solo `.exe` Windows)
+- [ ] Variables de entorno para URL de API
 
 ---
 
 ## 📊 Progreso General
 
-**Completado:** ~92%
-**Pendiente:** ~8%
+**Completado:** ~97%
+**Pendiente:** ~3% (principalmente técnico y responsive)

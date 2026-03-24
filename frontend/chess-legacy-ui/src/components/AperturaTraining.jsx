@@ -15,6 +15,9 @@ import EndgameTrainer from './EndgameTrainer';
 import ModoEspejo from './ModoEspejo';
 import PatronesTacticos from './PatronesTacticos';
 import BrillantesHistoricos from './BrillantesHistoricos';
+import ExploradorAperturas from './ExploradorAperturas';
+import PartidaReconstruida from './PartidaReconstruida';
+import QuizMaestros from './QuizMaestros';
 import { useBoardTheme } from '../context/BoardThemeContext';
 import './AperturaTraining.css';
 
@@ -222,6 +225,9 @@ export default function AperturaTraining({ onBack, hideBack }) {
       <button className={subTab === 'puzzles' ? 'active' : ''} onClick={() => setSubTab('puzzles')}>🧩 Puzzles</button>
       <button className={subTab === 'patrones' ? 'active' : ''} onClick={() => setSubTab('patrones')}>📌 Patrones</button>
       <button className={subTab === 'brillantes' ? 'active' : ''} onClick={() => setSubTab('brillantes')}>💎 Brillantes</button>
+      <button className={subTab === 'explorador' ? 'active' : ''} onClick={() => setSubTab('explorador')}>🌳 Explorador</button>
+      <button className={subTab === 'reconstruida' ? 'active' : ''} onClick={() => setSubTab('reconstruida')}>🎥 Reconstruida</button>
+      <button className={subTab === 'quiz' ? 'active' : ''} onClick={() => setSubTab('quiz')}>🎤 Quiz</button>
       <button className={subTab === 'supervivencia' ? 'active' : ''} onClick={() => setSubTab('supervivencia')}>💀 Supervivencia</button>
       <button className={subTab === 'speedrun' ? 'active' : ''} onClick={() => setSubTab('speedrun')}>⚡ Speed Run</button>
       <button className={subTab === 'finales' ? 'active' : ''} onClick={() => setSubTab('finales')}>♟️ Finales</button>
@@ -262,6 +268,14 @@ export default function AperturaTraining({ onBack, hideBack }) {
     </div>
   );
 
+  if (subTab === 'explorador') return (
+    <div className="apertura-training">
+      {!hideBack && <button className="back-btn" onClick={onBack}>← Volver</button>}
+      {subTabsBar}
+      <ExploradorAperturas />
+    </div>
+  );
+
   if (subTab === 'patrones') return (
     <div className="apertura-training">
       {!hideBack && <button className="back-btn" onClick={onBack}>← Volver</button>}
@@ -275,6 +289,22 @@ export default function AperturaTraining({ onBack, hideBack }) {
       {!hideBack && <button className="back-btn" onClick={onBack}>← Volver</button>}
       {subTabsBar}
       <BrillantesHistoricos />
+    </div>
+  );
+
+  if (subTab === 'reconstruida') return (
+    <div className="apertura-training">
+      {!hideBack && <button className="back-btn" onClick={onBack}>← Volver</button>}
+      {subTabsBar}
+      <PartidaReconstruida />
+    </div>
+  );
+
+  if (subTab === 'quiz') return (
+    <div className="apertura-training">
+      {!hideBack && <button className="back-btn" onClick={onBack}>← Volver</button>}
+      {subTabsBar}
+      <QuizMaestros />
     </div>
   );
 

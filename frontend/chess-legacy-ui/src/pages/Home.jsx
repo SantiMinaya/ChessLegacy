@@ -9,6 +9,7 @@ import RetosDelDia from '../components/RetosDelDia';
 import AnalisisLibre from '../components/AnalisisLibre';
 import BuscadorFen from '../components/BuscadorFen';
 import ComparadorMaestros from '../components/ComparadorMaestros';
+import MapaCalor from '../components/MapaCalor';
 import './Home.css';
 
 export default function Home() {
@@ -46,7 +47,7 @@ export default function Home() {
       {tab === 'analisis' && (
         <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 20px' }}>
           <div style={{ display: 'flex', gap: 12, marginBottom: 28, flexWrap: 'wrap' }}>
-            {[['libre', '🔬 Análisis libre'], ['fen', '🔍 Buscar por FEN'], ['comparar', '⚔️ Comparar Maestros']].map(([v, l]) => (
+            {[['libre', '🔬 Análisis libre'], ['fen', '🔍 Buscar por FEN'], ['comparar', '⚔️ Comparar Maestros'], ['calor', '🔥 Mapa de Calor']].map(([v, l]) => (
               <button key={v} onClick={() => setAnalisisTab(v)} style={{
                 padding: '8px 18px', borderRadius: 8, border: '1px solid #d4af37',
                 background: analisisTab === v ? '#d4af37' : 'transparent',
@@ -58,6 +59,7 @@ export default function Home() {
           {analisisTab === 'libre' && <AnalisisLibre />}
           {analisisTab === 'fen' && <BuscadorFen onVerPartida={(id) => navigate(`/partida/${id}`)} />}
           {analisisTab === 'comparar' && <ComparadorMaestros />}
+          {analisisTab === 'calor' && <MapaCalor />}
         </div>
       )}
 

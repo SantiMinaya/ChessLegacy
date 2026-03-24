@@ -9,7 +9,8 @@ const PATRONES = {
     nombre: 'Clavada', emoji: '📌', desc: 'Una pieza no puede moverse sin exponer a otra más valiosa',
     puzzles: [
       { fen: '2kr3r/ppp2ppp/2n5/3Rp1B1/8/2P5/PP3PPP/R5K1 w - - 0 1', solucion: ['Rd8+', 'Rxd8', 'Rxd8#'], titulo: 'Clavada al rey' },
-      { fen: 'r1bqk2r/pppp1ppp/2n2n2/2b1p3/2B1P3/5N2/PPPP1PPP/RNBQ1RK1 b kq - 5 4', solucion: ['Bxf2+', 'Rxf2', 'Nxe4'], titulo: 'Clavada del alfil' },
+      // Turno blancas: clavada con alfil
+      { fen: 'r1bqk2r/pppp1ppp/2n2n2/4p3/2B1P3/5N2/PPPP1PPP/RNBQ1RK1 w kq - 0 1', solucion: ['Ng5', 'O-O', 'Nxf7'], titulo: 'Clavada en f7' },
     ]
   },
   horquilla: {
@@ -38,7 +39,7 @@ const PATRONES = {
     nombre: 'Sacrificio', emoji: '💎', desc: 'Ceder material para obtener una ventaja decisiva',
     puzzles: [
       { fen: '6k1/5ppp/8/8/8/8/5PPP/3Q2K1 w - - 0 1', solucion: ['Qd8+', 'Kh7', 'Qg8+', 'Kxg8', 'f8=Q#'], titulo: 'Sacrificio de dama' },
-      { fen: 'r2qkb1r/ppp2ppp/2n1pn2/3p4/3P1B2/2N2N2/PPP1PPPP/R2QKB1R w KQkq - 0 6', solucion: ['Bxb8', 'Rxb8', 'Nxd5'], titulo: 'Sacrificio posicional' },
+      { fen: 'r1bk3r/p2pBpNp/n4n2/1p1NP2P/6P1/3P4/P1P1K3/q5b1 w - - 0 1', solucion: ['Nd6+', 'cxd6', 'Bc6#'], titulo: 'La Inmortal' },
     ]
   },
 };
@@ -61,27 +62,32 @@ export default function PatronesTacticos() {
   const patron = patronActual ? PATRONES[patronActual] : null;
   const puzzle = patron?.puzzles[puzzleIdx];
 
+  // Determinar orientación según turno del FEN
+  const orientacion = puzzle ? (new Chess(puzzle.fen).turn() === 'w' ? 'white' : 'black') : 'white';
+
   useEffect(() => {
     if (!puzzle) return;
-    setGame(new Chess(puzzle.fen));
+    try { setGame(new Chess(puzzle.fen)); } catch { setGame(null); }
     setStepIdx(0); setFeedback(null); setHighlight({}); setSolved(false);
   }, [puzzleIdx, patronActual]);
 
+  // Movimiento del oponente (índices impares)
   useEffect(() => {
     if (!game || !puzzle || solved) return;
     const isOpponent = stepIdx % 2 === 1 && stepIdx < puzzle.solucion.length;
     if (!isOpponent) return;
     const t = setTimeout(() => {
       const g = new Chess(game.fen());
-      const m = g.move(puzzle.solucion[stepIdx]);
-      if (m) {
+      try {
+        const m = g.move(puzzle.solucion[stepIdx]);
+        if (!m) return;
         setGame(g);
         setHighlight({ [m.from]: { background: 'rgba(255,165,0,0.4)' }, [m.to]: { background: 'rgba(255,165,0,0.4)' } });
-        playSound('move');
+        playSound(m.flags.includes('c') ? 'capture' : 'move');
         const next = stepIdx + 1;
         setStepIdx(next);
         if (next >= puzzle.solucion.length) { setSolved(true); playSound('correct'); setFeedback('solved'); }
-      }
+      } catch {}
     }, 500);
     return () => clearTimeout(t);
   }, [stepIdx, game]); // eslint-disable-line
@@ -89,43 +95,45 @@ export default function PatronesTacticos() {
   const onPieceDrop = (from, to) => {
     if (!game || solved || feedback === 'wrong') return false;
     const g = new Chess(game.fen());
-    const m = g.move({ from, to, promotion: 'q' });
+    let m;
+    try { m = g.move({ from, to, promotion: 'q' }); } catch { return false; }
     if (!m) return false;
     if (m.san === puzzle.solucion[stepIdx]) {
       setGame(g);
       setHighlight({ [from]: { background: 'rgba(76,175,80,0.4)' }, [to]: { background: 'rgba(76,175,80,0.4)' } });
-      playSound(m.flags.includes('c') ? 'capture' : 'move');
+      playSound(m.flags.includes('c') ? 'capture' : g.isCheck() ? 'check' : 'move');
       const next = stepIdx + 1;
       setStepIdx(next);
       if (next >= puzzle.solucion.length) { setSolved(true); playSound('correct'); setFeedback('solved'); }
+      else setFeedback(null);
     } else {
       setHighlight({ [from]: { background: 'rgba(244,67,54,0.4)' }, [to]: { background: 'rgba(244,67,54,0.4)' } });
       setFeedback('wrong'); playSound('error');
-      setTimeout(() => { setGame(new Chess(puzzle.fen)); setStepIdx(0); setHighlight({}); setFeedback('retry'); }, 900);
+      setTimeout(() => {
+        try { setGame(new Chess(puzzle.fen)); } catch {}
+        setStepIdx(0); setHighlight({}); setFeedback('retry');
+      }, 900);
     }
     return true;
   };
 
   const siguientePuzzle = () => {
-    const puzzles = patron.puzzles;
-    if (puzzleIdx + 1 < puzzles.length) {
+    if (puzzleIdx + 1 < patron.puzzles.length) {
       setPuzzleIdx(i => i + 1);
     } else {
-      // Patrón completado
       const nuevos = new Set(completados);
       nuevos.add(patronActual);
       setCompletados(nuevos);
       localStorage.setItem('patrones_completados', JSON.stringify([...nuevos]));
       setPatronActual(null);
+      setPuzzleIdx(0);
     }
   };
 
   if (!patronActual) return (
     <div style={{ maxWidth: 700, margin: '0 auto' }}>
       <h2 style={{ color: 'var(--accent)', margin: '0 0 8px' }}>🧩 Patrones Tácticos</h2>
-      <p style={{ color: 'var(--text-muted)', fontSize: 14, margin: '0 0 20px' }}>
-        Aprende los patrones tácticos más importantes del ajedrez
-      </p>
+      <p style={{ color: 'var(--text-muted)', fontSize: 14, margin: '0 0 20px' }}>Aprende los patrones tácticos más importantes del ajedrez</p>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 12 }}>
         {Object.entries(PATRONES).map(([key, p]) => {
           const done = completados.has(key);
@@ -135,7 +143,7 @@ export default function PatronesTacticos() {
               background: done ? 'rgba(76,175,80,0.1)' : 'var(--bg-card)',
               border: `1px solid ${done ? 'rgba(76,175,80,0.4)' : 'var(--border)'}`,
               borderRadius: 12, padding: '20px 16px', cursor: 'pointer',
-              transition: 'all var(--transition)',
+              transition: 'all var(--transition)', color: 'inherit',
             }}>
               <span style={{ fontSize: 32 }}>{p.emoji}</span>
               <span style={{ fontWeight: 'bold', color: 'var(--text-primary)', fontSize: 14 }}>{p.nombre}</span>
@@ -150,7 +158,7 @@ export default function PatronesTacticos() {
     </div>
   );
 
-  if (!game) return null;
+  if (!game) return <p style={{ color: 'var(--text-muted)', textAlign: 'center', padding: 40 }}>⏳ Cargando...</p>;
 
   return (
     <div>
@@ -163,18 +171,30 @@ export default function PatronesTacticos() {
       </div>
       <div className="training-layout">
         <div className="board-wrap">
-          <Chessboard position={game.fen()} onPieceDrop={onPieceDrop} customSquareStyles={highlight}
-            arePiecesDraggable={!solved && feedback !== 'wrong'} boardWidth={480} {...boardProps} />
+          <Chessboard
+            position={game.fen()}
+            onPieceDrop={onPieceDrop}
+            boardOrientation={orientacion}
+            customSquareStyles={highlight}
+            arePiecesDraggable={!solved && feedback !== 'wrong'}
+            boardWidth={480}
+            {...boardProps}
+          />
         </div>
         <div className="training-sidebar">
           <p style={{ color: 'var(--text-secondary)', fontSize: 14, margin: '0 0 12px' }}>{patron.desc}</p>
           <div className={`feedback-box ${feedback === 'solved' ? 'ok' : feedback === 'wrong' || feedback === 'retry' ? 'error' : ''}`}>
-            {feedback === 'solved' ? '✅ ¡Correcto!' : feedback === 'wrong' ? '❌ Incorrecto' : feedback === 'retry' ? '🔄 Inténtalo de nuevo' : '🎯 Encuentra la jugada táctica'}
+            {feedback === 'solved' ? '✅ ¡Correcto!' :
+             feedback === 'wrong'  ? '❌ Incorrecto' :
+             feedback === 'retry'  ? '🔄 Inténtalo de nuevo' :
+             `🎯 Mueves las ${orientacion === 'white' ? 'blancas' : 'negras'}`}
           </div>
-          {solved && <button className="start-btn" style={{ marginTop: 12 }} onClick={siguientePuzzle}>
-            {puzzleIdx + 1 < patron.puzzles.length ? 'Siguiente →' : '✅ Completar patrón'}
-          </button>}
-          <button className="abandon-btn" style={{ marginTop: 8 }} onClick={() => setPatronActual(null)}>← Volver</button>
+          {solved && (
+            <button className="start-btn" style={{ marginTop: 12 }} onClick={siguientePuzzle}>
+              {puzzleIdx + 1 < patron.puzzles.length ? 'Siguiente →' : '✅ Completar patrón'}
+            </button>
+          )}
+          <button className="abandon-btn" style={{ marginTop: 8 }} onClick={() => { setPatronActual(null); setPuzzleIdx(0); }}>← Volver</button>
         </div>
       </div>
     </div>

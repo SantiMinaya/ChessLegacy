@@ -9,41 +9,50 @@ export default function PartidaDelDia({ onVerPartida }) {
   const { boardProps } = useBoardTheme();
   const [partida, setPartida] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [fen, setFen] = useState('start');
+  const [fen, setFen] = useState('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1');
   const [moveIdx, setMoveIdx] = useState(0);
-  const [fens, setFens] = useState(['start']);
+  const [fens, setFens] = useState([]);
 
   useEffect(() => {
     partidasAPI.getDelDia()
       .then(r => { setPartida(r.data); buildFens(r.data.pgn); })
-      .catch(() => setLoading(false))
+      .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
 
   const buildFens = (pgn) => {
     try {
       const g = new Chess();
-      const positions = ['start'];
-      // Limpiar cabeceras PGN
-      const moves = pgn.replace(/\[.*?\]\s*/gs, '').trim();
-      const tokens = moves.split(/\s+/).filter(t => t && !/^\d+\./.test(t) && !['1-0','0-1','1/2-1/2','*'].includes(t));
+      const positions = [g.fen()];
+      // Eliminar cabeceras línea a línea sin flag s
+      const lines = pgn.split('\n');
+      const movesLines = lines.filter(l => !l.trim().startsWith('['));
+      const movesText = movesLines.join(' ').trim();
+      // Tokenizar: eliminar números de movimiento y resultados
+      const tokens = movesText
+        .split(/\s+/)
+        .filter(t => t && !/^\d+\./.test(t) && !['1-0','0-1','1/2-1/2','*'].includes(t));
       for (const t of tokens) {
-        const m = g.move(t);
-        if (!m) break;
-        positions.push(g.fen());
+        try {
+          const m = g.move(t);
+          if (!m) break;
+          positions.push(g.fen());
+        } catch { break; }
       }
       setFens(positions);
-      // Mostrar posición tras 10 movimientos
       const mid = Math.min(10, positions.length - 1);
       setMoveIdx(mid);
       setFen(positions[mid]);
-    } catch { setFen('start'); }
+    } catch {
+      setFens([]);
+    }
   };
 
   const navigate = (idx) => {
+    if (!fens.length) return;
     const i = Math.max(0, Math.min(fens.length - 1, idx));
     setMoveIdx(i);
-    setFen(fens[i] === 'start' ? 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1' : fens[i]);
+    setFen(fens[i]);
   };
 
   if (loading) return <div className="pdd-loading">⏳ Cargando partida del día...</div>;
@@ -72,16 +81,16 @@ export default function PartidaDelDia({ onVerPartida }) {
             {...boardProps}
           />
           <div className="pdd-nav">
-            <button onClick={() => navigate(0)}>⏮</button>
-            <button onClick={() => navigate(moveIdx - 1)}>◀</button>
-            <span>{moveIdx}/{fens.length - 1}</span>
-            <button onClick={() => navigate(moveIdx + 1)}>▶</button>
-            <button onClick={() => navigate(fens.length - 1)}>⏭</button>
+            <button onClick={() => navigate(0)} disabled={moveIdx === 0}>⏮</button>
+            <button onClick={() => navigate(moveIdx - 1)} disabled={moveIdx === 0}>◀</button>
+            <span>{moveIdx}/{Math.max(0, fens.length - 1)}</span>
+            <button onClick={() => navigate(moveIdx + 1)} disabled={moveIdx >= fens.length - 1}>▶</button>
+            <button onClick={() => navigate(fens.length - 1)} disabled={moveIdx >= fens.length - 1}>⏭</button>
           </div>
         </div>
         <div className="pdd-actions">
-          <p style={{ color: '#888', fontSize: 13, margin: '0 0 12px' }}>
-            Resultado: <strong style={{ color: '#d4af37' }}>{partida.resultado}</strong>
+          <p style={{ color: 'var(--text-muted)', fontSize: 13, margin: '0 0 12px' }}>
+            Resultado: <strong style={{ color: 'var(--accent)' }}>{partida.resultado}</strong>
           </p>
           <button className="pdd-btn" onClick={() => onVerPartida(partida.id)}>
             🔍 Ver partida completa

@@ -1,268 +1,394 @@
+<div align="center">
+
 # ♟️ Chess Legacy
 
-Sistema de análisis histórico de ajedrez con evaluación híbrida, juego contra maestros legendarios y entrenamiento de aperturas.
+**Plataforma completa de entrenamiento y análisis de ajedrez**
 
-## 📋 Requisitos Previos
+[![React](https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev)
+[![.NET](https://img.shields.io/badge/.NET-10.0-512BD4?style=for-the-badge&logo=dotnet&logoColor=white)](https://dotnet.microsoft.com)
+[![Vite](https://img.shields.io/badge/Vite-5-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev)
+[![SQLite](https://img.shields.io/badge/SQLite-003B57?style=for-the-badge&logo=sqlite&logoColor=white)](https://sqlite.org)
+[![Stockfish](https://img.shields.io/badge/Stockfish-Engine-orange?style=for-the-badge)](https://stockfishchess.org)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)](LICENSE)
 
-- **Node.js** 18+ y npm
-- **.NET SDK** 10.0 o superior
-- **Stockfish** (ejecutable en `backend/ChessLegacy.API/stockfish/stockfish.exe`)
-- **Git**
+*Juega contra maestros legendarios · Entrena aperturas · Analiza con Stockfish · Compite en torneos*
+
+---
+
+[🎮 Modos de juego](#-modos-de-juego) · [📖 Aperturas](#-aperturas) · [🏆 Torneo](#-torneo) · [🔬 Análisis](#-análisis) · [👤 Perfil](#-perfil) · [🚀 Instalación](#-instalación)
+
+</div>
+
+---
+
+## ✨ ¿Qué es Chess Legacy?
+
+Chess Legacy es una plataforma web de ajedrez con **más de 20 modos de entrenamiento**, evaluación con Stockfish, 20.550+ partidas históricas de los 8 grandes maestros de la historia, sistema de progresión con XP y logros, y personalización completa de la interfaz.
+
+---
 
 ## 🚀 Instalación
 
-### 1. Clonar repositorio
+### Requisitos
+
+| Herramienta | Versión mínima |
+|-------------|---------------|
+| Node.js | 18+ |
+| .NET SDK | 10.0+ |
+| Stockfish | Cualquiera |
+| Git | Cualquiera |
+
+### Pasos
 
 ```bash
+# 1. Clonar el repositorio
 git clone https://github.com/TU_USUARIO/chess-legacy.git
 cd chess-legacy
-```
 
-### 2. Backend (.NET)
-
-```bash
+# 2. Backend
 cd backend/ChessLegacy.API
-
 dotnet restore
 dotnet ef database update --context ChessLegacyContext
+dotnet run                    # → http://localhost:5000
 
-# Ejecutar API (puerto 5000)
-dotnet run
-```
-
-### 3. Frontend (React)
-
-```bash
+# 3. Frontend (nueva terminal)
 cd frontend/chess-legacy-ui
 npm install
-npm run dev
+npm run dev                   # → http://localhost:5173
 ```
 
-La aplicación estará disponible en: `http://localhost:5173`
+> **Nota:** Las 20.550+ partidas históricas se importan automáticamente al arrancar si la base de datos está vacía.
 
-### 4. Importar Partidas Históricas
+> **Stockfish:** Coloca el ejecutable en `backend/ChessLegacy.API/stockfish/stockfish.exe`
 
-```bash
-# Coloca archivos PGN en: backend/ChessLegacy.API/Scripts/pgn_files/
-curl -X POST http://localhost:5000/api/import/importar-todos
-```
+---
 
-## 📁 Estructura del Proyecto
+## 📁 Estructura del proyecto
 
 ```
 chess-legacy/
-├── backend/
+├── 📂 backend/
 │   └── ChessLegacy.API/
-│       ├── Controllers/          # Endpoints de la API
-│       ├── Services/             # Lógica de negocio + detección de aperturas
-│       ├── Repositories/         # Acceso a datos
-│       ├── Models/               # Entidades del dominio
-│       ├── Data/                 # Contexto y configuración DB
-│       ├── Engine/               # Integración Stockfish
-│       ├── Scripts/pgn_files/    # Archivos PGN para importar
-│       └── stockfish/            # Motor de ajedrez
+│       ├── Controllers/        # Endpoints REST
+│       ├── Services/           # Lógica + detección de aperturas (200+ variantes)
+│       ├── Engine/             # Integración Stockfish
+│       ├── Models/             # Entidades del dominio
+│       ├── Data/               # DbContext + migraciones EF Core
+│       └── Scripts/pgn_files/  # Archivos PGN por maestro
 │
-├── frontend/
-│   └── chess-legacy-ui/
-│       ├── src/
-│       │   ├── components/       # Componentes React
-│       │   ├── pages/            # Páginas principales
-│       │   ├── data/             # Datos estáticos y estilos
-│       │   ├── services/         # Llamadas a API
-│       │   └── public/images/    # Imágenes de maestros
-│       └── package.json
-│
-├── README.md
-└── ROADMAP.md
+└── 📂 frontend/
+    └── chess-legacy-ui/
+        └── src/
+            ├── components/     # +45 componentes React
+            ├── context/        # Auth, BoardTheme, Theme, Toast
+            ├── pages/          # Home, Login, PartidasFamosas
+            ├── data/           # masters.js, niveles.js
+            └── services/       # api.js
 ```
 
-## 🎮 Características
+---
 
-### ✅ Implementadas
+## 🎮 Modos de juego
 
-#### 1. Navegación principal con tabs
-- **Tab "Grandes Maestros"** — Galería con 8 maestros históricos, ordenable por año o rating
-- **Tab "Aprender Aperturas"** — Sistema completo de entrenamiento de aperturas
+### ⚔️ Jugar contra el Maestro
 
-#### 2. Galería de Maestros
-- 8 grandes maestros históricos con perfiles detallados
-- Biografías completas, estadísticas y frases célebres
-- Partidas imprescindibles con enlace directo al visor
+Enfrenta a 8 grandes maestros históricos con IA personalizada según su estilo real.
 
-#### 3. Visor de Partidas
-- 20.550+ partidas históricas importadas desde PGN
-- Navegación movimiento por movimiento
-- Filtros por año, oponente, evento, apertura y variante
-- Sistema de favoritos con localStorage
-- Evaluación en tiempo real con Stockfish
-- Barra de evaluación visual
+| Maestro | Estilo | ELO |
+|---------|--------|-----|
+| Mikhail Tal | Agresivo y táctico — sacrificios imposibles | 2705 |
+| Garry Kasparov | Universal y dinámico | 2851 |
+| Bobby Fischer | Preciso y perfeccionista | 2785 |
+| José R. Capablanca | Posicional y técnico | 2725 |
+| Anatoly Karpov | Profilaxis extrema | 2780 |
+| Alexander Alekhine | Combinaciones profundas | 2690 |
+| Tigran Petrosian | Defensa impenetrable | 2645 |
+| Magnus Carlsen | Maestro de finales | 2882 |
 
-#### 4. Jugar Contra el Maestro
-- IA personalizada por maestro con estilos históricos:
-  - **Tal**: Agresivo y táctico (90% ataque)
-  - **Capablanca**: Posicional y preciso (90% posicional)
-  - **Kasparov**: Universal y dinámico
-  - **Fischer**: Preciso y perfeccionista
-  - **Karpov**: Profilaxis extrema
-  - **Alekhine**: Combinaciones profundas
-  - **Petrosian**: Defensa impenetrable
-  - **Carlsen**: Maestro de finales
-- Visualización de barras de estilo en tiempo real
+**Características:**
+- 🎯 **3 niveles de dificultad** — Fácil (prof. 3), Normal (8), Difícil (15)
+- 🙈 **Modo Blindfold** — tablero oculto, juegas en notación SAN
+- 💬 **Partida comentada** — Stockfish explica la posición en tiempo real
+- 🔍 **Análisis post-partida** — clasifica cada jugada (Excelente / Bueno / Imprecisión / Error / Blunder)
+- 📥 **Exportar PGN** para analizar en Chess.com o Lichess
 
-#### 5. Estadísticas y Analytics
-- Dashboard por maestro
-- Gráficos de aperturas más usadas
-- Evolución histórica por año
-- Oponentes más frecuentes
+---
 
-#### 6. 📖 Aprender Aperturas (tab dedicada)
+### 📖 Modos de Entrenamiento de Aperturas
 
-La tab de aperturas contiene tres modos de entrenamiento:
+> **13 modos distintos** accesibles desde la tab de Aperturas
 
-##### Modo Aprender
-- Selecciona apertura, variante y color (blancas/negras)
-- El oponente juega automáticamente sus movimientos teóricos
-- Si fallas: muestra el movimiento correcto 1.5s y te deja reintentar
-- Botón para revelar/ocultar la línea teórica
-- Los movimientos ya jugados siempre se muestran
-- Apertura aleatoria con un clic
-- Resumen final con precisión y aciertos/errores
-- **25+ aperturas** con variantes de **20-30 jugadas** cada una
+| Modo | Descripción |
+|------|-------------|
+| 📖 **Aprender** | Teoría movimiento a movimiento con repetición espaciada |
+| ⏱️ **Contrarreloj** | 10 segundos por movimiento |
+| 🤔 **Adivina la Apertura** | 5 rondas, 4 opciones de respuesta |
+| 🗺️ **Aprender Casillas** | Encuentra la casilla / Mueve la pieza |
+| 🧩 **Puzzles Tácticos** | 8 puzzles clásicos con pistas |
+| 📌 **Patrones Tácticos** | 5 categorías: Clavada, Horquilla, Descubierta, Mate, Sacrificio |
+| 💎 **Brillantes Históricos** | 9 combinaciones legendarias con explicación táctica |
+| 💀 **Supervivencia** | Puzzles en cadena con 3 vidas |
+| ⚡ **Speed Run** | Aperturas cronometradas con récord personal |
+| ♟️ **Entrenador de Finales** | Stockfish juega el bando contrario |
+| 🪞 **Modo Espejo** | Juegas ambos colores, tablero gira automáticamente |
+| 🌳 **Explorador de Aperturas** | Árbol interactivo en tiempo real |
+| 🎭 **Partida Reconstruida** | Adivina los movimientos de un maestro en una partida real |
+| 🎤 **Quiz de Maestros** | ¿Quién jugó esta posición? 4 opciones |
 
-##### Modo Contrarreloj ⏱️
-- 10 segundos por movimiento
-- Barra de tiempo visual: verde → naranja → rojo
-- Si se agota el tiempo cuenta como error y muestra el movimiento
-- Siempre arranca con apertura aleatoria
-- Contador separado de tiempos agotados en el resultado
+---
 
-##### Modo Adivina la Apertura 🤔
-- 5 rondas por partida
-- Se muestra una posición tras 6-10 movimientos
-- 4 opciones de respuesta (1 correcta + 3 señuelos)
-- Las opciones incorrectas se marcan en rojo, la correcta en verde
-- Puntuación final con precisión
+### 🏆 Modo Torneo
 
-#### 7. Aperturas disponibles (25+)
-Ruy Lopez, Italiana, Siciliana, Francesa, Caro-Kann, Escocesa, Gambito de Rey, Petrov, Alekhine, Pirc, Escandinava, Gambito de Dama, India de Rey, Nimzoindia, India de Dama, Grünfeld, Benoni, Holandesa, Inglesa, Reti, Bird, Vienesa, Budapest, Benko, Catalan
+Juega torneos completos contra cualquier maestro con relojes reales.
 
-Cada apertura incluye sus principales variantes con líneas teóricas de 20-30 jugadas.
+- ⏰ **8 controles de tiempo** — Bala (1'), Bala (2'+1), Blitz (3', 3'+2, 5'), Rápido (10', 15'+10), Clásico (30')
+- 🔢 **5 opciones de rondas** — 1, 3, 5, 7 o 10
+- 🏅 **Puntuación FIDE** — 1 / 0.5 / 0
+- 🔴 Relojes con alertas de color (naranja ≤30s, rojo parpadeante ≤10s)
 
-## 📡 API Endpoints
+---
 
-### Jugadores
-- `GET /api/jugadores` — Lista todos los jugadores
-- `GET /api/jugadores/{id}` — Detalle de un jugador
+## 🔬 Análisis
+
+| Herramienta | Descripción |
+|-------------|-------------|
+| 🔬 **Análisis libre** | Tablero interactivo + Stockfish en tiempo real + cargar FEN |
+| 🔍 **Buscador por FEN** | Busca en las 20.000+ partidas históricas |
+| ⚔️ **Comparador de maestros** | Radar chart + aperturas + evolución temporal |
+| 🔥 **Mapa de calor** | Qué casillas ocupa más cada maestro, filtrable por pieza |
+
+---
+
+## 👤 Perfil
+
+### Sistema de niveles XP
+
+```
+♟️ Peón → 🏃 Alfil → 🐴 Caballo → 🏰 Torre → 👸 Dama
+→ 👑 Rey → 🎯 Candidato → 🏅 Maestro FIDE → 🥈 MI → 🏆 Gran Maestro
+```
+
+### Logros (24)
+
+<details>
+<summary>Ver todos los logros</summary>
+
+**Entrenamiento**
+- 🎓 Primera Apertura · 💯 Perfección · 📚 Estudioso · 🎯 Buen Estudiante
+- 🏅 Experto · 👑 Gran Maestro · ⚡ Sin Tiempo · 🔥 Constante · ⭐ Dedicado · 🤔 Reconocedor
+
+**Torneo**
+- 🎪 Debutante · 🏆 Campeón · 🎖️ Veterano · 👑 Invicto · ⚔️ Conquistador · ⚡ Rayo
+
+**Especiales**
+- 🙈 Ciego · 💀 Superviviente · ⚡ Speed Runner · 📅 Semana Completa · 🗺️ Geógrafo · 🔍 Analista · 🧩 Patrón Maestro
+
+</details>
+
+### Otras funcionalidades del perfil
+
+- 📅 **Calendario de actividad** — estilo GitHub contributions (365 días)
+- 🏆 **Tabla de clasificación** — ranking global de usuarios por XP
+- 📊 **Estadísticas de juego** — winrate por maestro, partidas por mes
+- 📈 **Gráfico de evolución XP** — últimas 12 semanas
+- 📸 **Foto de perfil** — subida desde el dispositivo
+- 📄 **Exportar PDF** — estadísticas completas en PDF
+- ⚔️ **Historial vs Maestros** — con exportar PGN individual
+
+---
+
+## 🎨 Personalización
+
+> Toda la app responde al cambio de tema instantáneamente gracias a CSS custom properties
+
+| Categoría | Opciones |
+|-----------|----------|
+| 🎨 **Temas de color** | Oscuro · Claro · Esmeralda · Púrpura · Rojo · Océano · Sepia · Hielo |
+| 🔤 **Tipografías** | Sistema · Georgia · Monospace · Redondeada |
+| 📏 **Tamaño de fuente** | Pequeño · Normal · Grande |
+| ⬜ **Bordes** | Cuadrado · Normal · Redondeado |
+| ♟️ **Temas de tablero** | Clásico · Verde · Azul · Púrpura · Noche · Nogal |
+| 🎭 **Sets de piezas** | Estándar · Neo · Flat |
+
+---
+
+## 📚 Aperturas disponibles
+
+> **200+ variantes** con líneas teóricas de 20-30 jugadas
+
+<details>
+<summary>Ver todas las aperturas</summary>
+
+| Apertura | Variantes destacadas |
+|----------|---------------------|
+| **Ruy Lopez** | Cerrada, Abierta, Berlinesa, Noruega, Arcángel, Möller, Keres, Adam, Schliemann... |
+| **Italiana** | Giuoco Piano, Greco, Møller, Pianissimo, Canal, Evans, Dos Caballos, Traxler, Fegatello... |
+| **Siciliana** | Najdorf, Dragon, Sveshnikov, Scheveningen, Pelikán, Boleslavski, Richter-Rauzer, Taimánov, Kan... |
+| **Francesa** | Winawer, Tarrasch, Paulsen, MacCutcheon, Avance, Cambio, Rubinstein, Guimard... |
+| **Caro-Kann** | Clásica, Avance, Panov, Fantasía, Edinburgo, Smyslov, Dos Caballos... |
+| **Escocesa** | Clásica, Horwitz A/B/C, Mieses, Tartakóver, Blackburne, Paulsen, Blumenfeld... |
+| **Gambito de Dama** | Aceptado, Rechazado, Eslava, Semi-Eslava, Tarrasch, Chigorin, Albin, Báltica... |
+| **Alekhine** | Four Pawns, Exchange, Voronezh, Moderna, Balogh, Dos Caballos... |
+| **Petrov** | Clásica, Nimzowitsch, Lasker, Cochrane, Stafford, Steinitz, Italiana... |
+| **Escandinava** | Qa5, Qd6, Valenciana, Patzer, Marshall, Portuguesa, Gambito Islandés... |
+| **Vienesa** | Gambito Vienés, Falkbeer, Boden-Kieseritzky, Zhuravlev, Jobava... |
+| **Sistema Londres** | Clásica, Jobava, vs Fianchetto, vs India de Rey, Agresiva, h3 Bh2... |
+| **Catalan** | Abierta, Cerrada (múltiples líneas) |
+| + India de Rey, Nimzoindia, Grünfeld, Benoni, Holandesa, Inglesa, Reti, Bird, Budapest, Benko... | |
+
+</details>
+
+---
+
+## 📡 API Reference
+
+<details>
+<summary>Ver endpoints</summary>
+
+### Autenticación
+```
+POST /api/auth/register
+POST /api/auth/login
+```
 
 ### Partidas
-- `GET /api/partidas` — Lista partidas con filtros
-  - Query params: `jugadorId`, `anioDesde`, `anioHasta`, `oponente`, `evento`, `nombreApertura`, `variante`
-- `GET /api/partidas/{id}` — Detalle de una partida
+```
+GET  /api/partidas                    # Lista con filtros
+GET  /api/partidas/{id}
+GET  /api/partidas/del-dia            # Seed por fecha
+GET  /api/partidas/buscar-fen?fen=... # Busca por posición
+```
 
 ### Análisis
-- `POST /api/analisis/evaluar` — Evalúa una posición FEN
-  - Body: `{ "fen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1" }`
-  - Response: `{ "evaluacion": 0, "mejorMovimiento": "e2e4" }`
+```
+POST /api/analisis/evaluar
+     Body: { "fen": "...", "maestro": "Tal", "profundidad": 10 }
+     Response: { "evaluacion": 34, "mejorMovimiento": "e2e4" }
+```
 
 ### Aperturas
-- `GET /api/aperturas` — Lista todas las aperturas
-- `GET /api/aperturas/{nombre}/variantes` — Variantes de una apertura
-- `GET /api/aperturas/aprendizaje?apertura=Siciliana&variante=Najdorf` — Línea teórica completa
-- `GET /api/aperturas/aprendizaje/random` — Apertura y variante aleatoria
+```
+GET /api/aperturas
+GET /api/aperturas/{nombre}/variantes
+GET /api/aperturas/aprendizaje?apertura=Siciliana&variante=Najdorf
+GET /api/aperturas/aprendizaje/random
+GET /api/aperturas/aprendizaje/random-espaciado   # JWT requerido
+```
 
-### Estadísticas
-- `GET /api/estadisticas/jugador/{id}` — Estadísticas completas del jugador
+### Progreso (JWT requerido)
+```
+GET  /api/progreso
+POST /api/progreso/sesion
+POST /api/progreso/torneo
+POST /api/progreso/partida
+GET  /api/progreso/partidas
+GET  /api/progreso/calendario
+POST /api/progreso/foto
+POST /api/progreso/logro
+GET  /api/clasificacion               # Público
+```
 
-### Importación
-- `POST /api/import/importar-todos` — Importa todos los archivos PGN
+</details>
 
-## 🔧 Configuración
+---
 
-### Base de Datos
-- SQLite (archivo: `ChessLegacy.db`)
-- Migraciones automáticas con Entity Framework Core
+## 🗃️ Base de datos
 
-### Stockfish
-- Profundidad de análisis: 10 (configurable en `StockfishEngine.cs`)
-- Tiempo de análisis: ~500ms por posición
+| Tabla | Descripción |
+|-------|-------------|
+| `Usuarios` | Username, PasswordHash, XP, Racha, Foto |
+| `ProgresoApertura` | Progreso por apertura/variante/color |
+| `LogroUsuario` | Logros desbloqueados |
+| `ActividadDiaria` | Días activos (calendario) |
+| `PartidasJugadas` | Historial vs maestros (PGN, resultado) |
+| `Jugadores` | 8 maestros históricos |
+| `Partidas` | 20.550+ partidas históricas |
+| `Movimientos` | Movimientos de cada partida |
+| `Aperturas` | Catálogo ECO |
 
-### Frontend
-- Puerto: 5173 (Vite default)
-- API URL: `http://localhost:5000` (configurable en `services/api.js`)
+---
+
+## 🛠️ Tecnologías
+
+<div align="center">
+
+| Backend | Frontend |
+|---------|----------|
+| ASP.NET Core 10.0 | React 18 + Vite |
+| Entity Framework Core | react-chessboard 4.7.1 |
+| SQLite | chess.js |
+| JWT + BCrypt | recharts |
+| Stockfish Engine | jsPDF |
+| | Web Audio API |
+
+</div>
+
+---
 
 ## 🐛 Troubleshooting
 
-### Backend no inicia
+<details>
+<summary>Backend no inicia</summary>
+
 ```bash
-dotnet --version   # Verificar .NET SDK
+dotnet --version   # Verificar .NET SDK 10+
 dotnet clean && dotnet build
 ```
+</details>
 
-### Frontend no carga
+<details>
+<summary>Frontend no carga</summary>
+
 ```bash
 rm -rf node_modules package-lock.json
 npm install
 ```
+</details>
 
-### Stockfish no funciona
-- Verificar que existe: `backend/ChessLegacy.API/stockfish/stockfish.exe`
-- Descargar desde: https://stockfishchess.org/download/
+<details>
+<summary>Stockfish no funciona</summary>
 
-### Base de datos corrupta
+Verificar que existe: `backend/ChessLegacy.API/stockfish/stockfish.exe`
+
+Descargar desde: https://stockfishchess.org/download/
+</details>
+
+<details>
+<summary>Base de datos corrupta</summary>
+
 ```bash
 rm ChessLegacy.db
-dotnet ef database update
+dotnet ef database update --context ChessLegacyContext
 ```
+</details>
 
-## 🚀 Producción
+---
+
+## 🚀 Despliegue
 
 ```bash
 # Backend
 dotnet publish -c Release -o ./publish
 
 # Frontend
-npm run build   # Archivos en dist/
+npm run build   # → dist/
 ```
 
-## 📚 Tecnologías
-
-### Backend
-- ASP.NET Core 10.0
-- Entity Framework Core
-- SQLite
-- Stockfish Chess Engine
-
-### Frontend
-- React 18
-- Vite
-- react-chessboard 4.7.1
-- chess.js
-- react-select
-- recharts
-
-## 👥 Maestros Incluidos
-
-1. **Mikhail Tal** (1936-1992) — El Mago de Riga
-2. **José Raúl Capablanca** (1888-1942) — La Máquina de Ajedrez
-3. **Garry Kasparov** (1963-presente) — El Ogro de Bakú
-4. **Bobby Fischer** (1943-2008) — El Genio Americano
-5. **Anatoly Karpov** (1951-presente) — La Boa Constrictora
-6. **Alexander Alekhine** (1892-1946) — El Poeta del Ajedrez
-7. **Tigran Petrosian** (1929-1984) — Tigran de Hierro
-8. **Magnus Carlsen** (1990-presente) — El Mozart del Ajedrez
-
-## 📝 Licencia
-
-MIT License
-
-## 🤝 Contribuir
-
-1. Fork el proyecto
-2. Crea una rama (`git checkout -b feature/NuevaFeature`)
-3. Commit (`git commit -m 'Add NuevaFeature'`)
-4. Push (`git push origin feature/NuevaFeature`)
-5. Abre un Pull Request
+> Para despliegue gratuito: **Vercel** (frontend) + **Railway** (backend + PostgreSQL)
+> Requiere migrar SQLite → PostgreSQL y adaptar Stockfish para Linux.
 
 ---
 
-Desarrollado para la asignatura de Desarrollo de Servicios Web y para uso personal, principalmente para estudiar aperturas de ajedrez 😁
+<div align="center">
+
+## 📝 Licencia
+
+MIT License — libre para uso personal y educativo
+
+---
+
+*Desarrollado para la asignatura de Desarrollo de Servicios Web* 😁
+
+**[⬆ Volver arriba](#️-chess-legacy)**
+
+</div>

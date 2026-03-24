@@ -8,6 +8,9 @@ import { getNivel } from '../data/niveles';
 import { jsPDF } from 'jspdf';
 import EstadisticasJuego from './EstadisticasJuego';
 import PanelPersonalizacion from './PanelPersonalizacion';
+import TablaClasificacion from './TablaClasificacion';
+import GraficoXP from './GraficoXP';
+import MisionesSemanales from './MisionesSemanales';
 import './PerfilUsuario.css';
 
 const LOGROS_INFO = {

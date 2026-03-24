@@ -15,10 +15,18 @@ const PLANTILLAS = [
 const APERTURAS = ['Siciliana', 'Ruy Lopez', 'Italiana', 'Francesa', 'Caro-Kann', 'Gambito de Dama', 'India de Rey'];
 
 function generarRetos(fecha) {
+  // Seed numérico robusto
   const seed = fecha.getFullYear() * 10000 + (fecha.getMonth() + 1) * 100 + fecha.getDate();
-  const rng = (n) => { let x = Math.sin(seed + n) * 10000; return x - Math.floor(x); };
+  const rng = (n) => { const x = Math.sin(seed * 31 + n * 17) * 10000; return x - Math.floor(x); };
+  // Elegir 3 plantillas distintas
+  const usados = new Set();
   return [0, 1, 2].map(i => {
-    const plantilla = PLANTILLAS[Math.floor(rng(i) * PLANTILLAS.length)];
+    let idx;
+    let attempts = 0;
+    do { idx = Math.floor(rng(i + attempts) * PLANTILLAS.length); attempts++; }
+    while (usados.has(idx) && attempts < 20);
+    usados.add(idx);
+    const plantilla = PLANTILLAS[idx];
     const apertura = APERTURAS[Math.floor(rng(i + 10) * APERTURAS.length)];
     return { ...plantilla, texto: plantilla.texto(apertura), key: `${fecha.toDateString()}-${i}` };
   });
