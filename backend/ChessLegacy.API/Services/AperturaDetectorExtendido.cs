@@ -243,6 +243,36 @@ public class AperturaDetectorExtendido
         new() { Apertura = "Escocesa", Variante = null, Movimientos = "e4 e5 Nf3 Nc6 d4" },
 
         // GAMBITO DE REY
+        // Gambito de Rey Aceptado — Variante Clásica (3...g5)
+        new() { Apertura = "Gambito de Rey", Variante = "Kieseritzky", Movimientos = "e4 e5 f4 exf4 Nf3 g5 h4 g4 Ne5 Nf6 Bc4 d5 exd5 Bd6 d4 Nh5 O-O" },
+        new() { Apertura = "Gambito de Rey", Variante = "Allgaier", Movimientos = "e4 e5 f4 exf4 Nf3 g5 h4 g4 Ng5 h6 Nxf7 Kxf7 Bc4+ d5 Bxd5+ Ke8" },
+        new() { Apertura = "Gambito de Rey", Variante = "Muzio", Movimientos = "e4 e5 f4 exf4 Nf3 g5 Bc4 g4 O-O gxf3 Qxf3 Qf6 e5 Qxe5 Bxf7+ Kxf7 d4" },
+        new() { Apertura = "Gambito de Rey", Variante = "Hanstein", Movimientos = "e4 e5 f4 exf4 Nf3 g5 Bc4 Bg7 h4 h6 d4 d6 Nc3 Nc6 O-O" },
+        new() { Apertura = "Gambito de Rey", Variante = "Philidor", Movimientos = "e4 e5 f4 exf4 Nf3 g5 Bc4 Bg7 h4 h6 d4 d6 Nc3 c6 O-O" },
+        new() { Apertura = "Gambito de Rey", Variante = "Quaade", Movimientos = "e4 e5 f4 exf4 Nf3 g5 Nc3 Bg7 d4 d6 Bc4 Nc6 O-O" },
+        // Gambito de Rey Aceptado — Defensa Fischer (3...d6)
+        new() { Apertura = "Gambito de Rey", Variante = "Fischer", Movimientos = "e4 e5 f4 exf4 Nf3 d6 d4 g5 h4 g4 Ng1 Bh6 Ne2 Qf6 Nbc3 c6 g3 fxg3 Nxg3" },
+        new() { Apertura = "Gambito de Rey", Variante = "Fischer Bc4", Movimientos = "e4 e5 f4 exf4 Nf3 d6 Bc4 h6 d4 g5 O-O Bg7 c3 Nc6 Nbd2" },
+        // Gambito de Rey Aceptado — Defensa Becker (3...h6)
+        new() { Apertura = "Gambito de Rey", Variante = "Becker", Movimientos = "e4 e5 f4 exf4 Nf3 h6 d4 g5 Nc3 Bg7 g3 fxg3 hxg3 d6" },
+        // Gambito de Rey Aceptado — Defensa Moderna (3...d5)
+        new() { Apertura = "Gambito de Rey", Variante = "Moderna Abbazia", Movimientos = "e4 e5 f4 exf4 Nf3 d5 exd5 Nf6 Bb5+ c6 dxc6 bxc6 Bc4 Nd5 O-O" },
+        // Gambito de Rey Aceptado — Defensa Cunningham (3...Be7)
+        new() { Apertura = "Gambito de Rey", Variante = "Cunningham", Movimientos = "e4 e5 f4 exf4 Nf3 Be7 Bc4 Bh4+ Kf1 d6 d4 Nf6 Nc3 O-O" },
+        new() { Apertura = "Gambito de Rey", Variante = "Cunningham Moderna", Movimientos = "e4 e5 f4 exf4 Nf3 Be7 Bc4 Nf6 e5 Ng4 O-O" },
+        // Gambito de Rey Aceptado — Defensa Schallopp (3...Nf6)
+        new() { Apertura = "Gambito de Rey", Variante = "Schallopp", Movimientos = "e4 e5 f4 exf4 Nf3 Nf6 e5 Nh5 d4 d6 Nc3 dxe5 fxe5 g6" },
+        // Gambito de Rey Aceptado — Gambito del Alfil (3.Bc4)
+        new() { Apertura = "Gambito de Rey", Variante = "Gambito del Alfil", Movimientos = "e4 e5 f4 exf4 Bc4 Qh4+ Kf1 d6 Nf3 Qh6 Nc3 Nf6 d4 Be7" },
+        new() { Apertura = "Gambito de Rey", Variante = "Gambito del Alfil Bledow", Movimientos = "e4 e5 f4 exf4 Bc4 d5 Bxd5 Nf6 Nc3 Bb4 Nf3 Bxc3 dxc3 Nxe4" },
+        // Gambito de Rey Rechazado — Defensa Clásica (2...Bc5)
+        new() { Apertura = "Gambito de Rey", Variante = "Rechazado Clásico", Movimientos = "e4 e5 f4 Bc5 Nf3 d6 c3 Nf6 d4 exd4 cxd4 Bb4+ Bd2 Bxd2+ Nbxd2 O-O Bd3 d5" },
+        new() { Apertura = "Gambito de Rey", Variante = "Rechazado Clásico Nc3", Movimientos = "e4 e5 f4 Bc5 Nf3 d6 Nc3 Nf6 Bc4 Nc6 d3 O-O" },
+        // Gambito de Rey Rechazado — Contragambito Falkbeer (2...d5)
+        new() { Apertura = "Gambito de Rey", Variante = "Falkbeer", Movimientos = "e4 e5 f4 d5 exd5 e4 d3 Nf6 dxe4 Nxe4 Nf3 Bc5 Qe2 Bf5 Nc3 Qe7" },
+        new() { Apertura = "Gambito de Rey", Variante = "Falkbeer Nimzowitsch-Marshall", Movimientos = "e4 e5 f4 d5 exd5 c6 Nc3 exf4 Nf3 Bd6 d4 Ne7 dxc6 Nbxc6" },
+        // Gambito de Rey Rechazado — otras líneas
+        new() { Apertura = "Gambito de Rey", Variante = "Rechazado Keene", Movimientos = "e4 e5 f4 Qh4+ g3 Qe7" },
         new() { Apertura = "Gambito de Rey", Variante = "Aceptado", Movimientos = "e4 e5 f4 exf4 Nf3 g5 h4 g4 Ne5 Nf6 Bc4 d5 exd5 Bd6 d4 Nh5 Bb3 Qe7 Bxf4 Nxf4 O-O" },
         new() { Apertura = "Gambito de Rey", Variante = "Rechazado", Movimientos = "e4 e5 f4 Bc5 Nf3 d6 c3 Nf6 d4 exd4 cxd4 Bb4+ Bd2 Bxd2+ Nbxd2 O-O Bd3 d5" },
         new() { Apertura = "Gambito de Rey", Variante = null, Movimientos = "e4 e5 f4" },
@@ -338,8 +368,26 @@ public class AperturaDetectorExtendido
         new() { Apertura = "Alekhine", Variante = null, Movimientos = "e4 Nf6" },
 
         // PIRC
-        new() { Apertura = "Pirc", Variante = "Austrian", Movimientos = "e4 d6 d4 Nf6 Nc3 g6 f4" },
-        new() { Apertura = "Pirc", Variante = "Classical", Movimientos = "e4 d6 d4 Nf6 Nc3 g6 Nf3" },
+        new() { Apertura = "Pirc", Variante = "Austrian", Movimientos = "e4 d6 d4 Nf6 Nc3 g6 f4 Bg7 Nf3 O-O e5 dxe5 fxe5 Nd5 Bc4 Nb6 Bb3 Nc6" },
+        new() { Apertura = "Pirc", Variante = "Austrian e5", Movimientos = "e4 d6 d4 Nf6 Nc3 g6 f4 Bg7 Nf3 O-O e5" },
+        new() { Apertura = "Pirc", Variante = "Austrian Be3", Movimientos = "e4 d6 d4 Nf6 Nc3 g6 f4 Bg7 Nf3 O-O Be3" },
+        new() { Apertura = "Pirc", Variante = "Austrian Bd3", Movimientos = "e4 d6 d4 Nf6 Nc3 g6 f4 Bg7 Nf3 O-O Bd3" },
+        new() { Apertura = "Pirc", Variante = "Austrian c5", Movimientos = "e4 d6 d4 Nf6 Nc3 g6 f4 Bg7 Nf3 c5" },
+        new() { Apertura = "Pirc", Variante = "Austrian Bc4", Movimientos = "e4 d6 d4 Nf6 Nc3 g6 f4 Bg7 Bc4" },
+        new() { Apertura = "Pirc", Variante = "Austrian g5", Movimientos = "e4 d6 d4 Nf6 Nc3 g6 f4 Bg7 Be2 g5" },
+        new() { Apertura = "Pirc", Variante = "Austrian h4", Movimientos = "e4 d6 d4 Nf6 Nc3 g6 f4 Bg7 Be2 h4" },
+        new() { Apertura = "Pirc", Variante = "Classical Be2", Movimientos = "e4 d6 d4 Nf6 Nc3 g6 Be2 Bg7 Nf3 O-O O-O" },
+        new() { Apertura = "Pirc", Variante = "Classical Be2 h3", Movimientos = "e4 d6 d4 Nf6 Nc3 g6 Be2 Bg7 Nf3 O-O h3" },
+        new() { Apertura = "Pirc", Variante = "Two Knights Nf3", Movimientos = "e4 d6 d4 Nf6 Nc3 g6 Nf3 Bg7" },
+        new() { Apertura = "Pirc", Variante = "Two Knights Nf3 h3", Movimientos = "e4 d6 d4 Nf6 Nc3 g6 Nf3 Bg7 h3" },
+        new() { Apertura = "Pirc", Variante = "Two Knights Nf3 Be2", Movimientos = "e4 d6 d4 Nf6 Nc3 g6 Nf3 Bg7 Be2" },
+        new() { Apertura = "Pirc", Variante = "150 Attack Be3", Movimientos = "e4 d6 d4 Nf6 Nc3 g6 Be3 c6 Qd2" },
+        new() { Apertura = "Pirc", Variante = "150 Attack Be3 Nf3", Movimientos = "e4 d6 d4 Nf6 Nc3 g6 Be3 c6 Nf3" },
+        new() { Apertura = "Pirc", Variante = "g3", Movimientos = "e4 d6 d4 Nf6 Nc3 g6 g3" },
+        new() { Apertura = "Pirc", Variante = "Bc4", Movimientos = "e4 d6 d4 Nf6 Nc3 g6 Bc4" },
+        new() { Apertura = "Pirc", Variante = "Bg5", Movimientos = "e4 d6 d4 Nf6 Nc3 g6 Bg5" },
+        new() { Apertura = "Pirc", Variante = "c6", Movimientos = "e4 d6 d4 Nf6 Nc3 c6" },
+        new() { Apertura = "Pirc", Variante = "Nf3 Bg7 c3", Movimientos = "e4 d6 d4 g6 Nf3 Bg7 c3" },
         new() { Apertura = "Pirc", Variante = null, Movimientos = "e4 d6 d4 Nf6 Nc3 g6" },
 
         // ESCANDINAVA
@@ -415,35 +463,245 @@ public class AperturaDetectorExtendido
         new() { Apertura = "Gambito de Dama", Variante = null, Movimientos = "d4 d5 c4" },
 
         // INDIA DE REY
+        // Líneas menores tras 1.d4 Nf6 2.c4 g6
+        new() { Apertura = "India de Rey", Variante = "Nf3 sin e4", Movimientos = "d4 Nf6 c4 g6 Nf3" },
+        new() { Apertura = "India de Rey", Variante = "Qc2", Movimientos = "d4 Nf6 c4 g6 Qc2" },
+        new() { Apertura = "India de Rey", Variante = "Benko d5 b5", Movimientos = "d4 Nf6 c4 g6 d5 b5" },
+        new() { Apertura = "India de Rey", Variante = "g3 Bg7 Bg2 d5", Movimientos = "d4 Nf6 c4 g6 g3 Bg7 Bg2 d5" },
+        // Variante Clásica (5.Be2)
         new() { Apertura = "India de Rey", Variante = "Classical", Movimientos = "d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 Nf3 O-O Be2 e5 O-O Nc6 d5 Ne7 Ne1 Nd7 Nd3 f5 Bd2 Nf6 f3 f4 c5" },
-        new() { Apertura = "India de Rey", Variante = "Samisch", Movimientos = "d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 f3 O-O Be3 e5 d5 Nh5 Qd2 Qh4+ g3 Nxg3 Qf2 Nxf1 Qxh4 Nxe3" },
+        new() { Apertura = "India de Rey", Variante = "Classical e5 d5 a5", Movimientos = "d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 Nf3 O-O Be2 e5 d5 a5" },
+        new() { Apertura = "India de Rey", Variante = "Classical e5 d5 Nbd7 Bg5 h6 Bh4 g5 Bg3 Nh5", Movimientos = "d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 Nf3 O-O Be2 e5 d5 Nbd7 Bg5 h6 Bh4 g5 Bg3 Nh5" },
+        new() { Apertura = "India de Rey", Variante = "Classical OO Nbd7 Re1 c6 Bf1 a5", Movimientos = "d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 Nf3 O-O Be2 e5 O-O Nbd7 Re1 c6 Bf1 a5" },
+        // Variante Áverbach (6.Bg5)
+        new() { Apertura = "India de Rey", Variante = "Averbakh", Movimientos = "d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 Be2 O-O Bg5 c5 d5 e6" },
+        new() { Apertura = "India de Rey", Variante = "Averbakh Be3", Movimientos = "d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 Be2 O-O Be3" },
+        // Ataque de los Cuatro Peones (5.f4)
         new() { Apertura = "India de Rey", Variante = "Four Pawns", Movimientos = "d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 f4 O-O Nf3 c5 d5 b5 cxb5 a6 bxa6 Bxa6 Bd3 Nbd7 O-O" },
+        new() { Apertura = "India de Rey", Variante = "Four Pawns Be2 c5 Nf3 cxd4 Nxd4 Nc6 Be3", Movimientos = "d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 f4 O-O Be2 c5 Nf3 cxd4 Nxd4 Nc6 Be3" },
+        new() { Apertura = "India de Rey", Variante = "Four Pawns Nf3 c5 d5", Movimientos = "d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 f4 O-O Nf3 c5 d5" },
+        // Sistema Sämisch (5.f3)
+        new() { Apertura = "India de Rey", Variante = "Samisch", Movimientos = "d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 f3 O-O Be3 Nc6 Nge2 Rb8" },
+        new() { Apertura = "India de Rey", Variante = "Samisch Nc6 Nge2 a6 Qd2 Rb8", Movimientos = "d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 f3 O-O Be3 Nc6 Nge2 a6 Qd2 Rb8" },
+        new() { Apertura = "India de Rey", Variante = "Samisch e5 Nge2 c6", Movimientos = "d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 f3 O-O Be3 e5 Nge2 c6" },
+        new() { Apertura = "India de Rey", Variante = "Samisch e5 d5 Nh5 Qd2", Movimientos = "d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 f3 O-O Be3 e5 d5 Nh5 Qd2" },
+        new() { Apertura = "India de Rey", Variante = "Samisch e5 d5 c6 Nge2", Movimientos = "d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 f3 O-O Be3 e5 d5 c6 Nge2" },
+        new() { Apertura = "India de Rey", Variante = "Samisch c6 Bd3 a6", Movimientos = "d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 f3 O-O Be3 c6 Bd3 a6" },
+        new() { Apertura = "India de Rey", Variante = "Samisch b6", Movimientos = "d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 f3 O-O Be3 b6" },
+        // Sistema Clásico (5.Nf3 0-0 6.Be2 e5) — Mar del Plata y variantes
+        new() { Apertura = "India de Rey", Variante = "Classical e5 d5 Mar del Plata", Movimientos = "d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 Nf3 O-O Be2 e5 O-O Nc6 d5 Ne7 Ne1 Nd7 Nd3 f5 Bd2 Nf6 f3 f4" },
+        new() { Apertura = "India de Rey", Variante = "Classical e5 d5 Ne7 Be3", Movimientos = "d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 Nf3 O-O Be2 e5 O-O Nc6 d5 Ne7 Be3" },
+        new() { Apertura = "India de Rey", Variante = "Classical e5 dxe5", Movimientos = "d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 Nf3 O-O Be2 e5 dxe5" },
+        new() { Apertura = "India de Rey", Variante = "Classical e5 Be3", Movimientos = "d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 Nf3 O-O Be2 e5 Be3" },
+        new() { Apertura = "India de Rey", Variante = "Classical OO Nbd7 Re1 c6 Bf1", Movimientos = "d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 Nf3 O-O Be2 e5 O-O Nbd7 Re1 c6 Bf1" },
+        new() { Apertura = "India de Rey", Variante = "Classical Na6", Movimientos = "d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 Nf3 O-O Be2 Na6" },
+        new() { Apertura = "India de Rey", Variante = "Classical Be3", Movimientos = "d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 Nf3 O-O Be3" },
+        new() { Apertura = "India de Rey", Variante = "Classical Bg5", Movimientos = "d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 Nf3 O-O Bg5" },
+        // Fianchetto (4.Nf3 d6 5.g3)
         new() { Apertura = "India de Rey", Variante = "Fianchetto", Movimientos = "d4 Nf6 c4 g6 Nf3 Bg7 g3 O-O Bg2 d6 O-O Nbd7 Nc3 e5 e4 c6 h3 Qb6 d5 cxd5 cxd5" },
+        new() { Apertura = "India de Rey", Variante = "Fianchetto c6 OO Bf5", Movimientos = "d4 Nf6 c4 g6 Nf3 Bg7 g3 d6 Bg2 O-O O-O c6 Nc3 Bf5" },
+        new() { Apertura = "India de Rey", Variante = "Fianchetto c6 OO Qa5", Movimientos = "d4 Nf6 c4 g6 Nf3 Bg7 g3 d6 Bg2 O-O O-O c6 Nc3 Qa5" },
+        new() { Apertura = "India de Rey", Variante = "Fianchetto Nc6 OO e5", Movimientos = "d4 Nf6 c4 g6 Nf3 Bg7 g3 d6 Bg2 O-O O-O Nc6 Nc3 e5" },
+        new() { Apertura = "India de Rey", Variante = "Fianchetto Nc6 OO Bf5", Movimientos = "d4 Nf6 c4 g6 Nf3 Bg7 g3 d6 Bg2 O-O O-O Nc6 Nc3 Bf5" },
+        new() { Apertura = "India de Rey", Variante = "Fianchetto Nc6 OO Bg4", Movimientos = "d4 Nf6 c4 g6 Nf3 Bg7 g3 d6 Bg2 O-O O-O Nc6 Nc3 Bg4" },
+        new() { Apertura = "India de Rey", Variante = "Fianchetto Nc6 OO a6", Movimientos = "d4 Nf6 c4 g6 Nf3 Bg7 g3 d6 Bg2 O-O O-O Nc6 Nc3 a6" },
+        new() { Apertura = "India de Rey", Variante = "Fianchetto c5 OO Nc6 d5", Movimientos = "d4 Nf6 c4 g6 Nf3 Bg7 g3 d6 Bg2 O-O O-O c5 Nc3 Nc6 d5" },
+        new() { Apertura = "India de Rey", Variante = "Fianchetto Nbd7 OO e5 e4 c6 h3", Movimientos = "d4 Nf6 c4 g6 Nf3 Bg7 g3 d6 Bg2 O-O O-O Nbd7 Nc3 e5 e4 c6 h3" },
+        new() { Apertura = "India de Rey", Variante = "Fianchetto Bg5", Movimientos = "d4 Nf6 c4 g6 Nf3 Bg7 Bg5" },
+        // Sin 2.c4 (ECO A48)
+        new() { Apertura = "India de Rey", Variante = "Sin c4 Bg5", Movimientos = "d4 Nf6 Nf3 g6 Bg5" },
+        new() { Apertura = "India de Rey", Variante = "Sin c4 Bf4", Movimientos = "d4 Nf6 Nf3 g6 Bf4" },
+        new() { Apertura = "India de Rey", Variante = "Sin c4 g3", Movimientos = "d4 Nf6 Nf3 g6 g3" },
         new() { Apertura = "India de Rey", Variante = null, Movimientos = "d4 Nf6 c4 g6" },
 
         // NIMZOINDIA
-        new() { Apertura = "Nimzoindia", Variante = "Classical", Movimientos = "d4 Nf6 c4 e6 Nc3 Bb4 Qc2 O-O a3 Bxc3+ Qxc3 b6 Bg5 Bb7 e3 d6 f3 Nbd7 Bd3 c5 Ne2 Rc8" },
+        // Sistema Rubinstein (4.e3)
+        new() { Apertura = "Nimzoindia", Variante = "Rubinstein OO Nf3 d5 Bd3 Nc6 OO dxc4", Movimientos = "d4 Nf6 c4 e6 Nc3 Bb4 e3 O-O Nf3 d5 Bd3 Nc6 O-O dxc4 Bxc4" },
+        new() { Apertura = "Nimzoindia", Variante = "Rubinstein OO Nf3 d5 Bd3 b6", Movimientos = "d4 Nf6 c4 e6 Nc3 Bb4 e3 O-O Nf3 d5 Bd3 b6" },
+        new() { Apertura = "Nimzoindia", Variante = "Rubinstein OO Nf3 d5 Bd3 c5 OO b6", Movimientos = "d4 Nf6 c4 e6 Nc3 Bb4 e3 O-O Nf3 d5 Bd3 c5 O-O b6" },
+        new() { Apertura = "Nimzoindia", Variante = "Rubinstein OO Nf3 d5 Bd3 c5 OO Nbd7", Movimientos = "d4 Nf6 c4 e6 Nc3 Bb4 e3 O-O Nf3 d5 Bd3 c5 O-O Nbd7" },
+        new() { Apertura = "Nimzoindia", Variante = "Rubinstein OO Nf3 d5 Bd3 c5 OO dxc4 Bxc4 Qe7", Movimientos = "d4 Nf6 c4 e6 Nc3 Bb4 e3 O-O Nf3 d5 Bd3 c5 O-O dxc4 Bxc4 Qe7" },
+        new() { Apertura = "Nimzoindia", Variante = "Rubinstein OO Nf3 d5 Bd3 c5 OO dxc4 Bxc4 Nbd7", Movimientos = "d4 Nf6 c4 e6 Nc3 Bb4 e3 O-O Nf3 d5 Bd3 c5 O-O dxc4 Bxc4 Nbd7" },
+        new() { Apertura = "Nimzoindia", Variante = "Rubinstein OO Nf3 d5 Bd3 c5 OO Nc6 a3", Movimientos = "d4 Nf6 c4 e6 Nc3 Bb4 e3 O-O Nf3 d5 Bd3 c5 O-O Nc6 a3" },
+        new() { Apertura = "Nimzoindia", Variante = "Rubinstein OO Nge2 d5 a3 Bd6", Movimientos = "d4 Nf6 c4 e6 Nc3 Bb4 e3 O-O Nge2 d5 a3 Bd6" },
+        new() { Apertura = "Nimzoindia", Variante = "Rubinstein OO Bd3 d5 a3 Bxc3 bxc3", Movimientos = "d4 Nf6 c4 e6 Nc3 Bb4 e3 O-O Bd3 d5 a3 Bxc3+ bxc3" },
+        new() { Apertura = "Nimzoindia", Variante = "Rubinstein c5 Bd3 Nc6 Nf3 Bxc3 bxc3 d6", Movimientos = "d4 Nf6 c4 e6 Nc3 Bb4 e3 c5 Bd3 Nc6 Nf3 Bxc3+ bxc3 d6" },
+        new() { Apertura = "Nimzoindia", Variante = "Rubinstein c5 Nge2", Movimientos = "d4 Nf6 c4 e6 Nc3 Bb4 e3 c5 Nge2" },
+        new() { Apertura = "Nimzoindia", Variante = "Rubinstein b6 Nge2 Ba6", Movimientos = "d4 Nf6 c4 e6 Nc3 Bb4 e3 b6 Nge2 Ba6" },
+        new() { Apertura = "Nimzoindia", Variante = "Rubinstein Nc6", Movimientos = "d4 Nf6 c4 e6 Nc3 Bb4 e3 Nc6" },
         new() { Apertura = "Nimzoindia", Variante = "Rubinstein", Movimientos = "d4 Nf6 c4 e6 Nc3 Bb4 e3 O-O Bd3 d5 Nf3 c5 O-O Nc6 a3 Bxc3 bxc3 dxc4 Bxc4 Qc7 Bd3" },
+        // Sistema Sämisch (4.a3)
+        new() { Apertura = "Nimzoindia", Variante = "Samisch c5 f3 d5 e3 OO cxd5 Nxd5", Movimientos = "d4 Nf6 c4 e6 Nc3 Bb4 a3 Bxc3+ bxc3 c5 f3 d5 e3 O-O cxd5 Nxd5" },
+        new() { Apertura = "Nimzoindia", Variante = "Samisch c5 f3 d5 cxd5 Nxd5 dxc5 f5", Movimientos = "d4 Nf6 c4 e6 Nc3 Bb4 a3 Bxc3+ bxc3 c5 f3 d5 cxd5 Nxd5 dxc5 f5" },
+        new() { Apertura = "Nimzoindia", Variante = "Samisch c5 e3 b6", Movimientos = "d4 Nf6 c4 e6 Nc3 Bb4 a3 Bxc3+ bxc3 c5 e3 b6" },
+        new() { Apertura = "Nimzoindia", Variante = "Samisch OO e3 c5 Bd3 Nc6 Ne2 b6 e4 Ne8", Movimientos = "d4 Nf6 c4 e6 Nc3 Bb4 a3 Bxc3+ bxc3 O-O e3 c5 Bd3 Nc6 Ne2 b6 e4 Ne8" },
         new() { Apertura = "Nimzoindia", Variante = "Samisch", Movimientos = "d4 Nf6 c4 e6 Nc3 Bb4 a3 Bxc3+ bxc3 O-O f3 d5 cxd5 exd5 e3 c5 Bd3 Nc6 Ne2 b6 O-O" },
+        // Variante Clásica (4.Qc2) — Aliojin
+        new() { Apertura = "Nimzoindia", Variante = "Classical d5 cxd5 exd5", Movimientos = "d4 Nf6 c4 e6 Nc3 Bb4 Qc2 d5 cxd5 exd5" },
+        new() { Apertura = "Nimzoindia", Variante = "Classical d5 a3 Bxc3 Qxc3 Nc6", Movimientos = "d4 Nf6 c4 e6 Nc3 Bb4 Qc2 d5 a3 Bxc3+ Qxc3 Nc6" },
+        new() { Apertura = "Nimzoindia", Variante = "Classical d5 a3 Bxc3 Qxc3 Ne4 Qc2 Nc6 e3 e5", Movimientos = "d4 Nf6 c4 e6 Nc3 Bb4 Qc2 d5 a3 Bxc3+ Qxc3 Ne4 Qc2 Nc6 e3 e5" },
+        new() { Apertura = "Nimzoindia", Variante = "Classical c5 dxc5 OO", Movimientos = "d4 Nf6 c4 e6 Nc3 Bb4 Qc2 c5 dxc5 O-O" },
+        new() { Apertura = "Nimzoindia", Variante = "Classical Nc6 Nf3 d6", Movimientos = "d4 Nf6 c4 e6 Nc3 Bb4 Qc2 Nc6 Nf3 d6" },
+        new() { Apertura = "Nimzoindia", Variante = "Classical OO a3 Bxc3 Qxc3 b5", Movimientos = "d4 Nf6 c4 e6 Nc3 Bb4 Qc2 O-O a3 Bxc3+ Qxc3 b5" },
+        new() { Apertura = "Nimzoindia", Variante = "Classical", Movimientos = "d4 Nf6 c4 e6 Nc3 Bb4 Qc2 O-O a3 Bxc3+ Qxc3 b6 Bg5 Bb7 e3 d6 f3 Nbd7 Bd3 c5 Ne2 Rc8" },
+        // Variante Leningrado (4.Bg5)
+        new() { Apertura = "Nimzoindia", Variante = "Leningrado h6 Bh4 c5 d5 b5", Movimientos = "d4 Nf6 c4 e6 Nc3 Bb4 Bg5 h6 Bh4 c5 d5 b5" },
+        new() { Apertura = "Nimzoindia", Variante = "Leningrado h6 Bh4 c5 d5 d6", Movimientos = "d4 Nf6 c4 e6 Nc3 Bb4 Bg5 h6 Bh4 c5 d5 d6" },
+        // Otras variantes
+        new() { Apertura = "Nimzoindia", Variante = "Nf3 c5 d5 Ne4", Movimientos = "d4 Nf6 c4 e6 Nc3 Bb4 Nf3 c5 d5 Ne4" },
+        new() { Apertura = "Nimzoindia", Variante = "Qb3 c5 dxc5 Nc6 Nf3 Ne4 Bd2 Nxd2 Nxc5 Dc2 f5 g3", Movimientos = "d4 Nf6 c4 e6 Nc3 Bb4 Qb3 c5 dxc5 Nc6 Nf3 Ne4 Bd2 Nxd2 Nxc5 Qc2 f5 g3" },
+        new() { Apertura = "Nimzoindia", Variante = "Qb3 c5 dxc5 Nc6 Nf3 Ne4 Bd2 Nxc5 Dc2", Movimientos = "d4 Nf6 c4 e6 Nc3 Bb4 Qb3 c5 dxc5 Nc6 Nf3 Ne4 Bd2 Nxc5 Qc2" },
+        new() { Apertura = "Nimzoindia", Variante = "f3", Movimientos = "d4 Nf6 c4 e6 Nc3 Bb4 f3" },
+        new() { Apertura = "Nimzoindia", Variante = "Qd3", Movimientos = "d4 Nf6 c4 e6 Nc3 Bb4 Qd3" },
+        new() { Apertura = "Nimzoindia", Variante = "g3", Movimientos = "d4 Nf6 c4 e6 Nc3 Bb4 g3" },
         new() { Apertura = "Nimzoindia", Variante = null, Movimientos = "d4 Nf6 c4 e6 Nc3 Bb4" },
 
         // INDIA DE DAMA
+        // 4.g3 — Línea principal moderna
+        new() { Apertura = "India de Dama", Variante = "g3 Ba6 b3 Bb4+ Bd2 Be7 Bg2 c6 Bc3 d5 Ne5 Nfd7 Nxd7 Nxd7 Nd2 OO OO", Movimientos = "d4 Nf6 c4 e6 Nf3 b6 g3 Ba6 b3 Bb4+ Bd2 Be7 Bg2 c6 Bc3 d5 Ne5 Nfd7 Nxd7 Nxd7 Nd2 O-O O-O" },
+        new() { Apertura = "India de Dama", Variante = "g3 Ba6 b3 Bb4+ Bd2 a5", Movimientos = "d4 Nf6 c4 e6 Nf3 b6 g3 Ba6 b3 Bb4+ Bd2 a5" },
+        new() { Apertura = "India de Dama", Variante = "g3 Ba6 Qc2 Bb7 Bg2 c5 d5", Movimientos = "d4 Nf6 c4 e6 Nf3 b6 g3 Ba6 Qc2 Bb7 Bg2 c5 d5" },
+        new() { Apertura = "India de Dama", Variante = "g3 Bb7 Bg2 Be7 OO OO Nc3 Ne4 Qc2 Nxc3 Qxc3 f5", Movimientos = "d4 Nf6 c4 e6 Nf3 b6 g3 Bb7 Bg2 Be7 O-O O-O Nc3 Ne4 Qc2 Nxc3 Qxc3 f5" },
+        new() { Apertura = "India de Dama", Variante = "g3 Bb7 Bg2 Be7 OO OO Nc3 Ne4 Qc2 Nxc3 Qxc3 c5", Movimientos = "d4 Nf6 c4 e6 Nf3 b6 g3 Bb7 Bg2 Be7 O-O O-O Nc3 Ne4 Qc2 Nxc3 Qxc3 c5" },
+        new() { Apertura = "India de Dama", Variante = "g3 Bb7 Bg2 Be7 OO OO Nc3 Ne4 Qc2 Nxc3 Qxc3 Ae4", Movimientos = "d4 Nf6 c4 e6 Nf3 b6 g3 Bb7 Bg2 Be7 O-O O-O Nc3 Ne4 Qc2 Nxc3 Qxc3 Be4" },
+        new() { Apertura = "India de Dama", Variante = "g3 Bb7 Bg2 Be7 OO OO Nc3 d5 Qd3", Movimientos = "d4 Nf6 c4 e6 Nf3 b6 g3 Bb7 Bg2 Be7 O-O O-O Nc3 d5 Qd3" },
+        new() { Apertura = "India de Dama", Variante = "g3 Bb7 Bg2 Be7 OO OO d5 exd5 Nh4", Movimientos = "d4 Nf6 c4 e6 Nf3 b6 g3 Bb7 Bg2 Be7 O-O O-O d5 exd5 Nh4" },
+        new() { Apertura = "India de Dama", Variante = "g3 Bb7 Bg2 Be7 OO OO Cc3", Movimientos = "d4 Nf6 c4 e6 Nf3 b6 g3 Bb7 Bg2 Be7 O-O O-O Nc3" },
+        // 4.a3 — Variante Petrosian
+        new() { Apertura = "India de Dama", Variante = "Petrosian a3 Bb7 Nc3 d5 cxd5 Nxd5 Qc2 Nxc3 bxc3 Be7 e4", Movimientos = "d4 Nf6 c4 e6 Nf3 b6 a3 Bb7 Nc3 d5 cxd5 Nxd5 Qc2 Nxc3 bxc3 Be7 e4 O-O Bd3 c5 O-O" },
         new() { Apertura = "India de Dama", Variante = "Petrosian", Movimientos = "d4 Nf6 c4 e6 Nf3 b6 a3 Bb7 Nc3 d5 cxd5 Nxd5 Qc2 Nxc3 bxc3 Be7 e4 O-O Bd3 c5 O-O" },
+        // 4.Nc3 — variantes
+        new() { Apertura = "India de Dama", Variante = "Nc3 Bb4 Bg5 h6 Bh4 g5 Bg3 Ne4 Qc2", Movimientos = "d4 Nf6 c4 e6 Nf3 b6 Nc3 Bb4 Bg5 h6 Bh4 g5 Bg3 Ne4 Qc2" },
+        new() { Apertura = "India de Dama", Variante = "Nc3 Bb7 a3 Petrosian", Movimientos = "d4 Nf6 c4 e6 Nf3 b6 Nc3 Bb7 a3" },
+        new() { Apertura = "India de Dama", Variante = "Nc3 Bb7 Bg5 h6 Bh4 g5 Bg3 Nh5", Movimientos = "d4 Nf6 c4 e6 Nf3 b6 Nc3 Bb7 Bg5 h6 Bh4 g5 Bg3 Nh5 e3 Nxg3 hxg3 Bg7" },
+        // 4.e3 — Petrosian tranquilo
+        new() { Apertura = "India de Dama", Variante = "e3 Bb7 Bd3 c5 OO Nc6", Movimientos = "d4 Nf6 c4 e6 Nf3 b6 e3 Bb7 Bd3 c5 O-O Nc6" },
+        new() { Apertura = "India de Dama", Variante = "e3 Bb7 Bd3 d5 OO Bd6", Movimientos = "d4 Nf6 c4 e6 Nf3 b6 e3 Bb7 Bd3 d5 O-O Bd6" },
+        // 4.Bf4 — Variante Miles
+        new() { Apertura = "India de Dama", Variante = "Bf4 Bb7 e3 c5 Nc3 cxd4 exd4", Movimientos = "d4 Nf6 c4 e6 Nf3 b6 Bf4 Bb7 e3 c5 Nc3 cxd4 exd4" },
+        // Línea clásica
         new() { Apertura = "India de Dama", Variante = "Classical", Movimientos = "d4 Nf6 c4 e6 Nf3 b6 g3 Bb7 Bg2 Be7 O-O O-O Nc3 Ne4 Qc2 Nxc3 Qxc3 f5 b3 Bf6 Bb2" },
         new() { Apertura = "India de Dama", Variante = null, Movimientos = "d4 Nf6 c4 e6 Nf3 b6" },
 
         // GRUNFELD
+        // Variante del Cambio (4.cxd5 Nxd5 5.e4) — ECO D85-D89
+        new() { Apertura = "Grunfeld", Variante = "Exchange Bc4 Ne2 Sevilla", Movimientos = "d4 Nf6 c4 g6 Nc3 d5 cxd5 Nxd5 e4 Nxc3 bxc3 Bg7 Bc4 c5 Ne2 Nc6 Be3 O-O O-O Bg4 f3 Na5 Bxf7+" },
+        new() { Apertura = "Grunfeld", Variante = "Exchange Bc4 Ne2 Be3 OO f4", Movimientos = "d4 Nf6 c4 g6 Nc3 d5 cxd5 Nxd5 e4 Nxc3 bxc3 Bg7 Bc4 c5 Ne2 Nc6 Be3 O-O O-O cxd4 cxd4 Bg4 f3 Na5 Bd3" },
+        new() { Apertura = "Grunfeld", Variante = "Exchange Rb1", Movimientos = "d4 Nf6 c4 g6 Nc3 d5 cxd5 Nxd5 e4 Nxc3 bxc3 Bg7 Bc4 c5 Ne2 Nc6 Be3 O-O Rb1 Qa5 Bd3" },
+        new() { Apertura = "Grunfeld", Variante = "Exchange Be3 Qd2 Rc1", Movimientos = "d4 Nf6 c4 g6 Nc3 d5 cxd5 Nxd5 e4 Nxc3 bxc3 Bg7 Be3 c5 Qd2 Qa5 Rc1" },
+        new() { Apertura = "Grunfeld", Variante = "Exchange Be3 Qd2 Rd1", Movimientos = "d4 Nf6 c4 g6 Nc3 d5 cxd5 Nxd5 e4 Nxc3 bxc3 Bg7 Be3 c5 Qd2 Nc6 Rd1" },
         new() { Apertura = "Grunfeld", Variante = "Exchange", Movimientos = "d4 Nf6 c4 g6 Nc3 d5 cxd5 Nxd5 e4 Nxc3 bxc3 Bg7 Bc4 c5 Ne2 Nc6 Be3 O-O O-O cxd4 cxd4 Bg4 f3 Na5 Bd3" },
+        // Sistema Ruso (4.Nf3 Bg7 5.Qb3) — ECO D90-D93
+        new() { Apertura = "Grunfeld", Variante = "Russian Hungara a6", Movimientos = "d4 Nf6 c4 g6 Nc3 d5 Nf3 Bg7 Qb3 dxc4 Qxc4 O-O e4 a6" },
+        new() { Apertura = "Grunfeld", Variante = "Russian Smyslov Bg4 Be3 Nfd7", Movimientos = "d4 Nf6 c4 g6 Nc3 d5 Nf3 Bg7 Qb3 dxc4 Qxc4 O-O e4 Bg4 Be3 Nfd7" },
+        new() { Apertura = "Grunfeld", Variante = "Russian Prins Na6", Movimientos = "d4 Nf6 c4 g6 Nc3 d5 Nf3 Bg7 Qb3 dxc4 Qxc4 O-O e4 Na6" },
+        new() { Apertura = "Grunfeld", Variante = "Russian Byrne Nc6 Be2 e5 d5 Nd4", Movimientos = "d4 Nf6 c4 g6 Nc3 d5 Nf3 Bg7 Qb3 dxc4 Qxc4 O-O e4 Nc6 Be2 e5 d5 Nd4 Nxd4 exd4 Qxd4" },
+        new() { Apertura = "Grunfeld", Variante = "Russian c6", Movimientos = "d4 Nf6 c4 g6 Nc3 d5 Nf3 Bg7 Qb3 dxc4 Qxc4 O-O e4 c6" },
+        new() { Apertura = "Grunfeld", Variante = "Russian b6", Movimientos = "d4 Nf6 c4 g6 Nc3 d5 Nf3 Bg7 Qb3 dxc4 Qxc4 O-O e4 b6" },
         new() { Apertura = "Grunfeld", Variante = "Russian", Movimientos = "d4 Nf6 c4 g6 Nc3 d5 Nf3 Bg7 Qb3 dxc4 Qxc4 O-O e4 Bg4 Be3 Nfd7 Qb3 Nb6 Rd1 Nc6 d5 Ne5" },
+        // Variante Taimanov-Petrosian (4.Nf3 Bg7 5.Bg5) — ECO D90
+        new() { Apertura = "Grunfeld", Variante = "Taimanov Ne4 Bh4 Nxc3 bxc3 dxc4", Movimientos = "d4 Nf6 c4 g6 Nc3 d5 Nf3 Bg7 Bg5 Ne4 Bh4 Nxc3 bxc3 dxc4" },
+        new() { Apertura = "Grunfeld", Variante = "Taimanov Ne4 cxd5 Nxg5 Nxg5 e6", Movimientos = "d4 Nf6 c4 g6 Nc3 d5 Nf3 Bg7 Bg5 Ne4 cxd5 Nxg5 Nxg5 e6 Nf3 exd5 Qb3" },
+        new() { Apertura = "Grunfeld", Variante = "Taimanov Ne4 cxd5 Nxg5 Nxg5 c6", Movimientos = "d4 Nf6 c4 g6 Nc3 d5 Nf3 Bg7 Bg5 Ne4 cxd5 Nxg5 Nxg5 c6" },
+        // 4.Bf4 y Gambito Grünfeld — ECO D82-D83
+        new() { Apertura = "Grunfeld", Variante = "Bf4 Bg7 e3 c5 dxc5 Qa5 cxd5", Movimientos = "d4 Nf6 c4 g6 Nc3 d5 Bf4 Bg7 e3 c5 dxc5 Qa5 cxd5" },
+        new() { Apertura = "Grunfeld", Variante = "Bf4 Bg7 e3 c5 dxc5 Qa5 Qb3", Movimientos = "d4 Nf6 c4 g6 Nc3 d5 Bf4 Bg7 e3 c5 dxc5 Qa5 Qb3" },
+        new() { Apertura = "Grunfeld", Variante = "Bf4 Bg7 e3 c5 dxc5 Qa5 Qa4", Movimientos = "d4 Nf6 c4 g6 Nc3 d5 Bf4 Bg7 e3 c5 dxc5 Qa5 Qa4" },
+        new() { Apertura = "Grunfeld", Variante = "Bf4 Bg7 e3 c5 dxc5 Qa5 Rc1", Movimientos = "d4 Nf6 c4 g6 Nc3 d5 Bf4 Bg7 e3 c5 dxc5 Qa5 Rc1" },
+        new() { Apertura = "Grunfeld", Variante = "Gambito Grunfeld Bf4 Bg7 e3 OO cxd5 Nxd5 Nxd5 Qxd5 Bxc7", Movimientos = "d4 Nf6 c4 g6 Nc3 d5 Bf4 Bg7 e3 O-O cxd5 Nxd5 Nxd5 Qxd5 Bxc7" },
+        new() { Apertura = "Grunfeld", Variante = "Gambito Grunfeld Bf4 Bg7 e3 OO Qb3 c5", Movimientos = "d4 Nf6 c4 g6 Nc3 d5 Bf4 Bg7 e3 O-O Qb3 c5" },
+        new() { Apertura = "Grunfeld", Variante = "Gambito Grunfeld Bf4 Bg7 e3 OO Rc1 c5", Movimientos = "d4 Nf6 c4 g6 Nc3 d5 Bf4 Bg7 e3 O-O Rc1 c5" },
+        // Neo-Grünfeld (ECO D70-D79)
+        new() { Apertura = "Grunfeld", Variante = "Neo g3 d5 Bg2 Bg7 Nf3 OO OO c6", Movimientos = "d4 Nf6 c4 g6 g3 d5 Bg2 Bg7 Nf3 O-O O-O c6" },
+        new() { Apertura = "Grunfeld", Variante = "Neo g3 d5 Bg2 Bg7 Nf3 OO OO dxc4", Movimientos = "d4 Nf6 c4 g6 g3 d5 Bg2 Bg7 Nf3 O-O O-O dxc4" },
+        new() { Apertura = "Grunfeld", Variante = "Neo g3 d5 cxd5 Nxd5 Bg2", Movimientos = "d4 Nf6 c4 g6 g3 d5 cxd5 Nxd5 Bg2" },
+        // Otras variantes
+        new() { Apertura = "Grunfeld", Variante = "Acelerado Ruso Qb3", Movimientos = "d4 Nf6 c4 g6 Nc3 d5 Qb3" },
+        new() { Apertura = "Grunfeld", Variante = "Flohr Qa4+", Movimientos = "d4 Nf6 c4 g6 Nc3 d5 Nf3 Bg7 Qa4+" },
+        new() { Apertura = "Grunfeld", Variante = "Quiet e3", Movimientos = "d4 Nf6 c4 g6 Nc3 d5 Nf3 Bg7 e3" },
+        new() { Apertura = "Grunfeld", Variante = "Nadanian cxd5 Na4", Movimientos = "d4 Nf6 c4 g6 Nc3 d5 cxd5 Nxd5 Na4" },
         new() { Apertura = "Grunfeld", Variante = null, Movimientos = "d4 Nf6 c4 g6 Nc3 d5" },
 
         // BENONI
-        new() { Apertura = "Benoni", Variante = "Modern", Movimientos = "d4 Nf6 c4 c5 d5 e6" },
+        // Línea principal moderna (tabiya)
+        new() { Apertura = "Benoni", Variante = "Modern f4 Bg7 e5", Movimientos = "d4 Nf6 c4 c5 d5 e6 Nc3 exd5 cxd5 d6 e4 g6 f4 Bg7 e5" },
+        new() { Apertura = "Benoni", Variante = "Modern f4 Bg7 Bb5+", Movimientos = "d4 Nf6 c4 c5 d5 e6 Nc3 exd5 cxd5 d6 e4 g6 f4 Bg7 Bb5+" },
+        new() { Apertura = "Benoni", Variante = "Modern f4 Bg7 Nf3", Movimientos = "d4 Nf6 c4 c5 d5 e6 Nc3 exd5 cxd5 d6 e4 g6 f4 Bg7 Nf3" },
+        new() { Apertura = "Benoni", Variante = "Modern Nf3 Bg7 Be2 OO OO a6 a4 Bg4", Movimientos = "d4 Nf6 c4 c5 d5 e6 Nc3 exd5 cxd5 d6 e4 g6 Nf3 Bg7 Be2 O-O O-O a6 a4 Bg4" },
+        new() { Apertura = "Benoni", Variante = "Modern Nf3 Bg7 Be2 OO OO a6 a4", Movimientos = "d4 Nf6 c4 c5 d5 e6 Nc3 exd5 cxd5 d6 e4 g6 Nf3 Bg7 Be2 O-O O-O a6 a4" },
+        new() { Apertura = "Benoni", Variante = "Modern Nf3 Bg7 Be2 OO OO Re8 Nd2 Na6 f3", Movimientos = "d4 Nf6 c4 c5 d5 e6 Nc3 exd5 cxd5 d6 e4 g6 Nf3 Bg7 Be2 O-O O-O Re8 Nd2 Na6 f3" },
+        new() { Apertura = "Benoni", Variante = "Modern Nf3 Bg7 Be2 OO OO Re8 Nd2 Na6", Movimientos = "d4 Nf6 c4 c5 d5 e6 Nc3 exd5 cxd5 d6 e4 g6 Nf3 Bg7 Be2 O-O O-O Re8 Nd2 Na6" },
+        new() { Apertura = "Benoni", Variante = "Modern Nf3 Bg7 Be2 OO OO Re8 Nd2", Movimientos = "d4 Nf6 c4 c5 d5 e6 Nc3 exd5 cxd5 d6 e4 g6 Nf3 Bg7 Be2 O-O O-O Re8 Nd2" },
+        new() { Apertura = "Benoni", Variante = "Modern Nf3 Bg7 Bg5", Movimientos = "d4 Nf6 c4 c5 d5 e6 Nc3 exd5 cxd5 d6 e4 g6 Nf3 Bg7 Bg5" },
+        new() { Apertura = "Benoni", Variante = "Modern Nf3 Bg7 Bg5 Be2 e3", Movimientos = "d4 Nf6 c4 c5 d5 e6 Nc3 exd5 cxd5 d6 e4 g6 Nf3 Bg7 Bg5 Be2 e3" },
+        new() { Apertura = "Benoni", Variante = "Modern Nf3 g6 g3 Bg7 Bg2 OO OO Nbd7 Nd2 a6 a4 Re8", Movimientos = "d4 Nf6 c4 c5 d5 e6 Nc3 exd5 cxd5 d6 Nf3 g6 g3 Bg7 Bg2 O-O O-O Nbd7 Nd2 a6 a4 Re8" },
+        new() { Apertura = "Benoni", Variante = "Modern Nf3 g6 g3 Bg7 Bg2 OO OO Nbd7", Movimientos = "d4 Nf6 c4 c5 d5 e6 Nc3 exd5 cxd5 d6 Nf3 g6 g3 Bg7 Bg2 O-O O-O Nbd7" },
+        new() { Apertura = "Benoni", Variante = "Modern Nf3 g6 Bg5", Movimientos = "d4 Nf6 c4 c5 d5 e6 Nc3 exd5 cxd5 d6 Nf3 g6 Bg5" },
+        new() { Apertura = "Benoni", Variante = "Modern Nf3 g6 Nd2", Movimientos = "d4 Nf6 c4 c5 d5 e6 Nc3 exd5 cxd5 d6 Nf3 g6 Nd2" },
+        new() { Apertura = "Benoni", Variante = "Modern Bd3", Movimientos = "d4 Nf6 c4 c5 d5 e6 Nc3 exd5 cxd5 d6 e4 g6 Bd3" },
+        new() { Apertura = "Benoni", Variante = "Modern f3", Movimientos = "d4 Nf6 c4 c5 d5 e6 Nc3 exd5 cxd5 d6 e4 g6 f3" },
+        new() { Apertura = "Benoni", Variante = "Modern h3 Bg7 Nf3 OO Bd3 Re8 OO c4 Bc2 b5", Movimientos = "d4 Nf6 c4 c5 d5 e6 Nc3 exd5 cxd5 d6 e4 g6 h3 Bg7 Nf3 O-O Bd3 Re8 O-O c4 Bc2 b5" },
+        new() { Apertura = "Benoni", Variante = "Modern", Movimientos = "d4 Nf6 c4 c5 d5 e6 Nc3 exd5 cxd5 d6 e4 g6" },
+        // Sistema Hromadka (3...d6)
+        new() { Apertura = "Benoni", Variante = "Hromadka d6 Nc3 g6", Movimientos = "d4 Nf6 c4 c5 d5 d6 Nc3 g6" },
+        new() { Apertura = "Benoni", Variante = "Hromadka d6 Nf3 g6", Movimientos = "d4 Nf6 c4 c5 d5 d6 Nf3 g6" },
+        // Benoni Checa (3...e5)
         new() { Apertura = "Benoni", Variante = "Czech", Movimientos = "d4 Nf6 c4 c5 d5 e5" },
+        // Benoni antigua (ECO A43) — 1.d4 c5
+        new() { Apertura = "Benoni", Variante = "Antigua Nf6 Nc3 Qa5", Movimientos = "d4 c5 d5 Nf6 Nc3 Qa5" },
+        new() { Apertura = "Benoni", Variante = "Antigua Nf6 Nf3 c4", Movimientos = "d4 c5 d5 Nf6 Nf3 c4" },
+        new() { Apertura = "Benoni", Variante = "Antigua Nf6 Nf3 g6", Movimientos = "d4 c5 d5 Nf6 Nf3 g6" },
+        new() { Apertura = "Benoni", Variante = "Antigua d6 Nc3 g6", Movimientos = "d4 c5 d5 d6 Nc3 g6" },
+        new() { Apertura = "Benoni", Variante = "Antigua e5 e4 d6", Movimientos = "d4 c5 d5 e5 e4 d6" },
+        new() { Apertura = "Benoni", Variante = "Antigua e6 e4", Movimientos = "d4 c5 d5 e6 e4" },
+        new() { Apertura = "Benoni", Variante = "Antigua f5", Movimientos = "d4 c5 d5 f5" },
+        // Gambito Benko/Volga
+        new() { Apertura = "Benko", Variante = "Aceptado axb5 Bxb5", Movimientos = "d4 Nf6 c4 c5 d5 b5 cxb5 a6 bxa6 Bxa6 Nc3 d6 Nf3 g6 g3 Bg7 Bg2 O-O O-O Nbd7" },
+        new() { Apertura = "Benko", Variante = "Aceptado axb5 a6", Movimientos = "d4 Nf6 c4 c5 d5 b5 cxb5 a6 bxa6 Nxa6" },
+        new() { Apertura = "Benko", Variante = "Semi-aceptado b6", Movimientos = "d4 Nf6 c4 c5 d5 b5 b6" },
+        new() { Apertura = "Benko", Variante = "Rechazado e3", Movimientos = "d4 Nf6 c4 c5 d5 b5 e3" },
+        new() { Apertura = "Benko", Variante = null, Movimientos = "d4 Nf6 c4 c5 d5 b5" },
+        // Gambito Blumenfeld
+        new() { Apertura = "Benoni", Variante = "Blumenfeld b5", Movimientos = "d4 Nf6 c4 e6 Nf3 c5 d5 b5" },
         new() { Apertura = "Benoni", Variante = null, Movimientos = "d4 Nf6 c4 c5" },
 
         // HOLANDESA
+        // Líneas menores tras 1.d4 f5
+        new() { Apertura = "Holandesa", Variante = "Qd3 e6 g4", Movimientos = "d4 f5 Qd3 e6 g4" },
+        new() { Apertura = "Holandesa", Variante = "h3", Movimientos = "d4 f5 h3" },
+        new() { Apertura = "Holandesa", Variante = "g4", Movimientos = "d4 f5 g4" },
+        new() { Apertura = "Holandesa", Variante = "Bg5", Movimientos = "d4 f5 Bg5" },
+        // Gambito Staunton (2.e4)
+        new() { Apertura = "Holandesa", Variante = "Staunton fxe4 Nc3 Nf6 g4", Movimientos = "d4 f5 e4 fxe4 Nc3 Nf6 g4" },
+        new() { Apertura = "Holandesa", Variante = "Staunton fxe4 Nc3 Nf6 Bg5 g6 h4", Movimientos = "d4 f5 e4 fxe4 Nc3 Nf6 Bg5 g6 h4" },
+        new() { Apertura = "Holandesa", Variante = "Staunton fxe4 Nc3 Nf6 Bg5 g6 f3", Movimientos = "d4 f5 e4 fxe4 Nc3 Nf6 Bg5 g6 f3" },
+        new() { Apertura = "Holandesa", Variante = "Staunton fxe4 Nc3 Nf6 Bg5 c6", Movimientos = "d4 f5 e4 fxe4 Nc3 Nf6 Bg5 c6" },
+        new() { Apertura = "Holandesa", Variante = "Staunton fxe4 Nc3 Nf6 Bg5 b6", Movimientos = "d4 f5 e4 fxe4 Nc3 Nf6 Bg5 b6" },
+        new() { Apertura = "Holandesa", Variante = "Staunton fxe4 d6", Movimientos = "d4 f5 e4 d6" },
+        // 2.g3 — sistema fianchetto
+        new() { Apertura = "Holandesa", Variante = "g3 Nf6 Bg2 e6 Nh3", Movimientos = "d4 f5 g3 Nf6 Bg2 e6 Nh3" },
+        new() { Apertura = "Holandesa", Variante = "g3 Nf6 Bg2 g6", Movimientos = "d4 f5 g3 Nf6 Bg2 g6" },
+        new() { Apertura = "Holandesa", Variante = "g3 g6 Bg2 Bg7 Nf3 c6 OO Nh6", Movimientos = "d4 f5 g3 g6 Bg2 Bg7 Nf3 c6 O-O Nh6" },
+        new() { Apertura = "Holandesa", Variante = "g3 g6 Bg2 Bg7 Nh3", Movimientos = "d4 f5 g3 g6 Bg2 Bg7 Nh3" },
+        // 2.c4 — línea principal
+        new() { Apertura = "Holandesa", Variante = "c4 g6 Nc3 Nh6", Movimientos = "d4 f5 c4 g6 Nc3 Nh6" },
+        new() { Apertura = "Holandesa", Variante = "c4 e6 Nc3", Movimientos = "d4 f5 c4 e6 Nc3" },
+        new() { Apertura = "Holandesa", Variante = "c4 e6 e4", Movimientos = "d4 f5 c4 e6 e4" },
+        new() { Apertura = "Holandesa", Variante = "c4 Nf6 Nc3", Movimientos = "d4 f5 c4 Nf6 Nc3" },
+        new() { Apertura = "Holandesa", Variante = "c4 Nf6 g3 d6 Bg2 c6 Nc3 Qc7", Movimientos = "d4 f5 c4 Nf6 g3 d6 Bg2 c6 Nc3 Qc7" },
+        new() { Apertura = "Holandesa", Variante = "c4 Nf6 g3 e6 Bg2 Bb4+ Bd2 Be7", Movimientos = "d4 f5 c4 Nf6 g3 e6 Bg2 Bb4+ Bd2 Be7" },
+        // Variante Leningrado (g6 Bg7)
+        new() { Apertura = "Holandesa", Variante = "Leningrad c4 Nf6 g3 g6 Bg2 Bg7 Nf3 OO OO d6 Nc3 c6", Movimientos = "d4 f5 c4 Nf6 g3 g6 Bg2 Bg7 Nf3 O-O O-O d6 Nc3 c6" },
+        new() { Apertura = "Holandesa", Variante = "Leningrad c4 Nf6 g3 g6 Bg2 Bg7 Nf3 OO OO d6 Nc3 Nc6", Movimientos = "d4 f5 c4 Nf6 g3 g6 Bg2 Bg7 Nf3 O-O O-O d6 Nc3 Nc6" },
         new() { Apertura = "Holandesa", Variante = "Leningrad", Movimientos = "d4 f5 g3 Nf6 Bg2 g6" },
+        // Stonewall (d5 e6 c6 f5)
+        new() { Apertura = "Holandesa", Variante = "Stonewall c4 Nf6 g3 e6 Bg2 Be7 Nf3 OO OO d5 Nc3 c6 Qc2", Movimientos = "d4 f5 c4 Nf6 g3 e6 Bg2 Be7 Nf3 O-O O-O d5 Nc3 c6 Qc2" },
+        new() { Apertura = "Holandesa", Variante = "Stonewall c4 Nf6 g3 e6 Bg2 Be7 Nf3 OO OO d5 b3 c6 Ba3", Movimientos = "d4 f5 c4 Nf6 g3 e6 Bg2 Be7 Nf3 O-O O-O d5 b3 c6 Ba3" },
+        new() { Apertura = "Holandesa", Variante = "Stonewall c4 Nf6 g3 e6 Bg2 Be7 Nf3 OO OO d5 Nc3", Movimientos = "d4 f5 c4 Nf6 g3 e6 Bg2 Be7 Nf3 O-O O-O d5 Nc3" },
+        new() { Apertura = "Holandesa", Variante = "Stonewall c4 Nf6 g3 e6 Bg2 Be7 Nf3 OO OO d6 Nc3 Qe8 Re1", Movimientos = "d4 f5 c4 Nf6 g3 e6 Bg2 Be7 Nf3 O-O O-O d6 Nc3 Qe8 Re1" },
+        new() { Apertura = "Holandesa", Variante = "Stonewall c4 Nf6 g3 e6 Bg2 Be7 Nf3 OO OO d6 Nc3 Qe8 Qc2", Movimientos = "d4 f5 c4 Nf6 g3 e6 Bg2 Be7 Nf3 O-O O-O d6 Nc3 Qe8 Qc2" },
+        new() { Apertura = "Holandesa", Variante = "Stonewall c4 Nf6 g3 e6 Bg2 Be7 Nf3 OO OO d6 Nc3 Qe8 b3", Movimientos = "d4 f5 c4 Nf6 g3 e6 Bg2 Be7 Nf3 O-O O-O d6 Nc3 Qe8 b3" },
+        new() { Apertura = "Holandesa", Variante = "Stonewall c4 Nf6 g3 e6 Bg2 Be7 Nf3 OO OO Ne4", Movimientos = "d4 f5 c4 Nf6 g3 e6 Bg2 Be7 Nf3 O-O O-O Ne4" },
         new() { Apertura = "Holandesa", Variante = "Stonewall", Movimientos = "d4 f5 g3 Nf6 Bg2 e6 Nf3 d5" },
         new() { Apertura = "Holandesa", Variante = null, Movimientos = "d4 f5" },
 
