@@ -96,8 +96,31 @@ export default function TournamentMode({ onBack }) {
 
     setScores(prev => ({ player: prev.player + points.player, master: prev.master + points.master }));
     setRoundResults(prev => [...prev, { round: currentRound, winner, reason }]);
+
+    // Guardar ronda como partida en el historial
+    if (user?.token) {
+      setMoveHistory(prev => {
+        const resultado = winner === 'player' ? 'win' : winner === 'master' ? 'loss' : 'draw';
+        const date = new Date().toISOString().slice(0, 10).replace(/-/g, '.');
+        const pgn = `[Event "Torneo Chess Legacy"]\n[Date "${date}"]\n[White "Tú"]\n[Black "${selectedMaster.name}"]\n\n` +
+          prev.reduce((acc, m, i) => {
+            if (i % 2 === 0) acc += `${Math.ceil((i+1)/2)}. `;
+            return acc + m.san + ' ';
+          }, '').trim();
+        progresoAPI.guardarPartida(user.token, {
+          maestro: selectedMaster.name,
+          resultado,
+          pgn,
+          totalMovimientos: prev.length,
+          esTorneo: true,
+          colorJugador: playerColor,
+        }).catch(() => {});
+        return prev;
+      });
+    }
+
     setPhase(PHASES.ROUND_END);
-  }, [currentRound]);
+  }, [currentRound, user, selectedMaster, playerColor]);
 
   const nextRound = () => {
     if (currentRound >= totalRounds) {

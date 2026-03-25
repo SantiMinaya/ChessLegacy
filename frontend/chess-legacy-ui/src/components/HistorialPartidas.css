@@ -1,0 +1,182 @@
+.historial {
+  padding: 8px 0;
+  color: var(--text-primary);
+}
+
+.historial h2 { color: var(--accent); margin: 0 0 6px; font-size: 1.5rem; }
+.historial-subtitle { color: var(--text-secondary); margin: 0 0 24px; font-size: 14px; }
+
+/* Stats */
+.historial-stats {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.h-stat {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(212,175,55,0.2);
+  border-radius: 10px;
+  padding: 14px 20px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 80px;
+}
+.h-stat span  { font-size: 1.6rem; font-weight: bold; color: var(--accent); }
+.h-stat label { font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 1px; }
+.h-stat.win span  { color: #4caf50; }
+.h-stat.loss span { color: #f44336; }
+.h-stat.draw span { color: #ff9800; }
+
+/* Filtros */
+.historial-filtros {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.historial-filtros select {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  padding: 8px 12px;
+  border-radius: var(--border-radius);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.h-clear-btn {
+  padding: 8px 14px;
+  background: transparent;
+  border: 1px solid #555;
+  color: #888;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  font-size: 13px;
+  transition: all 0.2s;
+}
+.h-clear-btn:hover { border-color: var(--error); color: var(--error); }
+
+/* Lista */
+.historial-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.historial-empty {
+  text-align: center;
+  padding: 60px 20px;
+  color: #555;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Card */
+.historial-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 10px;
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+.historial-card:hover { border-color: rgba(212,175,55,0.3); }
+.historial-card.open  { border-color: rgba(212,175,55,0.5); }
+
+.historial-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px;
+  cursor: pointer;
+  gap: 12px;
+}
+
+.h-card-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.h-master-photo {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(212,175,55,0.4);
+  flex-shrink: 0;
+}
+
+.h-master-placeholder {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(212,175,55,0.1);
+  border: 2px solid rgba(212,175,55,0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.h-maestro { font-weight: bold; font-size: 15px; color: var(--text-primary); }
+.h-meta    { font-size: 12px; color: #888; display: flex; gap: 6px; align-items: center; margin-top: 3px; flex-wrap: wrap; }
+.h-sep     { color: #444; }
+
+.h-card-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-shrink: 0;
+}
+
+.h-resultado { font-weight: bold; font-size: 14px; }
+.h-fecha     { font-size: 12px; color: #666; }
+.h-chevron   { color: #555; font-size: 12px; }
+
+/* Body expandido */
+.historial-card-body {
+  border-top: 1px solid rgba(255,255,255,0.06);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.h-pgn-box {
+  background: rgba(0,0,0,0.2);
+  border-radius: 6px;
+  padding: 12px;
+  max-height: 160px;
+  overflow-y: auto;
+}
+
+.h-pgn {
+  font-family: monospace;
+  font-size: 13px;
+  color: #c0c0c0;
+  white-space: pre-wrap;
+  margin: 0;
+  line-height: 1.6;
+}
+
+.h-export-btn {
+  align-self: flex-start;
+  padding: 8px 16px;
+  background: transparent;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  font-size: 13px;
+  transition: all 0.2s;
+}
+.h-export-btn:hover { background: rgba(212,175,55,0.1); }

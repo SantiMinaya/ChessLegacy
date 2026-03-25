@@ -10,6 +10,8 @@ import AnalisisLibre from '../components/AnalisisLibre';
 import BuscadorFen from '../components/BuscadorFen';
 import ComparadorMaestros from '../components/ComparadorMaestros';
 import MapaCalor from '../components/MapaCalor';
+import HistorialPartidas from '../components/HistorialPartidas';
+import AnalisisPuntosDebiles from '../components/AnalisisPuntosDebiles';
 import './Home.css';
 
 export default function Home() {
@@ -38,16 +40,22 @@ export default function Home() {
         <button className={tab === 'openings' ? 'active' : ''} onClick={() => setTab('openings')}>📖 Aperturas</button>
         <button className={tab === 'tournament' ? 'active' : ''} onClick={() => setTab('tournament')}>🏆 Torneo</button>
         <button className={tab === 'analisis' ? 'active' : ''} onClick={() => setTab('analisis')}>🔬 Análisis</button>
+        <button className={tab === 'historial' ? 'active' : ''} onClick={() => setTab('historial')}>📚 Historial</button>
         <button className={tab === 'perfil' ? 'active' : ''} onClick={() => setTab('perfil')}>👤 Perfil</button>
       </div>
 
       {tab === 'openings' && <AperturaTraining onBack={() => setTab('masters')} hideBack />}
       {tab === 'tournament' && <TournamentMode onBack={() => setTab('masters')} />}
+      {tab === 'historial' && (
+        <div style={{ maxWidth: 900, margin: '0 auto', padding: '0 20px' }}>
+          <HistorialPartidas />
+        </div>
+      )}
       {tab === 'perfil' && <PerfilUsuario />}
       {tab === 'analisis' && (
         <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 20px' }}>
           <div style={{ display: 'flex', gap: 12, marginBottom: 28, flexWrap: 'wrap' }}>
-            {[['libre', '🔬 Análisis libre'], ['fen', '🔍 Buscar por FEN'], ['comparar', '⚔️ Comparar Maestros'], ['calor', '🔥 Mapa de Calor']].map(([v, l]) => (
+            {[['libre', '🔬 Análisis libre'], ['fen', '🔍 Buscar por FEN'], ['comparar', '⚔️ Comparar Maestros'], ['calor', '🔥 Mapa de Calor'], ['debiles', '🔎 Puntos Débiles']].map(([v, l]) => (
               <button key={v} onClick={() => setAnalisisTab(v)} style={{
                 padding: '8px 18px', borderRadius: 8, border: '1px solid #d4af37',
                 background: analisisTab === v ? '#d4af37' : 'transparent',
@@ -60,6 +68,7 @@ export default function Home() {
           {analisisTab === 'fen' && <BuscadorFen onVerPartida={(id) => navigate(`/partida/${id}`)} />}
           {analisisTab === 'comparar' && <ComparadorMaestros />}
           {analisisTab === 'calor' && <MapaCalor />}
+          {analisisTab === 'debiles' && <AnalisisPuntosDebiles />}
         </div>
       )}
 

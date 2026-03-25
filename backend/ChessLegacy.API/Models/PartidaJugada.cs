@@ -8,6 +8,8 @@ public class PartidaJugada
     public string Resultado { get; set; } = string.Empty; // win | loss | draw
     public string Pgn { get; set; } = string.Empty;
     public int TotalMovimientos { get; set; }
+    public bool EsTorneo { get; set; } = false;
+    public string ColorJugador { get; set; } = "white"; // white | black
     public DateTime FechaJugada { get; set; } = DateTime.UtcNow;
 
     public Usuario Usuario { get; set; } = null!;

@@ -252,18 +252,24 @@ public class ProgresoController : ControllerBase
             Resultado = req.Resultado,
             Pgn = req.Pgn,
             TotalMovimientos = req.TotalMovimientos,
+            EsTorneo = req.EsTorneo,
+            ColorJugador = req.ColorJugador,
         });
         await _db.SaveChangesAsync();
         return Ok();
     }
 
     [HttpGet("partidas")]
-    public async Task<IActionResult> GetPartidas()
+    public async Task<IActionResult> GetPartidas([FromQuery] string? maestro, [FromQuery] string? resultado, [FromQuery] bool? esTorneo)
     {
-        var partidas = await _db.PartidasJugadas
-            .Where(p => p.UsuarioId == UserId)
+        var query = _db.PartidasJugadas.Where(p => p.UsuarioId == UserId);
+        if (!string.IsNullOrEmpty(maestro)) query = query.Where(p => p.Maestro == maestro);
+        if (!string.IsNullOrEmpty(resultado)) query = query.Where(p => p.Resultado == resultado);
+        if (esTorneo.HasValue) query = query.Where(p => p.EsTorneo == esTorneo.Value);
+
+        var partidas = await query
             .OrderByDescending(p => p.FechaJugada)
-            .Select(p => new { p.Id, p.Maestro, p.Resultado, p.TotalMovimientos, p.FechaJugada, p.Pgn })
+            .Select(p => new { p.Id, p.Maestro, p.Resultado, p.TotalMovimientos, p.FechaJugada, p.Pgn, p.EsTorneo, p.ColorJugador })
             .ToListAsync();
         return Ok(partidas);
     }
@@ -309,6 +315,6 @@ public class ProgresoController : ControllerBase
 
 public record SesionRequest(string Apertura, string? Variante, string Color, int Intentos, int Aciertos, string Modo = "aprender", int Timeouts = 0);
 public record TorneoRequest(string Maestro, bool Ganado, int RondasPerdidas, int MinutosPorRonda);
-public record PartidaJugadaRequest(string Maestro, string Resultado, string Pgn, int TotalMovimientos);
+public record PartidaJugadaRequest(string Maestro, string Resultado, string Pgn, int TotalMovimientos, bool EsTorneo = false, string ColorJugador = "white");
 public record FotoRequest(string FotoBase64);
 public record LogroManualRequest(string Codigo);
