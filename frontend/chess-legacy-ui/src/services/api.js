@@ -43,3 +43,13 @@ export const progresoAPI = {
   subirFoto: (token, fotoBase64) => axios.post(`${API_URL}/progreso/foto`, { fotoBase64 }, { headers: { Authorization: `Bearer ${token}` } }),
   registrarLogro: (token, codigo) => axios.post(`${API_URL}/progreso/logro`, { codigo }, { headers: { Authorization: `Bearer ${token}` } }),
 };
+
+export const amigosAPI = {
+  getAmigos: (token) => axios.get(`${API_URL}/amigos`, { headers: { Authorization: `Bearer ${token}` } }),
+  getSolicitudes: (token) => axios.get(`${API_URL}/amigos/solicitudes`, { headers: { Authorization: `Bearer ${token}` } }),
+  solicitar: (token, username) => axios.post(`${API_URL}/amigos/solicitar`, { username }, { headers: { Authorization: `Bearer ${token}` } }),
+  aceptar: (token, id) => axios.post(`${API_URL}/amigos/aceptar/${id}`, {}, { headers: { Authorization: `Bearer ${token}` } }),
+  rechazar: (token, id) => axios.delete(`${API_URL}/amigos/rechazar/${id}`, { headers: { Authorization: `Bearer ${token}` } }),
+  eliminar: (token, amigoId) => axios.delete(`${API_URL}/amigos/${amigoId}`, { headers: { Authorization: `Bearer ${token}` } }),
+  buscar: (token, q) => axios.get(`${API_URL}/amigos/buscar`, { params: { q }, headers: { Authorization: `Bearer ${token}` } }),
+};

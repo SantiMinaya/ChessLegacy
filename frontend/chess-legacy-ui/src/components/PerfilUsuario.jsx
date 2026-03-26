@@ -11,6 +11,7 @@ import PanelPersonalizacion from './PanelPersonalizacion';
 import TablaClasificacion from './TablaClasificacion';
 import GraficoXP from './GraficoXP';
 import MisionesSemanales from './MisionesSemanales';
+import SistemaAmigos from './SistemaAmigos';
 import './PerfilUsuario.css';
 
 const LOGROS_INFO = {
@@ -187,6 +188,11 @@ export default function PerfilUsuario() {
       <div className="perfil-section">
         <h3>🏆 Tabla de Clasificación</h3>
         <TablaClasificacion miId={user.id} />
+      </div>
+
+      <div className="perfil-section">
+        <h3>👥 Amigos</h3>
+        <SistemaAmigos />
       </div>
 
       <div className="perfil-section">

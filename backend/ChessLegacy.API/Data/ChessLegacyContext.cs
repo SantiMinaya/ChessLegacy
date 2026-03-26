@@ -18,6 +18,7 @@ public class ChessLegacyContext : DbContext
     public DbSet<LogroUsuario> Logros { get; set; }
     public DbSet<ActividadDiaria> ActividadesDiarias { get; set; }
     public DbSet<PartidaJugada> PartidasJugadas { get; set; }
+    public DbSet<Amistad> Amistades { get; set; }
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -111,6 +112,14 @@ public class ChessLegacyContext : DbContext
             entity.HasKey(e => e.Id);
             entity.HasOne(e => e.Usuario).WithMany().HasForeignKey(e => e.UsuarioId);
             entity.HasIndex(e => new { e.UsuarioId, e.FechaJugada });
+        });
+
+        modelBuilder.Entity<Amistad>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.HasOne(e => e.Usuario).WithMany().HasForeignKey(e => e.UsuarioId).OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne(e => e.Amigo).WithMany().HasForeignKey(e => e.AmigoId).OnDelete(DeleteBehavior.Restrict);
+            entity.HasIndex(e => new { e.UsuarioId, e.AmigoId }).IsUnique();
         });
     }
 }

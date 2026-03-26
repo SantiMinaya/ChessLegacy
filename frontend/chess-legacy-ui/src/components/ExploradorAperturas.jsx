@@ -75,6 +75,22 @@ export default function ExploradorAperturas() {
   // Variantes completadas (los movimientos jugados cubren toda la línea)
   const variantesCompletadas = variantesActivas.filter(v => v.moves.length <= movimientos.length);
 
+  // Detectar transposiciones: variantes que llegan al mismo FEN por distinto camino
+  const fenActual = game.fen().split(' ')[0]; // solo la posición, sin contadores
+  const transposiciones = todasVariantes.filter(v => {
+    // Ya coincide por movimientos — no es transposición
+    if (variantesActivas.some(a => a.apertura === v.apertura && a.variante === v.variante)) return false;
+    // Comprobar si algún FEN intermedio de esta variante coincide con el actual
+    const g = new Chess();
+    for (const m of v.moves) {
+      try {
+        if (!g.move(m)) break;
+        if (g.fen().split(' ')[0] === fenActual) return true;
+      } catch { break; }
+    }
+    return false;
+  }).slice(0, 5); // máximo 5 transposiciones
+
   const onPieceDrop = (from, to) => {
     const g = new Chess(game.fen());
     const m = g.move({ from, to, promotion: 'q' });
@@ -258,6 +274,23 @@ export default function ExploradorAperturas() {
               >
                 ← Volver al último movimiento teórico
               </button>
+            </div>
+          )}
+
+          {/* Transposiciones */}
+          {transposiciones.length > 0 && movimientos.length > 0 && (
+            <div style={{ background: 'rgba(255,152,0,0.08)', border: '1px solid rgba(255,152,0,0.3)', borderRadius: 8, padding: '10px 12px' }}>
+              <div style={{ fontSize: 12, color: 'var(--warning)', fontWeight: 'bold', marginBottom: 6 }}>
+                🔀 Transposición detectada
+              </div>
+              <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 6 }}>
+                Esta posición también se puede llegar desde:
+              </div>
+              {transposiciones.map((v, i) => (
+                <div key={i} style={{ fontSize: 12, color: 'var(--text-secondary)', padding: '2px 0' }}>
+                  ↔️ {v.apertura} — <span style={{ color: 'var(--accent)' }}>{v.variante}</span>
+                </div>
+              ))}
             </div>
           )}
         </div>

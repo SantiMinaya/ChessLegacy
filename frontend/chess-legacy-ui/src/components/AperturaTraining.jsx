@@ -18,6 +18,14 @@ import BrillantesHistoricos from './BrillantesHistoricos';
 import ExploradorAperturas from './ExploradorAperturas';
 import PartidaReconstruida from './PartidaReconstruida';
 import QuizMaestros from './QuizMaestros';
+import FlashcardsVariantes from './FlashcardsVariantes';
+import JugadasRaras from './JugadasRaras';
+import VisualizacionSinTablero from './VisualizacionSinTablero';
+import CalculoVariantes from './CalculoVariantes';
+import ReconocimientoEstructuras from './ReconocimientoEstructuras';
+import MemorizacionPosiciones from './MemorizacionPosiciones';
+import FinalesTeóricos from './FinalesTeóricos';
+import MatesTeóricos from './MatesTeóricos';
 import ModoVotacion from './ModoVotacion';
 import EditorVariantes from './EditorVariantes';
 import ArbolVariantes from './ArbolVariantes';
@@ -231,6 +239,14 @@ export default function AperturaTraining({ onBack, hideBack }) {
       <button className={subTab === 'explorador' ? 'active' : ''} onClick={() => setSubTab('explorador')}>🌳 Explorador</button>
       <button className={subTab === 'reconstruida' ? 'active' : ''} onClick={() => setSubTab('reconstruida')}>🎥 Reconstruida</button>
       <button className={subTab === 'quiz' ? 'active' : ''} onClick={() => setSubTab('quiz')}>🎤 Quiz</button>
+      <button className={subTab === 'flashcards' ? 'active' : ''} onClick={() => setSubTab('flashcards')}>🃏 Flashcards</button>
+      <button className={subTab === 'raras' ? 'active' : ''} onClick={() => setSubTab('raras')}>🎲 Jugadas Raras</button>
+      <button className={subTab === 'visualizacion' ? 'active' : ''} onClick={() => setSubTab('visualizacion')}>👁️ Visualización</button>
+      <button className={subTab === 'calculo' ? 'active' : ''} onClick={() => setSubTab('calculo')}>🧮 Cálculo</button>
+      <button className={subTab === 'estructuras' ? 'active' : ''} onClick={() => setSubTab('estructuras')}>🏗️ Estructuras</button>
+      <button className={subTab === 'memoria' ? 'active' : ''} onClick={() => setSubTab('memoria')}>🧠 Memoria</button>
+      <button className={subTab === 'finales_teo' ? 'active' : ''} onClick={() => setSubTab('finales_teo')}>♟️ Finales Teóricos</button>
+      <button className={subTab === 'mates_teo' ? 'active' : ''} onClick={() => setSubTab('mates_teo')}>♔ Mates Teóricos</button>
       <button className={subTab === 'votacion' ? 'active' : ''} onClick={() => setSubTab('votacion')}>🗳️ Votación</button>
       <button className={subTab === 'editor' ? 'active' : ''} onClick={() => setSubTab('editor')}>✏️ Editor</button>
       <button className={subTab === 'arbol' ? 'active' : ''} onClick={() => setSubTab('arbol')}>🌳 Árbol</button>
@@ -311,6 +327,70 @@ export default function AperturaTraining({ onBack, hideBack }) {
       {!hideBack && <button className="back-btn" onClick={onBack}>← Volver</button>}
       {subTabsBar}
       <QuizMaestros />
+    </div>
+  );
+
+  if (subTab === 'flashcards') return (
+    <div className="apertura-training">
+      {!hideBack && <button className="back-btn" onClick={onBack}>← Volver</button>}
+      {subTabsBar}
+      <FlashcardsVariantes />
+    </div>
+  );
+
+  if (subTab === 'raras') return (
+    <div className="apertura-training">
+      {!hideBack && <button className="back-btn" onClick={onBack}>← Volver</button>}
+      {subTabsBar}
+      <JugadasRaras />
+    </div>
+  );
+
+  if (subTab === 'visualizacion') return (
+    <div className="apertura-training">
+      {!hideBack && <button className="back-btn" onClick={onBack}>← Volver</button>}
+      {subTabsBar}
+      <VisualizacionSinTablero />
+    </div>
+  );
+
+  if (subTab === 'calculo') return (
+    <div className="apertura-training">
+      {!hideBack && <button className="back-btn" onClick={onBack}>← Volver</button>}
+      {subTabsBar}
+      <CalculoVariantes />
+    </div>
+  );
+
+  if (subTab === 'estructuras') return (
+    <div className="apertura-training">
+      {!hideBack && <button className="back-btn" onClick={onBack}>← Volver</button>}
+      {subTabsBar}
+      <ReconocimientoEstructuras />
+    </div>
+  );
+
+  if (subTab === 'memoria') return (
+    <div className="apertura-training">
+      {!hideBack && <button className="back-btn" onClick={onBack}>← Volver</button>}
+      {subTabsBar}
+      <MemorizacionPosiciones />
+    </div>
+  );
+
+  if (subTab === 'finales_teo') return (
+    <div className="apertura-training">
+      {!hideBack && <button className="back-btn" onClick={onBack}>← Volver</button>}
+      {subTabsBar}
+      <FinalesTeóricos />
+    </div>
+  );
+
+  if (subTab === 'mates_teo') return (
+    <div className="apertura-training">
+      {!hideBack && <button className="back-btn" onClick={onBack}>← Volver</button>}
+      {subTabsBar}
+      <MatesTeóricos />
     </div>
   );
 
