@@ -20,7 +20,10 @@ namespace ChessLegacy.API.Migrations
                 migrationBuilder.Sql($@"
                     DO $$
                     BEGIN
-                        IF NOT EXISTS (
+                        IF EXISTS (
+                            SELECT 1 FROM information_schema.tables
+                            WHERE table_name = '{table.ToLower()}'
+                        ) AND NOT EXISTS (
                             SELECT 1 FROM information_schema.columns
                             WHERE table_name = '{table.ToLower()}'
                             AND column_name = 'Id'
