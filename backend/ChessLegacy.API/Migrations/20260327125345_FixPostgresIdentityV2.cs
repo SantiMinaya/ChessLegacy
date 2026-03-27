@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace ChessLegacy.API.Migrations
 {
-    public partial class FixPostgresIdentity : Migration
+    public partial class FixPostgresIdentityV2 : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -17,7 +17,6 @@ namespace ChessLegacy.API.Migrations
 
             foreach (var table in tables)
             {
-                // Usar LOWER() para comparar nombres de columna independientemente del case
                 migrationBuilder.Sql($@"
                     DO $$
                     BEGIN
