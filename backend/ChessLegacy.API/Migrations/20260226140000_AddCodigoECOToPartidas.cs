@@ -8,19 +8,11 @@ namespace ChessLegacy.API.Migrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<string>(
-                name: "CodigoECO",
-                table: "Partidas",
-                type: "TEXT",
-                nullable: false,
-                defaultValue: "");
+            // No-op para PostgreSQL: gestionado por PostgreSQLSync
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "CodigoECO",
-                table: "Partidas");
         }
     }
 }

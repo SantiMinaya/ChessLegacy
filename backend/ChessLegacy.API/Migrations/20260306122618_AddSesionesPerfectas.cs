@@ -10,20 +10,11 @@ namespace ChessLegacy.API.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<int>(
-                name: "SesionesPerfectas",
-                table: "Progresos",
-                type: "INTEGER",
-                nullable: false,
-                defaultValue: 0);
+            // No-op para PostgreSQL: gestionado por PostgreSQLSync
         }
 
-        /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "SesionesPerfectas",
-                table: "Progresos");
         }
     }
 }

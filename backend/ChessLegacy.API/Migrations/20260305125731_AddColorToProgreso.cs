@@ -10,14 +10,8 @@ namespace ChessLegacy.API.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AlterColumn<string>(
-                name: "Color",
-                table: "Progresos",
-                type: "TEXT",
-                nullable: false,
-                oldClrType: typeof(string),
-                oldType: "TEXT",
-                oldDefaultValue: "white");
+            // No-op: columna Color gestionada por migración PostgreSQLSync
+            // Esta migración era específica de SQLite
         }
 
         /// <inheritdoc />
