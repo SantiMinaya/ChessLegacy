@@ -85,8 +85,8 @@ Thumbs.db
 # Stockfish (if large)
 # backend/ChessLegacy.API/stockfish/
 
-# PGN files (if large)
-backend/ChessLegacy.API/Scripts/pgn_files/*.pgn
+# PGN files — incluidos para el despliegue en Railway
+# backend/ChessLegacy.API/Scripts/pgn_files/*.pgn
 
 # Keep directory structure
 !backend/ChessLegacy.API/Scripts/pgn_files/.gitkeep
