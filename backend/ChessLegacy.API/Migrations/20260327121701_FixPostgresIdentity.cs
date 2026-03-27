@@ -8,8 +8,6 @@ namespace ChessLegacy.API.Migrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            // Añadir secuencias SERIAL a todas las tablas que las necesitan en PostgreSQL
-            // Esto solo afecta a PostgreSQL; en SQLite no hace nada
             var tables = new[]
             {
                 "Jugadores", "Partidas", "Posiciones", "Intentos", "Movimientos",
@@ -30,7 +28,7 @@ namespace ChessLegacy.API.Migrations
                         ) THEN
                             CREATE SEQUENCE IF NOT EXISTS ""{table}_Id_seq"";
                             ALTER TABLE ""{table}"" ALTER COLUMN ""Id"" SET DEFAULT nextval('""{table}_Id_seq""');
-                            SELECT setval('""{table}_Id_seq""', COALESCE((SELECT MAX(""Id"") FROM ""{table}""), 0) + 1, false);
+                            PERFORM setval('""{table}_Id_seq""', COALESCE((SELECT MAX(""Id"") FROM ""{table}""), 0) + 1, false);
                         END IF;
                     END $$;
                 ");
