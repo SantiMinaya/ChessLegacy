@@ -1,19 +1,24 @@
-FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
-WORKDIR /src
-COPY ["ChessLegacy.API.csproj", "."]
-RUN dotnet restore
-COPY . .
-RUN dotnet publish -c Release -o /app/publish
-
-FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
+FROM mcr.microsoft.com/dotnet/sdk:10.0
 WORKDIR /app
 
 # Instalar Stockfish
 RUN apt-get update && apt-get install -y stockfish && rm -rf /var/lib/apt/lists/*
 RUN mkdir -p /app/stockfish && ln -s /usr/games/stockfish /app/stockfish/stockfish
 
-COPY --from=build /app/publish .
-COPY --from=build /src/Scripts ./Scripts
+# Restaurar dependencias primero (cache layer)
+COPY ChessLegacy.API.csproj .
+RUN dotnet restore
+
+# Copiar todo el código
+COPY . .
+
+# Publicar
+RUN dotnet publish -c Release -o /app/out
+
+# Copiar Scripts al directorio de publicación
+RUN cp -r /app/Scripts /app/out/Scripts 2>/dev/null || true
+
+WORKDIR /app/out
 
 EXPOSE 8080
 ENV PORT=8080
