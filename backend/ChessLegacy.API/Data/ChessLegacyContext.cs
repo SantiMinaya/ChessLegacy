@@ -6,6 +6,12 @@ namespace ChessLegacy.API.Data;
 public class ChessLegacyContext : DbContext
 {
     public ChessLegacyContext(DbContextOptions<ChessLegacyContext> options) : base(options) { }
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        optionsBuilder.ConfigureWarnings(w =>
+            w.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning));
+    }
     
     public DbSet<Jugador> Jugadores { get; set; }
     public DbSet<Partida> Partidas { get; set; }
