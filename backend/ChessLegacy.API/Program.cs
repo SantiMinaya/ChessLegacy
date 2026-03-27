@@ -7,14 +7,10 @@ using System.Text;
 var builder = WebApplication.CreateBuilder(args);
 
 // ── Base de datos: PostgreSQL en producción, SQLite en desarrollo ──
-var connectionString = Environment.GetEnvironmentVariable("DATABASE_URL")
-    ?? builder.Configuration.GetConnectionString("DefaultConnection");
+var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
 
-if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("DATABASE_URL")))
+if (!string.IsNullOrEmpty(databaseUrl))
 {
-    // Railway proporciona DATABASE_URL en formato postgres://user:pass@host:port/db
-    // Npgsql necesita formato Host=...;Database=...
-    var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL")!;
     var uri = new Uri(databaseUrl);
     var userInfo = uri.UserInfo.Split(':');
     var npgsqlConn = $"Host={uri.Host};Port={uri.Port};Database={uri.AbsolutePath.TrimStart('/')};Username={userInfo[0]};Password={userInfo[1]};SSL Mode=Require;Trust Server Certificate=true";
@@ -23,11 +19,12 @@ if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("DATABASE_URL")))
 }
 else
 {
+    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
     builder.Services.AddDbContext<ChessLegacyContext>(options =>
         options.UseSqlite(connectionString));
 }
 
-// ── JWT: clave desde variable de entorno en producción ──
+// ── JWT ──
 var jwtKey = Environment.GetEnvironmentVariable("JWT_KEY")
     ?? builder.Configuration["Jwt:Key"]
     ?? throw new InvalidOperationException("JWT Key no configurada");
@@ -49,7 +46,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddAuthorization();
 
-// ── CORS: permitir el frontend de Vercel y localhost ──
+// ── CORS ──
 var frontendUrl = Environment.GetEnvironmentVariable("FRONTEND_URL") ?? "http://localhost:5173";
 builder.Services.AddCors(options =>
 {
@@ -61,7 +58,7 @@ builder.Services.AddCors(options =>
     });
 });
 
-// ── Stockfish: ruta adaptada a Linux/Windows ──
+// ── Stockfish ──
 var stockfishPath = Environment.GetEnvironmentVariable("STOCKFISH_PATH")
     ?? Path.Combine(AppContext.BaseDirectory, "stockfish",
         OperatingSystem.IsWindows() ? "stockfish.exe" : "stockfish");
@@ -85,7 +82,6 @@ builder.Services.AddControllers(options =>
 builder.Services.Configure<Microsoft.AspNetCore.Http.Features.FormOptions>(o => o.MultipartBodyLengthLimit = 5 * 1024 * 1024);
 builder.WebHost.ConfigureKestrel(o => o.Limits.MaxRequestBodySize = 5 * 1024 * 1024);
 
-// Puerto desde variable de entorno (Railway lo inyecta)
 var port = Environment.GetEnvironmentVariable("PORT") ?? "5000";
 builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
 
@@ -93,29 +89,36 @@ builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
+// ── Migraciones y seed ──
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<ChessLegacyContext>();
-    await context.Database.MigrateAsync();
 
-    // Parche de columnas solo para SQLite (PostgreSQL las gestiona EF)
+    Console.WriteLine("✅ Conectando a la base de datos...");
+    await context.Database.MigrateAsync();
+    Console.WriteLine("✅ Migraciones aplicadas");
+
+    // Parche de columnas solo para SQLite
     if (context.Database.IsSqlite())
     {
         var conn = context.Database.GetDbConnection();
         await conn.OpenAsync();
         var cols = new List<string>();
-        using (var cmd = conn.CreateCommand()) {
+        using (var cmd = conn.CreateCommand())
+        {
             cmd.CommandText = "PRAGMA table_info(Usuarios)";
             using var r = await cmd.ExecuteReaderAsync();
             while (await r.ReadAsync()) cols.Add(r["name"].ToString()!);
         }
-        var alter = new[] {
+        var alter = new[]
+        {
             ("RachaActual",    "ALTER TABLE Usuarios ADD COLUMN RachaActual INTEGER NOT NULL DEFAULT 0"),
             ("MaximaRacha",    "ALTER TABLE Usuarios ADD COLUMN MaximaRacha INTEGER NOT NULL DEFAULT 0"),
             ("UltimaActividad","ALTER TABLE Usuarios ADD COLUMN UltimaActividad TEXT NULL"),
         };
         foreach (var (col, sql) in alter)
-            if (!cols.Contains(col)) {
+            if (!cols.Contains(col))
+            {
                 using var cmd = conn.CreateCommand();
                 cmd.CommandText = sql;
                 await cmd.ExecuteNonQueryAsync();
@@ -152,7 +155,6 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
-// No usar HTTPS redirect en producción (Railway gestiona TLS externamente)
 if (app.Environment.IsDevelopment())
 {
     app.UseHttpsRedirection();
