@@ -47,28 +47,39 @@ def strip_emojis(text):
     return clean_text.strip()
 
 def download_mermaid_diagram(mermaid_code, output_path):
-    """Codifica el diagrama Mermaid y descarga el renderizado en PNG usando Kroki/Mermaid.ink."""
-    try:
-        print(f"[INFO] Descargando diagrama en PNG...")
-        # Limpiar sintaxis específicas de Kroki / Mermaid.ink
-        clean_code = mermaid_code.strip()
-        # Codificación base64 url safe
-        encoded = base64.urlsafe_b64encode(clean_code.encode('utf-8')).decode('utf-8')
-        url = f"https://mermaid.ink/img/{encoded}"
-        
-        req = urllib.request.Request(
-            url, 
-            headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
-        )
-        
-        with urllib.request.urlopen(req, timeout=15) as response:
-            with open(output_path, 'wb') as f:
-                f.write(response.read())
-        print(f"[SUCCESS] Diagrama guardado en: {output_path}")
-        return True
-    except Exception as e:
-        print(f"[WARNING] No se pudo renderizar el diagrama online: {e}")
-        return False
+    """Codifica el diagrama Mermaid y descarga el renderizado en PNG usando Kroki/Mermaid.ink.
+    Soporta hasta 3 reintentos en caso de timeout o error temporal."""
+    import time
+    max_retries = 3
+    timeout_seconds = 30
+    
+    # Limpiar sintaxis específicas de Kroki / Mermaid.ink
+    clean_code = mermaid_code.strip()
+    # Codificación base64 url safe
+    encoded = base64.urlsafe_b64encode(clean_code.encode('utf-8')).decode('utf-8')
+    url = f"https://mermaid.ink/img/{encoded}"
+    
+    req = urllib.request.Request(
+        url, 
+        headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
+    )
+    
+    for attempt in range(1, max_retries + 1):
+        try:
+            print(f"[INFO] Descangando diagrama en PNG (intento {attempt} de {max_retries})...")
+            with urllib.request.urlopen(req, timeout=timeout_seconds) as response:
+                with open(output_path, 'wb') as f:
+                    f.write(response.read())
+            print(f"[SUCCESS] Diagrama guardado en: {output_path}")
+            return True
+        except Exception as e:
+            print(f"[WARNING] Fallo en intento {attempt}: {e}")
+            if attempt < max_retries:
+                print("[INFO] Reintentando en 2 segundos...")
+                time.sleep(2)
+            else:
+                print(f"[ERROR] No se pudo renderizar el diagrama online tras {max_retries} intentos.")
+    return False
 
 def set_cell_borders_apa(cell, top=False, bottom=False):
     """Aplica bordes horizontales finos negros (Estilo Científico/APA) a una celda."""
@@ -195,7 +206,12 @@ def convert_md_to_docx(md_path, docx_path):
                 
                 # Descargar e insertar la imagen PNG en lugar de texto
                 mermaid_code = '\n'.join(mermaid_lines)
-                if download_mermaid_diagram(mermaid_code, img_path):
+                download_success = download_mermaid_diagram(mermaid_code, img_path)
+                
+                if download_success or os.path.exists(img_path):
+                    if not download_success:
+                        print(f"[WARNING] Reutilizando version local previa del diagrama {diagram_count} en: {img_path}")
+                    
                     p_img = doc.add_paragraph()
                     p_img.alignment = WD_ALIGN_PARAGRAPH.CENTER
                     p_img.paragraph_format.space_before = Pt(12)
@@ -214,7 +230,7 @@ def convert_md_to_docx(md_path, docx_path):
                     run_cap.font.italic = True
                     run_cap.font.color.rgb = RGBColor(80, 80, 80)
                 else:
-                    # Si falla la descarga, insertar como bloque de código ordinario
+                    # Si falla la descarga y no hay versión previa, insertar como bloque de código ordinario
                     p = doc.add_paragraph()
                     p.paragraph_format.left_indent = Inches(0.5)
                     run = p.add_run(mermaid_code)
