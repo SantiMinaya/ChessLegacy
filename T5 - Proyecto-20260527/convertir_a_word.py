@@ -66,7 +66,7 @@ def download_mermaid_diagram(mermaid_code, output_path):
     
     for attempt in range(1, max_retries + 1):
         try:
-            print(f"[INFO] Descangando diagrama en PNG (intento {attempt} de {max_retries})...")
+            print(f"[INFO] Descargando diagrama en JPG (intento {attempt} de {max_retries})...")
             with urllib.request.urlopen(req, timeout=timeout_seconds) as response:
                 with open(output_path, 'wb') as f:
                     f.write(response.read())
@@ -201,10 +201,10 @@ def convert_md_to_docx(md_path, docx_path):
             if in_mermaid_block:
                 in_mermaid_block = False
                 diagram_count += 1
-                img_name = f"diagrama_{diagram_count}.png"
+                img_name = f"diagrama_{diagram_count}.jpg"
                 img_path = os.path.join(os.path.dirname(docx_path), img_name)
                 
-                # Descargar e insertar la imagen PNG en lugar de texto
+                # Descargar e insertar la imagen JPG en lugar de texto
                 mermaid_code = '\n'.join(mermaid_lines)
                 download_success = download_mermaid_diagram(mermaid_code, img_path)
                 
