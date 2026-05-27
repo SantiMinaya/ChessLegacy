@@ -272,7 +272,7 @@ sequenceDiagram
     participant Back as API Controller (C#)
     participant Rep as PartidaRepository
     participant Stock as StockfishEngine
-    database DB as SQLite (chesslegacy.db)
+    participant DB as SQLite (chesslegacy.db)
 
     Jugador->>Front: Arrastra y suelta pieza
     Note over Front: Valida movimiento localmente con chess.js
@@ -281,12 +281,12 @@ sequenceDiagram
     Rep->>DB: Query pesos de estilo (ej. Sacrificio=0.9)
     DB-->>Rep: Retorna Pesos
     Rep-->>Back: Devuelve Personalidad
-    Back->>Stock: Solicita análisis posicional (UCI)
-    Note over Stock: Stockfish procesa la posición FEN nativamente
-    Stock-->>Back: Devuelve mejores movimientos y evaluación
-    Note over Back: Aplica algoritmo heurístico adaptando movimientos según la personalidad del Maestro
-    Back-->>Front: Retorna mejor movimiento de respuesta (SAN) y evaluación
-    Front->>Jugador: Renderiza movimiento del Maestro y actualiza barra evaluación
+    Back->>Stock: Solicita analisis posicional (UCI)
+    Note over Stock: Stockfish procesa la posicion FEN nativamente
+    Stock-->>Back: Devuelve mejores movimientos y evaluacion
+    Note over Back: Aplica heuristica adaptando movimientos segun personalidad del Maestro
+    Back-->>Front: Retorna mejor movimiento de respuesta (SAN) y evaluacion
+    Front->>Jugador: Renderiza movimiento del Maestro y actualiza barra evaluacion
 ```
 
 ## 4.5.- Resultados e Implementación
