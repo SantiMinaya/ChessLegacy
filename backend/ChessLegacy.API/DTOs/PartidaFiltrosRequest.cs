@@ -27,4 +27,6 @@ public class PartidaResponse
     public string NombreApertura { get; set; } = string.Empty;
     public string Pgn { get; set; } = string.Empty;
     public string ColorJugador { get; set; } = string.Empty;
+    public string NombreJugador { get; set; } = string.Empty;
+    public int JugadorId { get; set; }
 }

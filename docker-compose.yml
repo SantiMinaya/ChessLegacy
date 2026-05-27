@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: chess-legacy-backend
+    ports:
+      - "5000:8080"
+    volumes:
+      # Montaje bidireccional de la base de datos para no perder tus cuentas, XP y 40,509 partidas cargadas
+      - ./backend/ChessLegacy.API/chesslegacy.db:/app/out/chesslegacy.db
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - PORT=8080
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend/chess-legacy-ui
+      dockerfile: Dockerfile
+    container_name: chess-legacy-frontend
+    ports:
+      - "80:80"
+    environment:
+      - VITE_API_URL=http://localhost:5000/api
+    depends_on:
+      - backend
+    restart: unless-stopped

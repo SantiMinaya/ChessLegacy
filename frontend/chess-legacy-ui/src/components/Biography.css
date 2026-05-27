@@ -1,82 +1,91 @@
+/* Biography — tema oscuro en consonancia con MasterDetail */
 .biography {
   min-height: 100vh;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
   padding: 40px 20px;
+  font-family: var(--font-family);
+  color: var(--text-primary);
 }
 
 .bio-header {
-  max-width: 1200px;
+  max-width: 900px;
   margin: 0 auto 40px;
-  background: white;
+  background: var(--bg-card);
+  border: 2px solid var(--border);
   border-radius: 16px;
-  padding: 48px;
+  padding: 40px 48px;
   display: flex;
   gap: 32px;
   align-items: center;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
   border-top: 6px solid;
 }
 
 .bio-header img {
-  width: 200px;
-  height: 200px;
+  width: 160px;
+  height: 160px;
   border-radius: 12px;
   object-fit: cover;
+  filter: grayscale(15%);
+  border: 3px solid var(--accent);
 }
 
 .bio-header h1 {
   margin: 0 0 12px 0;
-  font-size: 42px;
+  font-size: 38px;
+  font-family: Georgia, serif;
+  color: var(--text-primary);
 }
 
 .bio-header .years {
-  font-size: 18px;
-  color: #666;
-  margin: 8px 0;
+  font-size: 16px;
+  color: var(--text-muted);
+  margin: 6px 0;
 }
 
 .bio-header .nationality {
-  font-size: 18px;
-  color: #444;
-  margin: 8px 0;
+  font-size: 16px;
+  color: var(--text-secondary);
+  margin: 6px 0;
 }
 
 .bio-content {
-  max-width: 1200px;
+  max-width: 900px;
   margin: 0 auto;
 }
 
 .bio-section {
-  background: white;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
   padding: 32px;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
 
 .bio-section h2 {
-  margin: 0 0 20px 0;
-  font-size: 28px;
-  color: #1a1a1a;
+  margin: 0 0 18px 0;
+  font-size: 24px;
+  color: var(--accent);
+  font-family: Georgia, serif;
 }
 
 .bio-section p {
   line-height: 1.8;
-  color: #444;
-  font-size: 16px;
+  color: var(--text-secondary);
+  font-size: 15px;
+  margin: 0;
 }
 
 .bio-section ul {
   list-style: none;
   padding: 0;
-  margin: 16px 0;
+  margin: 12px 0 0 0;
 }
 
 .bio-section li {
-  padding: 12px 0;
-  border-bottom: 1px solid #eee;
-  font-size: 16px;
-  color: #444;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border-subtle);
+  font-size: 15px;
+  color: var(--text-secondary);
 }
 
 .bio-section li:last-child {
@@ -84,42 +93,43 @@
 }
 
 .bio-section blockquote {
-  font-size: 20px;
+  font-size: 18px;
   font-style: italic;
-  color: #555;
-  margin: 20px 0;
-  padding: 24px;
-  background: #f9f9f9;
-  border-left: 4px solid #ddd;
+  color: var(--text-primary);
+  margin: 16px 0;
+  padding: 20px 24px;
+  background: var(--bg-secondary);
+  border-left: 4px solid var(--accent);
   border-radius: 8px;
 }
 
-.stats {
+.bio-stats {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 24px;
-  margin-top: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 16px;
+  margin-top: 16px;
 }
 
-.stat {
+.bio-stat {
   text-align: center;
-  padding: 24px;
-  background: #f9f9f9;
-  border-radius: 12px;
+  padding: 20px;
+  background: var(--bg-secondary);
+  border-radius: 10px;
+  border: 1px solid var(--border);
 }
 
-.stat-value {
+.bio-stat-value {
   display: block;
-  font-size: 36px;
+  font-size: 32px;
   font-weight: 700;
-  color: #1a1a1a;
-  margin-bottom: 8px;
+  color: var(--accent);
+  margin-bottom: 6px;
 }
 
-.stat-label {
+.bio-stat-label {
   display: block;
-  font-size: 14px;
-  color: #666;
+  font-size: 12px;
+  color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 1px;
 }

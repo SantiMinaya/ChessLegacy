@@ -29,21 +29,17 @@ export default function PartidaReconstruida() {
   }, []);
 
   const parsePgn = (pgn) => {
-    const lines = pgn.split('\n').filter(l => !l.trim().startsWith('['));
-    const text = lines.join(' ').trim();
-    const tokens = text.split(/\s+/).filter(t => t && !/^\d+\./.test(t) && !['1-0','0-1','1/2-1/2','*'].includes(t));
-    const g = new Chess();
-    const sanList = [];
-    const fenList = [g.fen()];
-    for (const t of tokens) {
-      try {
-        const m = g.move(t);
-        if (!m) break;
-        sanList.push(m.san);
-        fenList.push(g.fen());
-      } catch { break; }
+    try {
+      const g = new Chess();
+      g.loadPgn(pgn);
+      const history = g.history({ verbose: true });
+      const sanList = history.map(m => m.san);
+      const fenList = [history[0]?.before || g.fen(), ...history.map(m => m.after)];
+      return { sanList, fenList };
+    } catch (e) {
+      console.error("Error parsing PGN", e);
+      return { sanList: [], fenList: [] };
     }
-    return { sanList, fenList };
   };
 
   const cargarPartida = async (master) => {

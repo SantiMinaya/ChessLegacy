@@ -59,7 +59,9 @@ export default function PartidasFamosas({ jugadorId, jugadorNombre, onBack, filt
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (!partidaActual) return;
-      
+      if (['INPUT', 'TEXTAREA'].includes(document.activeElement?.tagName) || document.activeElement?.isContentEditable) {
+        return;
+      }
       if (e.key === 'ArrowRight') {
         e.preventDefault();
         siguiente();
@@ -120,7 +122,7 @@ export default function PartidasFamosas({ jugadorId, jugadorNombre, onBack, filt
       }
       
       setPartidas(partidasData);
-      setTotal(partidasData.length);
+      setTotal(mostrarSoloFavoritos ? partidasData.length : data.total);
 
       if (filtrosIniciales && partidasData.length === 1) {
         seleccionarPartida(partidasData[0]);

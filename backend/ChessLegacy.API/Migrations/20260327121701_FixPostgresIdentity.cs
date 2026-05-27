@@ -8,6 +8,11 @@ namespace ChessLegacy.API.Migrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            if (migrationBuilder.ActiveProvider != "Npgsql.EntityFrameworkCore.PostgreSQL")
+            {
+                return;
+            }
+
             var tables = new[]
             {
                 "Jugadores", "Partidas", "Posiciones", "Intentos", "Movimientos",

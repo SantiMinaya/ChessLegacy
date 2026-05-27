@@ -8,38 +8,37 @@ const PATRONES = {
   clavada: {
     nombre: 'Clavada', emoji: '📌', desc: 'Una pieza no puede moverse sin exponer a otra más valiosa',
     puzzles: [
-      { fen: '2kr3r/ppp2ppp/2n5/3Rp1B1/8/2P5/PP3PPP/R5K1 w - - 0 1', solucion: ['Rd8+', 'Rxd8', 'Rxd8#'], titulo: 'Clavada al rey' },
-      // Turno blancas: clavada con alfil
-      { fen: 'r1bqk2r/pppp1ppp/2n2n2/4p3/2B1P3/5N2/PPPP1PPP/RNBQ1RK1 w kq - 0 1', solucion: ['Ng5', 'O-O', 'Nxf7'], titulo: 'Clavada en f7' },
+      { fen: '4k3/4q3/8/8/8/8/4R1K1/8 w - - 0 1', solucion: ['Rxe7+', 'Kxe7'], titulo: 'Clavada de dama al rey' },
+      { fen: '3rkb1r/pp3ppp/2n5/1B2p3/8/8/PPP2PPP/R1B1K1NR w KQk - 0 9', solucion: ['Bxc6+', 'bxc6'], titulo: 'Clavada de caballo' },
     ]
   },
   horquilla: {
     nombre: 'Horquilla', emoji: '🍴', desc: 'Una pieza ataca dos piezas enemigas simultáneamente',
     puzzles: [
-      { fen: 'r1bqkbnr/pppp1ppp/2n5/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3', solucion: ['Nxe5', 'Nxe5', 'Qh5'], titulo: 'Horquilla de caballo' },
-      { fen: 'r1bqk1nr/pppp1ppp/2n5/2b1p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4', solucion: ['Bxf7+', 'Kxf7', 'Nxe5+'], titulo: 'Horquilla con jaque' },
+      { fen: '4k3/8/q7/3N4/8/8/8/4K3 w - - 0 1', solucion: ['Nc7+', 'Kd7', 'Nxa6'], titulo: 'Horquilla de caballo' },
+      { fen: '4k3/8/8/2n1b3/8/3P4/8/4K3 w - - 0 1', solucion: ['d4', 'Nd7', 'dxe5'], titulo: 'Horquilla de peón' },
     ]
   },
   descubierta: {
     nombre: 'Ataque Descubierto', emoji: '👁️', desc: 'Al mover una pieza se descubre el ataque de otra',
     puzzles: [
-      { fen: 'r1bqk2r/pppp1ppp/2n2n2/2b1p3/2B1P3/2N2N2/PPPP1PPP/R1BQK2R w KQkq - 4 5', solucion: ['Nxe5', 'Nxe5', 'Bxf7+'], titulo: 'Descubierta clásica' },
-      { fen: '4r1k1/pp3ppp/2p5/8/3B4/8/PP3PPP/R5K1 w - - 0 1', solucion: ['Bh7+', 'Kh8', 'Ra8#'], titulo: 'Descubierta con mate' },
+      { fen: '3k4/8/8/q7/3B4/8/8/3R2K1 w - - 0 1', solucion: ['Bb6+', 'Ke8', 'Bxa5'], titulo: 'Descubierta ganando dama' },
+      { fen: '6k1/pppq1ppp/8/8/8/3B4/PP1Q1PPP/3R2K1 w - - 0 1', solucion: ['Bxh7+', 'Kxh7', 'Qxd7'], titulo: 'Descubierta clásica' },
     ]
   },
   mate: {
     nombre: 'Patrones de Mate', emoji: '♟️', desc: 'Combinaciones que terminan en jaque mate',
     puzzles: [
       { fen: '6k1/5ppp/8/8/8/8/8/R5K1 w - - 0 1', solucion: ['Ra8#'], titulo: 'Mate del pasillo' },
-      { fen: 'r1bqkb1r/pppp1ppp/2n2n2/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4', solucion: ['Bxf7+', 'Ke7', 'Nd5#'], titulo: 'Mate Legal' },
-      { fen: '5rk1/pp3ppp/8/8/8/8/PP3PPP/4RNK1 w - - 0 1', solucion: ['Ng3', 'Kh8', 'Nf5', 'Kg8', 'Re8#'], titulo: 'Mate Anastasia' },
+      { fen: 'r2qkb1r/ppp2ppp/2np1n2/4N3/2B1P3/2N5/PPPP1PPP/R1BbK2R w KQkq - 0 6', solucion: ['Bxf7+', 'Ke7', 'Nd5#'], titulo: 'Mate Legal' },
+      { fen: 'r4r1k/1p2Nppp/8/7Q/8/5R2/6PP/6K1 w - - 0 1', solucion: ['Qxh7+', 'Kxh7', 'Rh3#'], titulo: 'Mate Anastasia' },
     ]
   },
   sacrificio: {
     nombre: 'Sacrificio', emoji: '💎', desc: 'Ceder material para obtener una ventaja decisiva',
     puzzles: [
-      { fen: '6k1/5ppp/8/8/8/8/5PPP/3Q2K1 w - - 0 1', solucion: ['Qd8+', 'Kh7', 'Qg8+', 'Kxg8', 'f8=Q#'], titulo: 'Sacrificio de dama' },
-      { fen: 'r1bk3r/p2pBpNp/n4n2/1p1NP2P/6P1/3P4/P1P1K3/q5b1 w - - 0 1', solucion: ['Nd6+', 'cxd6', 'Bc6#'], titulo: 'La Inmortal' },
+      { fen: 'r4r1k/1p2Nppp/8/7Q/8/5R2/6PP/6K1 w - - 0 1', solucion: ['Qxh7+', 'Kxh7', 'Rh3#'], titulo: 'Sacrificio de dama (Anastasia)' },
+      { fen: '5r1k/6pp/7N/8/2Q5/8/8/6K1 w - - 0 1', solucion: ['Qg8+', 'Rxg8', 'Nf7#'], titulo: 'Mate ahogado (La Inmortal)' },
     ]
   },
 };

@@ -23,27 +23,15 @@ export default function PartidaDelDia({ onVerPartida }) {
   const buildFens = (pgn) => {
     try {
       const g = new Chess();
-      const positions = [g.fen()];
-      // Eliminar cabeceras línea a línea sin flag s
-      const lines = pgn.split('\n');
-      const movesLines = lines.filter(l => !l.trim().startsWith('['));
-      const movesText = movesLines.join(' ').trim();
-      // Tokenizar: eliminar números de movimiento y resultados
-      const tokens = movesText
-        .split(/\s+/)
-        .filter(t => t && !/^\d+\./.test(t) && !['1-0','0-1','1/2-1/2','*'].includes(t));
-      for (const t of tokens) {
-        try {
-          const m = g.move(t);
-          if (!m) break;
-          positions.push(g.fen());
-        } catch { break; }
-      }
+      g.loadPgn(pgn);
+      const history = g.history({ verbose: true });
+      const positions = [history[0]?.before || g.fen(), ...history.map(m => m.after)];
       setFens(positions);
       const mid = Math.min(10, positions.length - 1);
       setMoveIdx(mid);
       setFen(positions[mid]);
-    } catch {
+    } catch (e) {
+      console.error("Error building FENs for daily game", e);
       setFens([]);
     }
   };
@@ -54,6 +42,24 @@ export default function PartidaDelDia({ onVerPartida }) {
     setMoveIdx(i);
     setFen(fens[i]);
   };
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (['INPUT', 'TEXTAREA'].includes(document.activeElement?.tagName) || document.activeElement?.isContentEditable) {
+        return;
+      }
+      if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        navigate(moveIdx + 1);
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        navigate(moveIdx - 1);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [moveIdx, fens]);
 
   if (loading) return <div className="pdd-loading">⏳ Cargando partida del día...</div>;
   if (!partida) return null;
@@ -69,7 +75,12 @@ export default function PartidaDelDia({ onVerPartida }) {
         </div>
         <div className="pdd-info">
           <span className="pdd-titulo">{partida.nombreApertura || 'Partida histórica'}</span>
-          <span className="pdd-meta">vs {partida.oponente} · {partida.anio} · {partida.evento}</span>
+          <div className="pdd-players">
+            <span className="pdd-player white">⚪ {partida.colorJugador === 'Blancas' ? (partida.nombreJugador || 'Gran Maestro') : partida.oponente}</span>
+            <span className="pdd-vs">vs</span>
+            <span className="pdd-player black">⚫ {partida.colorJugador === 'Negras' ? (partida.nombreJugador || 'Gran Maestro') : partida.oponente}</span>
+          </div>
+          <span className="pdd-meta">{partida.anio} · {partida.evento}</span>
         </div>
       </div>
       <div className="pdd-body">

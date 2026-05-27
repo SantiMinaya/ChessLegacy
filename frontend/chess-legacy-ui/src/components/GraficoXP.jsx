@@ -7,13 +7,20 @@ export default function GraficoXP({ progresos, xpActual }) {
     if (!progresos.length) return [];
 
     // Agrupar aciertos por semana
+    const getLocalISODate = (date) => {
+      const yyyy = date.getFullYear();
+      const mm = String(date.getMonth() + 1).padStart(2, '0');
+      const dd = String(date.getDate()).padStart(2, '0');
+      return `${yyyy}-${mm}-${dd}`;
+    };
+
     const porSemana = {};
     progresos.forEach(p => {
       const fecha = new Date(p.ultimaSesion || Date.now());
       // Semana del año
       const inicio = new Date(fecha);
       inicio.setDate(inicio.getDate() - inicio.getDay());
-      const key = inicio.toISOString().slice(0, 10);
+      const key = getLocalISODate(inicio);
       porSemana[key] = (porSemana[key] || 0) + (p.sesiones * 10 + p.aciertos);
     });
 

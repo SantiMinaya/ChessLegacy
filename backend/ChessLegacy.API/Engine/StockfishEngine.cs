@@ -112,6 +112,12 @@ public class StockfishEngine
 
                 process.Dispose();
 
+                // Normalizar evaluación a la perspectiva de las blancas
+                if (fen.Split(' ')[1] == "b")
+                {
+                    evaluation = -evaluation;
+                }
+
                 Console.WriteLine($"Resultado: movimiento={bestMove}, evaluacion={evaluation}");
                 return (bestMove, evaluation);
             }

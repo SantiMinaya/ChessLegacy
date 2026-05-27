@@ -9,9 +9,9 @@ import RetosDelDia from '../components/RetosDelDia';
 import AnalisisLibre from '../components/AnalisisLibre';
 import BuscadorFen from '../components/BuscadorFen';
 import ComparadorMaestros from '../components/ComparadorMaestros';
-import MapaCalor from '../components/MapaCalor';
 import HistorialPartidas from '../components/HistorialPartidas';
 import AnalisisPuntosDebiles from '../components/AnalisisPuntosDebiles';
+import PartidasFamosas from './PartidasFamosas';
 import './Home.css';
 
 export default function Home() {
@@ -37,6 +37,7 @@ export default function Home() {
 
       <div className="home-tabs">
         <button className={tab === 'masters' ? 'active' : ''} onClick={() => setTab('masters')}>👑 Maestros</button>
+        <button className={tab === 'partidas' ? 'active' : ''} onClick={() => setTab('partidas')}>🔍 Partidas</button>
         <button className={tab === 'openings' ? 'active' : ''} onClick={() => setTab('openings')}>📖 Aperturas</button>
         <button className={tab === 'tournament' ? 'active' : ''} onClick={() => setTab('tournament')}>🏆 Torneo</button>
         <button className={tab === 'analisis' ? 'active' : ''} onClick={() => setTab('analisis')}>🔬 Análisis</button>
@@ -46,6 +47,11 @@ export default function Home() {
 
       {tab === 'openings' && <AperturaTraining onBack={() => setTab('masters')} hideBack />}
       {tab === 'tournament' && <TournamentMode onBack={() => setTab('masters')} />}
+      {tab === 'partidas' && (
+        <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 20px' }}>
+          <PartidasFamosas jugadorId={null} jugadorNombre={null} onBack={() => setTab('masters')} />
+        </div>
+      )}
       {tab === 'historial' && (
         <div style={{ maxWidth: 900, margin: '0 auto', padding: '0 20px' }}>
           <HistorialPartidas />
@@ -55,7 +61,7 @@ export default function Home() {
       {tab === 'analisis' && (
         <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 20px' }}>
           <div style={{ display: 'flex', gap: 12, marginBottom: 28, flexWrap: 'wrap' }}>
-            {[['libre', '🔬 Análisis libre'], ['fen', '🔍 Buscar por FEN'], ['comparar', '⚔️ Comparar Maestros'], ['calor', '🔥 Mapa de Calor'], ['debiles', '🔎 Puntos Débiles']].map(([v, l]) => (
+            {[['libre', '🔬 Análisis libre'], ['fen', '🔍 Buscar por FEN'], ['comparar', '⚔️ Comparar Maestros'], ['debiles', '🔎 Puntos Débiles']].map(([v, l]) => (
               <button key={v} onClick={() => setAnalisisTab(v)} style={{
                 padding: '8px 18px', borderRadius: 8, border: '1px solid #d4af37',
                 background: analisisTab === v ? '#d4af37' : 'transparent',
@@ -67,7 +73,7 @@ export default function Home() {
           {analisisTab === 'libre' && <AnalisisLibre />}
           {analisisTab === 'fen' && <BuscadorFen onVerPartida={(id) => navigate(`/partida/${id}`)} />}
           {analisisTab === 'comparar' && <ComparadorMaestros />}
-          {analisisTab === 'calor' && <MapaCalor />}
+
           {analisisTab === 'debiles' && <AnalisisPuntosDebiles />}
         </div>
       )}

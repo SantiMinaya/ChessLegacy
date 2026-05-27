@@ -37,7 +37,7 @@ function generarPregunta(g) {
   }
 
   if (tipo === 1) {
-    // ¿Puede enrocar X?
+    // ¿Tiene derecho a enrocar X?
     const color = Math.random() > 0.5 ? 'w' : 'b';
     const fen = g.fen();
     const partes = fen.split(' ');
@@ -45,11 +45,11 @@ function generarPregunta(g) {
     let puede;
     if (color === 'w') puede = castling.includes('K') || castling.includes('Q');
     else puede = castling.includes('k') || castling.includes('q');
-    const respuesta = puede ? 'Sí puede enrocar' : 'No puede enrocar';
+    const respuesta = puede ? 'Sí tienen derecho' : 'No tienen derecho';
     return {
-      pregunta: `¿Pueden enrocar las ${color === 'w' ? 'blancas' : 'negras'}?`,
+      pregunta: `¿Conservan las ${color === 'w' ? 'blancas' : 'negras'} el derecho teórico de enroque (es decir, no han movido el rey ni las torres en lo que va de partida, independientemente de si hay piezas bloqueando o jaques)?`,
       respuesta,
-      opciones: ['Sí puede enrocar', 'No puede enrocar'],
+      opciones: ['Sí tienen derecho', 'No tienen derecho'],
       tipo: 'enroque',
     };
   }

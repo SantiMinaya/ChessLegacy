@@ -40,6 +40,44 @@ const btnStyle = {
   borderRadius: 12, padding: '16px 20px', cursor: 'pointer', textAlign: 'left',
 };
 
+const getProgresoKey = () => {
+  try {
+    const userStr = localStorage.getItem('chess_user');
+    if (userStr) {
+      const userObj = JSON.parse(userStr);
+      return `chess_retos_progreso_${userObj.id || userObj.username || 'anon'}`;
+    }
+  } catch {}
+  return 'chess_retos_progreso_anon';
+};
+
+const updateRetoProgreso = (key, value, isAccumulator = false) => {
+  try {
+    const hoyKey = new Date().toDateString();
+    const storageKey = getProgresoKey();
+    const stored = JSON.parse(localStorage.getItem(storageKey) || '{}');
+    if (stored.fecha !== hoyKey) {
+      stored.fecha = hoyKey;
+      stored.puzzles_resueltos = 0;
+      stored.casillas_seguidas = 0;
+      stored.contrarreloj_completados = [];
+      stored.adivina_aciertos = 0;
+      stored.aperturas_perfectas = [];
+    }
+    
+    if (isAccumulator) {
+      stored[key] = (stored[key] || 0) + value;
+    } else {
+      if (Array.isArray(stored[key])) {
+        if (!stored[key].includes(value)) stored[key].push(value);
+      } else {
+        stored[key] = Math.max(stored[key] || 0, value);
+      }
+    }
+    localStorage.setItem(storageKey, JSON.stringify(stored));
+  } catch {}
+};
+
 export default function AprendizajeCasillas() {
   const { playSound } = useToast();
   const [mode, setMode] = useState(null);
@@ -56,6 +94,8 @@ export default function AprendizajeCasillas() {
   const [round, setRound] = useState(0);
   const [done, setDone] = useState(false);
   const [highlight, setHighlight] = useState({});
+  const [orientation, setOrientation] = useState('white');
+  const [racha, setRacha] = useState(0);
 
   function startMode(m) {
     setMode(m);
@@ -64,6 +104,7 @@ export default function AprendizajeCasillas() {
     setDone(false);
     setFeedback(null);
     setHighlight({});
+    setRacha(0);
     if (m === 'casilla') {
       setTarget(ALL_SQUARES[Math.floor(Math.random() * ALL_SQUARES.length)]);
     } else {
@@ -98,8 +139,16 @@ export default function AprendizajeCasillas() {
       ...(!correct ? { [target]: { background: 'rgba(76,175,80,0.5)' } } : {}),
     });
     setFeedback(correct ? 'ok' : 'error');
-    if (correct) { setScore(s => s + 1); playSound('correct'); }
-    else playSound('error');
+    if (correct) {
+      setScore(s => s + 1);
+      playSound('correct');
+      const newRacha = racha + 1;
+      setRacha(newRacha);
+      updateRetoProgreso('casillas_seguidas', newRacha);
+    } else {
+      playSound('error');
+      setRacha(0);
+    }
     advanceRound(correct);
   };
 
@@ -115,8 +164,16 @@ export default function AprendizajeCasillas() {
       [to]:   { background: correct ? 'rgba(76,175,80,0.7)' : 'rgba(244,67,54,0.7)' },
     });
     setFeedback(correct ? 'ok' : 'error');
-    if (correct) { setScore(s => s + 1); playSound('correct'); }
-    else playSound('error');
+    if (correct) {
+      setScore(s => s + 1);
+      playSound('correct');
+      const newRacha = racha + 1;
+      setRacha(newRacha);
+      updateRetoProgreso('casillas_seguidas', newRacha);
+    } else {
+      playSound('error');
+      setRacha(0);
+    }
     advanceRound(correct);
     return true;
   };
@@ -180,6 +237,7 @@ export default function AprendizajeCasillas() {
               onSquareClick={handleSquareClick}
               customSquareStyles={highlight}
               arePiecesDraggable={false}
+              boardOrientation={orientation}
               boardWidth={480}
             />
           ) : (
@@ -188,6 +246,7 @@ export default function AprendizajeCasillas() {
               onPieceDrop={handlePieceDrop}
               customSquareStyles={highlight}
               arePiecesDraggable={feedback === null}
+              boardOrientation={orientation}
               boardWidth={480}
             />
           )}
@@ -203,6 +262,11 @@ export default function AprendizajeCasillas() {
                 ? `Casilla ${getSquareColor(target)}`
                 : 'Realiza este movimiento'}
             </div>
+          </div>
+
+          <div className="color-selector" style={{ display: 'flex', gap: 8, justifyContent: 'center', marginBottom: 16 }}>
+            <button className={orientation === 'white' ? 'active' : ''} onClick={() => setOrientation('white')} style={{ padding: '8px 16px', borderRadius: 8, border: '1px solid #d4af37', background: orientation === 'white' ? '#d4af37' : 'transparent', color: orientation === 'white' ? '#1a1a2e' : '#d4af37', cursor: 'pointer', fontWeight: 'bold' }}>♔ Blancas</button>
+            <button className={orientation === 'black' ? 'active' : ''} onClick={() => setOrientation('black')} style={{ padding: '8px 16px', borderRadius: 8, border: '1px solid #d4af37', background: orientation === 'black' ? '#d4af37' : 'transparent', color: orientation === 'black' ? '#1a1a2e' : '#d4af37', cursor: 'pointer', fontWeight: 'bold' }}>♚ Negras</button>
           </div>
 
           <div className={`feedback-box ${feedback || ''}`}>

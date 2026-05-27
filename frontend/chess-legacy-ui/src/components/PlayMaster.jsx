@@ -105,6 +105,10 @@ export default function PlayMaster({ master, onBack }) {
 
   const [analysisData, setAnalysisData] = useState([]);
   const [analysisLoading, setAnalysisLoading] = useState(false);
+  const [gameSaved, setGameSaved] = useState(false);
+
+  // Ref para romper la circularidad makeMasterMove <-> tryExecutePremove
+  const tryExecutePremoveRef = useRef(null);
 
   const depth = difficulty === 'easy' ? 3 : difficulty === 'normal' ? 8 : 15;
 
@@ -122,6 +126,45 @@ export default function PlayMaster({ master, onBack }) {
     else
       setStatus(isPlayerTurn(g) ? '♟️ Tu turno' : `⏳ ${master.name} pensando...`);
   }, [isPlayerTurn, master.name]);
+
+  const saveGame = useCallback((g, history) => {
+    if (gameSaved || !user?.token) return;
+
+    let resultado = 'draw';
+    if (g.isCheckmate()) {
+      resultado = isPlayerTurn(g) ? 'loss' : 'win';
+    }
+
+    const localDate = new Date();
+    const yyyy = localDate.getFullYear();
+    const mm = String(localDate.getMonth() + 1).padStart(2, '0');
+    const dd = String(localDate.getDate()).padStart(2, '0');
+    const date = `${yyyy}.${mm}.${dd}`;
+    const whitePlayer = playerColor === 'white' ? 'Tú' : master.name;
+    const blackPlayer = playerColor === 'black' ? 'Tú' : master.name;
+
+    const pgn = `[Event "Partida contra ${master.name}"]\n[Date "${date}"]\n[White "${whitePlayer}"]\n[Black "${blackPlayer}"]\n\n` +
+      history.reduce((acc, m, i) => {
+        if (i % 2 === 0) acc += `${Math.ceil((i+1)/2)}. `;
+        return acc + m.san + ' ';
+      }, '').trim();
+
+    progresoAPI.guardarPartida(user.token, {
+      maestro: master.name,
+      resultado,
+      pgn,
+      totalMovimientos: history.length,
+      esTorneo: false,
+      colorJugador: playerColor,
+    })
+    .then(() => {
+      setGameSaved(true);
+      console.log('Partida guardada correctamente contra el maestro.');
+    })
+    .catch((err) => {
+      console.error('Error al guardar la partida:', err);
+    });
+  }, [gameSaved, user, master.name, playerColor, isPlayerTurn]);
 
   const makeMasterMove = useCallback(async (currentGame, currentHistory, currentEvalHistory) => {
     try {
@@ -147,12 +190,17 @@ export default function PlayMaster({ master, onBack }) {
       setComentario(generarComentario(data.evaluacion, newHistory.length, g.isCheck(), move.flags.includes('c'), move.san, playerColor));
       setThinking(false);
       updateStatus(g);
-      if (g.isGameOver()) gameOverRef.current = true;
+      if (g.isGameOver()) {
+        gameOverRef.current = true;
+        saveGame(g, newHistory);
+      } else {
+        if (tryExecutePremoveRef.current) await tryExecutePremoveRef.current(g);
+      }
     } catch {
       setThinking(false);
       setStatus('❌ Error de conexión');
     }
-  }, [depth, updateStatus, playerColor]);
+  }, [depth, updateStatus, playerColor, saveGame]);
 
   const makeMove = useCallback(async (from, to) => {
     if (thinking || gameOverRef.current) return false;
@@ -181,6 +229,7 @@ export default function PlayMaster({ master, onBack }) {
     if (g.isGameOver()) {
       gameOverRef.current = true;
       updateStatus(g);
+      saveGame(g, newHistory);
       return true;
     }
 
@@ -188,11 +237,13 @@ export default function PlayMaster({ master, onBack }) {
     updateStatus(g);
     setTimeout(() => makeMasterMove(g, newHistory, newEvalHistory), 400);
     return true;
-  }, [thinking, game, moveHistory, evalHistory, depth, updateStatus, makeMasterMove, playerColor]);
+  }, [thinking, game, moveHistory, evalHistory, depth, updateStatus, makeMasterMove, playerColor, saveGame]);
 
   const { onSquareClick, onPieceDrop, customSquareStyles, tryExecutePremove } = useChessInput(
     game, playerColor, !thinking && !game.isGameOver() && phase === 'playing', makeMove
   );
+  // Actualizar el ref siempre que cambie tryExecutePremove
+  tryExecutePremoveRef.current = tryExecutePremove;
 
   const startGame = () => {
     let g;
@@ -203,6 +254,7 @@ export default function PlayMaster({ master, onBack }) {
       g = new Chess();
     }
     gameOverRef.current = false;
+    setGameSaved(false);
     setGame(g);
     setMoveHistory([]);
     setEvaluation(0);

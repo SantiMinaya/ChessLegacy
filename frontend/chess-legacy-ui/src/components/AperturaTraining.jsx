@@ -11,15 +11,12 @@ import AprendizajeCasillas from './AprendizajeCasillas';
 import PuzzlesTacticos from './PuzzlesTacticos';
 import ModoSupervivencia from './ModoSupervivencia';
 import SpeedRun from './SpeedRun';
-import EndgameTrainer from './EndgameTrainer';
 import ModoEspejo from './ModoEspejo';
 import PatronesTacticos from './PatronesTacticos';
-import BrillantesHistoricos from './BrillantesHistoricos';
 import ExploradorAperturas from './ExploradorAperturas';
 import PartidaReconstruida from './PartidaReconstruida';
 import QuizMaestros from './QuizMaestros';
 import FlashcardsVariantes from './FlashcardsVariantes';
-import JugadasRaras from './JugadasRaras';
 import VisualizacionSinTablero from './VisualizacionSinTablero';
 import CalculoVariantes from './CalculoVariantes';
 import ReconocimientoEstructuras from './ReconocimientoEstructuras';
@@ -33,6 +30,44 @@ import { useBoardTheme } from '../context/BoardThemeContext';
 import './AperturaTraining.css';
 
 const PHASES = { SELECT: 'select', PLAYING: 'playing', DONE: 'done' };
+
+const getProgresoKey = () => {
+  try {
+    const userStr = localStorage.getItem('chess_user');
+    if (userStr) {
+      const userObj = JSON.parse(userStr);
+      return `chess_retos_progreso_${userObj.id || userObj.username || 'anon'}`;
+    }
+  } catch {}
+  return 'chess_retos_progreso_anon';
+};
+
+const updateRetoProgreso = (key, value, isAccumulator = false) => {
+  try {
+    const hoyKey = new Date().toDateString();
+    const storageKey = getProgresoKey();
+    const stored = JSON.parse(localStorage.getItem(storageKey) || '{}');
+    if (stored.fecha !== hoyKey) {
+      stored.fecha = hoyKey;
+      stored.puzzles_resueltos = 0;
+      stored.casillas_seguidas = 0;
+      stored.contrarreloj_completados = [];
+      stored.adivina_aciertos = 0;
+      stored.aperturas_perfectas = [];
+    }
+    
+    if (isAccumulator) {
+      stored[key] = (stored[key] || 0) + value;
+    } else {
+      if (Array.isArray(stored[key])) {
+        if (!stored[key].includes(value)) stored[key].push(value);
+      } else {
+        stored[key] = Math.max(stored[key] || 0, value);
+      }
+    }
+    localStorage.setItem(storageKey, JSON.stringify(stored));
+  } catch {}
+};
 
 export default function AperturaTraining({ onBack, hideBack }) {
   const { user } = useAuth();
@@ -159,6 +194,9 @@ export default function AperturaTraining({ onBack, hideBack }) {
       setProgresoKey(k => k + 1);
       r.data?.nuevosLogros?.forEach(l => showLogro(l));
     }).catch(() => {});
+    if (stats.errors === 0) {
+      updateRetoProgreso('aperturas_perfectas', aperturaInfo.apertura);
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase]);
 
@@ -235,12 +273,10 @@ export default function AperturaTraining({ onBack, hideBack }) {
       <button className={subTab === 'casillas' ? 'active' : ''} onClick={() => setSubTab('casillas')}>🗺️ Casillas</button>
       <button className={subTab === 'puzzles' ? 'active' : ''} onClick={() => setSubTab('puzzles')}>🧩 Puzzles</button>
       <button className={subTab === 'patrones' ? 'active' : ''} onClick={() => setSubTab('patrones')}>📌 Patrones</button>
-      <button className={subTab === 'brillantes' ? 'active' : ''} onClick={() => setSubTab('brillantes')}>💎 Brillantes</button>
       <button className={subTab === 'explorador' ? 'active' : ''} onClick={() => setSubTab('explorador')}>🌳 Explorador</button>
       <button className={subTab === 'reconstruida' ? 'active' : ''} onClick={() => setSubTab('reconstruida')}>🎥 Reconstruida</button>
       <button className={subTab === 'quiz' ? 'active' : ''} onClick={() => setSubTab('quiz')}>🎤 Quiz</button>
       <button className={subTab === 'flashcards' ? 'active' : ''} onClick={() => setSubTab('flashcards')}>🃏 Flashcards</button>
-      <button className={subTab === 'raras' ? 'active' : ''} onClick={() => setSubTab('raras')}>🎲 Jugadas Raras</button>
       <button className={subTab === 'visualizacion' ? 'active' : ''} onClick={() => setSubTab('visualizacion')}>👁️ Visualización</button>
       <button className={subTab === 'calculo' ? 'active' : ''} onClick={() => setSubTab('calculo')}>🧮 Cálculo</button>
       <button className={subTab === 'estructuras' ? 'active' : ''} onClick={() => setSubTab('estructuras')}>🏗️ Estructuras</button>
@@ -252,7 +288,6 @@ export default function AperturaTraining({ onBack, hideBack }) {
       <button className={subTab === 'arbol' ? 'active' : ''} onClick={() => setSubTab('arbol')}>🌳 Árbol</button>
       <button className={subTab === 'supervivencia' ? 'active' : ''} onClick={() => setSubTab('supervivencia')}>💀 Supervivencia</button>
       <button className={subTab === 'speedrun' ? 'active' : ''} onClick={() => setSubTab('speedrun')}>⚡ Speed Run</button>
-      <button className={subTab === 'finales' ? 'active' : ''} onClick={() => setSubTab('finales')}>♟️ Finales</button>
       <button className={subTab === 'espejo' ? 'active' : ''} onClick={() => setSubTab('espejo')}>🪩 Espejo</button>
       <button className={subTab === 'progreso' ? 'active' : ''} onClick={() => setSubTab('progreso')}>📊 Progreso</button>
     </div>
@@ -306,13 +341,7 @@ export default function AperturaTraining({ onBack, hideBack }) {
     </div>
   );
 
-  if (subTab === 'brillantes') return (
-    <div className="apertura-training">
-      {!hideBack && <button className="back-btn" onClick={onBack}>← Volver</button>}
-      {subTabsBar}
-      <BrillantesHistoricos />
-    </div>
-  );
+
 
   if (subTab === 'reconstruida') return (
     <div className="apertura-training">
@@ -338,13 +367,7 @@ export default function AperturaTraining({ onBack, hideBack }) {
     </div>
   );
 
-  if (subTab === 'raras') return (
-    <div className="apertura-training">
-      {!hideBack && <button className="back-btn" onClick={onBack}>← Volver</button>}
-      {subTabsBar}
-      <JugadasRaras />
-    </div>
-  );
+
 
   if (subTab === 'visualizacion') return (
     <div className="apertura-training">
@@ -434,13 +457,7 @@ export default function AperturaTraining({ onBack, hideBack }) {
     </div>
   );
 
-  if (subTab === 'finales') return (
-    <div className="apertura-training">
-      {!hideBack && <button className="back-btn" onClick={onBack}>← Volver</button>}
-      {subTabsBar}
-      <EndgameTrainer />
-    </div>
-  );
+
 
   if (subTab === 'espejo') return (
     <div className="apertura-training">

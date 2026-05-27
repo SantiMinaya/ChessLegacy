@@ -11,12 +11,12 @@ const LECCIONES = [
     emoji: '👑',
     concepto: 'Dos reyes están en oposición cuando están separados por una casilla en línea recta. El rey que NO tiene el turno tiene la oposición y ventaja.',
     objetivo: 'Consigue la oposición frente al rey negro y avanza el peón a coronar.',
-    fen: '8/8/8/8/8/3k4/3P4/3K4 w - - 0 1',
+    fen: '8/8/3k4/8/3P4/3K4/8/8 w - - 0 1',
     orientacion: 'white',
     pistas: [
       'Para tener la oposición, tu rey debe estar frente al rey negro con él teniendo el turno.',
-      'Mueve el rey a d2 para ganar la oposición cuando el negro mueva.',
-      'Con la oposición ganada, avanza el peón protegido por el rey.',
+      'Mueve el rey a d4 o e4 ganando la oposición según donde se mueva el negro.',
+      'Con la oposición ganada, empuja al rey negro hacia atrás y avanza el peón.',
     ],
     esCorrecta: (fen) => {
       const g = new Chess(fen);
@@ -143,6 +143,7 @@ export default function FinalesTeóricos() {
 
   const iniciarLeccion = (leccion) => {
     setLeccionSel(leccion);
+    setOrientacionJugador(leccion.orientacion);
     setPhase('leccion');
   };
 
@@ -262,17 +263,10 @@ export default function FinalesTeóricos() {
         <h4 style={{ color: 'var(--accent)', margin: '0 0 6px', fontSize: 14 }}>🎯 Tu objetivo</h4>
         <p style={{ color: 'var(--text-primary)', fontSize: 14, margin: 0 }}>{leccionSel.objetivo}</p>
       </div>
-      <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
-        {['white','black'].map(c => (
-          <button key={c} onClick={() => setOrientacionJugador(c)} style={{
-            padding: '8px 20px', borderRadius: 'var(--border-radius)', cursor: 'pointer',
-            background: orientacionJugador === c ? 'var(--accent)' : 'var(--bg-card)',
-            color: orientacionJugador === c ? 'var(--accent-text)' : 'var(--text-primary)',
-            border: `1px solid ${orientacionJugador === c ? 'var(--accent)' : 'var(--border)'}`,
-          }}>
-            {c === 'white' ? '♔ Blancas' : '♚ Negras'}
-          </button>
-        ))}
+      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 8 }}>
+        <span style={{ fontSize: 14, color: 'var(--accent)', fontWeight: 'bold' }}>
+          Juegas con {leccionSel.orientacion === 'white' ? '♔ piezas blancas' : '♚ piezas negras'}
+        </span>
       </div>
       <div style={{ display: 'flex', gap: 8 }}>
         <button className="start-btn" style={{ flex: 1 }} onClick={empezarJugar}>🚀 Practicar</button>

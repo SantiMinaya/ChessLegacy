@@ -12,10 +12,13 @@ const MATES = [
     concepto: 'El mate más rápido posible: 4 movimientos. Las blancas atacan f7 con dama y alfil. Las negras deben conocerlo para evitarlo.',
     movimientos: ['e4','e5','Bc4','Nc6','Qh5','Nf6??','Qxf7#'],
     descripcion: 'Tras 1.e4 e5 2.Bc4 Nc6 3.Qh5, las negras deben jugar 3...g6 para bloquear. Si juegan 3...Nf6?? la dama da mate en f7.',
-    fen: 'r1bqkb1r/pppp1Qpp/2n2n2/4p3/2B1P3/8/PPPP1PPP/RNB1K1NR b KQkq - 0 4',
+    fen: 'r1bqkb1r/pppp1ppp/2n2n2/4p2Q/2B1P3/8/PPPP1PPP/RNB1K1NR w KQkq - 6 4',
     orientacion: 'white',
     defensa: '3...g6 bloquea la dama. Luego 4...Nf6 ataca la dama y desarrolla.',
     dificultad: '⭐',
+    esPractica: true,
+    objetivo: 'Da mate al rey negro en f7 en un solo movimiento.',
+    esCorrecta: (fen) => { const g = new Chess(fen); return g.isCheckmate() && g.turn() === 'b'; },
   },
   {
     id: 'legal',
@@ -24,10 +27,13 @@ const MATES = [
     concepto: 'Sacrificio de dama seguido de mate con piezas menores. Sire de Légal lo jugó en 1750. Ocurre cuando las negras clavaron el caballo de f3 con Bg4.',
     movimientos: ['e4','e5','Bc4','d6','Nf3','Bg4','Nc3','g6','Nxe5','Bxd1','Bxf7+','Ke7','Nd5#'],
     descripcion: 'Tras la clavada con Bg4, las blancas sacrifican la dama con Nxe5! Si las negras capturan la dama, Bxf7+ Ke7 Nd5# es mate.',
-    fen: 'rn1qkbnr/ppp2Bpp/3p4/4N3/2B1P3/8/PPPP1PPP/R1BbK2R b KQkq - 0 7',
+    fen: 'rn1q1b1r/ppp1kBpp/3p1n2/4N3/2B1P3/2N5/PPPP1PPP/R1BbK2R w KQ - 2 8',
     orientacion: 'white',
     defensa: 'Las negras deben jugar Bxf3 en vez de Bxd1, o no clavarse con Bg4.',
     dificultad: '⭐⭐',
+    esPractica: true,
+    objetivo: 'Da el mate final de Légal con tu caballo en d5.',
+    esCorrecta: (fen) => { const g = new Chess(fen); return g.isCheckmate() && g.turn() === 'b'; },
   },
   {
     id: 'smothered',
@@ -36,22 +42,28 @@ const MATES = [
     concepto: 'El caballo da jaque mate a un rey rodeado por sus propias piezas. Es uno de los mates más elegantes del ajedrez.',
     movimientos: ['e4','e5','Nf3','Nc6','Bc4','Nd4','Nxe5','Qg5','Nxf7','Qxg2','Rf1','Qxe4+','Be2','Nf3#'],
     descripcion: 'El rey queda atrapado por sus propias piezas y el caballo da el golpe final. El rey no puede moverse porque sus piezas bloquean todas las casillas.',
-    fen: '4kb1r/pppp1Npp/8/6q1/4n3/8/PPPPBP1P/RNBQKR2 b Qk - 0 8',
+    fen: 'r1b1kb1r/pppp1Npp/8/8/3nq3/8/PPPPBPPP/RNBQKR2 b Qkq - 1 7',
     orientacion: 'black',
     defensa: 'Evitar que el rey quede rodeado por sus propias piezas. Mantener casillas de escape.',
     dificultad: '⭐⭐⭐',
+    esPractica: true,
+    objetivo: 'Aprovecha la clavada del alfil blanco para dar el mate ahogado final con tu caballo en f3.',
+    esCorrecta: (fen) => { const g = new Chess(fen); return g.isCheckmate() && g.turn() === 'w'; },
   },
   {
     id: 'anastasia',
     titulo: 'Mate de Anastasia',
     emoji: '♜',
     concepto: 'Torre y caballo coordinados para dar mate. El caballo bloquea la huida del rey y la torre da el golpe final.',
-    movimientos: ['e4','e5','Nf3','Nc6','Bc4','Bc5','O-O','Nf6','Ng5','O-O','Nxf7','Rxf7','Bxf7+','Kxf7','Qh5+','Ke7','Qe8#'],
-    descripcion: 'El caballo en e6 bloquea la huida del rey y la torre en e1 da mate. El rey queda atrapado entre el caballo y el borde del tablero.',
-    fen: '4Q3/4k1pp/4N3/8/8/8/PPPP1PPP/RNB2RK1 b - - 0 9',
+    movimientos: [],
+    descripcion: 'El caballo en e7 bloquea la huida del rey (g8 y g6) y la torre da mate en la columna h.',
+    fen: '7k/4N1pp/8/7Q/8/3R4/8/6K1 w - - 0 1',
     orientacion: 'white',
     defensa: 'No enrocar si el flanco de rey está debilitado. Mantener el caballo de f6 para defender.',
     dificultad: '⭐⭐',
+    esPractica: true,
+    objetivo: 'Da mate al rey negro sacrificando la dama y rematando con la torre.',
+    esCorrecta: (fen) => { const g = new Chess(fen); return g.isCheckmate() && g.turn() === 'b'; },
   },
   {
     id: 'arabian',
@@ -59,8 +71,8 @@ const MATES = [
     emoji: '🏰',
     concepto: 'Torre y caballo en esquina. El caballo controla las casillas de escape y la torre da mate. Uno de los patrones más antiguos del ajedrez.',
     movimientos: [],
-    descripcion: 'El rey negro está en la esquina. El caballo blanco controla g8 y f7, y la torre da mate en h8.',
-    fen: '6Rk/8/5N2/8/8/8/8/6K1 w - - 0 1',
+    descripcion: 'El rey negro está en la esquina. El caballo blanco en f6 protege la torre en h7 y controla g8, dando mate.',
+    fen: '7k/6R1/5N2/8/8/8/8/6K1 w - - 0 1',
     orientacion: 'white',
     defensa: 'Nunca dejar el rey en la esquina sin piezas defensoras cerca.',
     dificultad: '⭐',
@@ -90,7 +102,7 @@ const MATES = [
     concepto: 'El rey queda atrapado entre dos de sus propias piezas (como charreteras en los hombros). La dama da mate en el centro.',
     movimientos: [],
     descripcion: 'Las dos torres negras bloquean al rey por los lados y la dama blanca da mate en el centro.',
-    fen: '3r2r1/8/3k4/8/8/3Q4/8/3K4 w - - 0 1',
+    fen: '3rkr2/8/8/3Q4/5N2/8/8/4K3 w - - 0 1',
     orientacion: 'white',
     defensa: 'No colocar piezas propias que bloqueen las casillas de escape del rey.',
     dificultad: '⭐⭐',
@@ -120,6 +132,7 @@ export default function MatesTeóricos() {
 
   const verLeccion = (mate) => {
     setMateSel(mate);
+    setOrientacionJugador(mate.orientacion);
     if (mate.movimientos.length > 0) {
       setGameRepro(new Chess());
       setStepIdx(0);
@@ -270,17 +283,10 @@ export default function MatesTeóricos() {
         </div>
       </div>
 
-      <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginBottom: 8 }}>
-        {['white','black'].map(c => (
-          <button key={c} onClick={() => setOrientacionJugador(c)} style={{
-            padding: '8px 20px', borderRadius: 'var(--border-radius)', cursor: 'pointer',
-            background: orientacionJugador === c ? 'var(--accent)' : 'var(--bg-card)',
-            color: orientacionJugador === c ? 'var(--accent-text)' : 'var(--text-primary)',
-            border: `1px solid ${orientacionJugador === c ? 'var(--accent)' : 'var(--border)'}`,
-          }}>
-            {c === 'white' ? '♔ Blancas' : '♚ Negras'}
-          </button>
-        ))}
+      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 8 }}>
+        <span style={{ fontSize: 14, color: 'var(--accent)', fontWeight: 'bold' }}>
+          Juegas con {mateSel.orientacion === 'white' ? '♔ piezas blancas' : '♚ piezas negras'}
+        </span>
       </div>
 
       <div style={{ display: 'flex', gap: 8 }}>

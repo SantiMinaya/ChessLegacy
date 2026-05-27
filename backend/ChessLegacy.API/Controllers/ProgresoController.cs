@@ -71,7 +71,8 @@ public class ProgresoController : ControllerBase
             logros = logrosDetalle,
             rachaActual = usuario?.RachaActual ?? 0,
             maximaRacha = usuario?.MaximaRacha ?? 0,
-            xp = usuario?.Xp ?? 0
+            xp = usuario?.Xp ?? 0,
+            foto = usuario?.Foto
         });
     }
 

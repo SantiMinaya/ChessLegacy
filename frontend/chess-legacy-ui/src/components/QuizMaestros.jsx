@@ -29,16 +29,16 @@ export default function QuizMaestros() {
 
   const parsePgnToFen = (pgn, numMoves) => {
     try {
-      const lines = pgn.split('\n').filter(l => !l.trim().startsWith('['));
-      const text = lines.join(' ').trim();
-      const tokens = text.split(/\s+/).filter(t => t && !/^\d+\./.test(t) && !['1-0','0-1','1/2-1/2','*'].includes(t));
       const g = new Chess();
-      const count = Math.min(numMoves, tokens.length);
-      for (let i = 0; i < count; i++) {
-        try { if (!g.move(tokens[i])) break; } catch { break; }
-      }
-      return g.fen();
-    } catch { return null; }
+      g.loadPgn(pgn);
+      const history = g.history({ verbose: true });
+      if (history.length === 0) return null;
+      const count = Math.min(numMoves, history.length);
+      return count > 0 ? history[count - 1].after : g.fen();
+    } catch (e) {
+      console.error("Error parsing PGN in quiz", e);
+      return null;
+    }
   };
 
   const cargarRonda = useCallback(async () => {

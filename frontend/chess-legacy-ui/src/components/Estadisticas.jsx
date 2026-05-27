@@ -1,132 +1,190 @@
 import { useState, useEffect } from 'react';
-import { BarChart, Bar, PieChart, Pie, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Cell, ResponsiveContainer } from 'recharts';
+import {
+  BarChart, Bar, PieChart, Pie, LineChart, Line,
+  XAxis, YAxis, CartesianGrid, Tooltip, Legend, Cell, ResponsiveContainer
+} from 'recharts';
 
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d', '#ffc658', '#ff7c7c', '#8dd1e1', '#d084d0'];
+const CARD = {
+  background: 'var(--bg-card)',
+  border: '1px solid var(--border)',
+  borderRadius: 12,
+  padding: '24px 28px',
+  marginBottom: 20,
+};
+
+const LABEL_STYLE = { fill: 'var(--text-muted)', fontSize: 11 };
+const TOOLTIP_STYLE = {
+  backgroundColor: 'var(--bg-card)',
+  border: '1px solid var(--border)',
+  color: 'var(--text-primary)',
+  borderRadius: 8,
+  fontSize: 13,
+};
 
 export default function Estadisticas({ jugadorId, jugadorNombre, onBack }) {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    cargarEstadisticas();
+    fetch(`http://localhost:5000/api/estadisticas/jugador/${jugadorId}`)
+      .then(r => r.json())
+      .then(setStats)
+      .catch(() => {})
+      .finally(() => setLoading(false));
   }, [jugadorId]);
 
-  const cargarEstadisticas = async () => {
-    try {
-      const response = await fetch(`http://localhost:5000/api/estadisticas/jugador/${jugadorId}`);
-      const data = await response.json();
-      setStats(data);
-    } catch (error) {
-      console.error('Error:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   if (loading) {
-    return <div style={{ padding: '20px', textAlign: 'center' }}>Cargando estadísticas...</div>;
+    return (
+      <div style={{ padding: 40, textAlign: 'center', color: 'var(--text-muted)', fontSize: 16 }}>
+        ⏳ Cargando estadísticas de {jugadorNombre}...
+      </div>
+    );
   }
 
   if (!stats) {
-    return <div style={{ padding: '20px', textAlign: 'center' }}>No hay datos disponibles</div>;
+    return (
+      <div style={{ padding: 40, textAlign: 'center', color: 'var(--text-muted)' }}>
+        <div style={{ fontSize: 36, marginBottom: 12 }}>📊</div>
+        No hay estadísticas disponibles para {jugadorNombre}.
+      </div>
+    );
   }
 
   const coloresData = [
-    { name: 'Blancas', value: stats.distribucionColores.blancas },
-    { name: 'Negras', value: stats.distribucionColores.negras }
+    { name: 'Blancas', value: stats.distribucionColores?.blancas ?? 0 },
+    { name: 'Negras',  value: stats.distribucionColores?.negras  ?? 0 },
   ];
 
   return (
-    <div style={{ padding: '20px', maxWidth: '1400px', margin: '0 auto' }}>
-      <button onClick={onBack} style={{ marginBottom: '20px', padding: '10px 20px', cursor: 'pointer' }}>← Volver</button>
-      <h2>Estadísticas de {jugadorNombre}</h2>
+    <div style={{ padding: '20px', maxWidth: 1400, margin: '0 auto', fontFamily: 'var(--font-family)', color: 'var(--text-primary)' }}>
+      <button
+        onClick={onBack}
+        style={{
+          marginBottom: 24, padding: '10px 20px', cursor: 'pointer',
+          background: 'var(--bg-card)', border: '2px solid var(--accent)',
+          color: 'var(--accent)', borderRadius: 'var(--border-radius)', fontSize: 15,
+        }}
+      >
+        ← Volver
+      </button>
 
-      <div style={{ background: '#f5f5f5', padding: '20px', borderRadius: '8px', marginBottom: '20px' }}>
-        <h3 style={{ margin: '0 0 10px 0' }}>Resumen General</h3>
-        <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#4a90e2' }}>
-          {stats.totalPartidas} partidas analizadas
+      <h2 style={{ fontFamily: 'Georgia, serif', color: 'var(--accent)', marginBottom: 24 }}>
+        📊 Estadísticas de {jugadorNombre}
+      </h2>
+
+      {/* Resumen */}
+      <div style={{ ...CARD, display: 'flex', alignItems: 'center', gap: 20 }}>
+        <div style={{ fontSize: 48 }}>♟️</div>
+        <div>
+          <div style={{ fontSize: 28, fontWeight: 700, color: 'var(--accent)' }}>
+            {stats.totalPartidas}
+          </div>
+          <div style={{ color: 'var(--text-muted)', fontSize: 14, textTransform: 'uppercase', letterSpacing: 1 }}>
+            Partidas Analizadas
+          </div>
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
-        <div style={{ background: '#fff', padding: '20px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
-          <h3>Top 10 Aperturas Más Usadas</h3>
+      {/* Gráficos principales */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 20 }}>
+
+        {/* Top aperturas */}
+        <div style={CARD}>
+          <h3 style={{ margin: '0 0 16px', color: 'var(--accent)', fontFamily: 'Georgia, serif' }}>
+            Top 10 Aperturas Más Usadas
+          </h3>
           <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={stats.aperturasTop}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="apertura" angle={-45} textAnchor="end" height={100} />
-              <YAxis />
-              <Tooltip />
-              <Bar dataKey="cantidad" fill="#4a90e2" />
+            <BarChart data={stats.aperturasTop} margin={{ bottom: 60 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+              <XAxis dataKey="apertura" angle={-40} textAnchor="end" height={90} tick={LABEL_STYLE} />
+              <YAxis tick={LABEL_STYLE} />
+              <Tooltip contentStyle={TOOLTIP_STYLE} />
+              <Bar dataKey="cantidad" fill="var(--accent)" radius={[4,4,0,0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>
 
-        <div style={{ background: '#fff', padding: '20px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
-          <h3>Distribución de Colores</h3>
+        {/* Distribución colores */}
+        <div style={CARD}>
+          <h3 style={{ margin: '0 0 16px', color: 'var(--accent)', fontFamily: 'Georgia, serif' }}>
+            Distribución de Colores
+          </h3>
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
               <Pie
                 data={coloresData}
-                cx="50%"
-                cy="50%"
-                labelLine={false}
-                label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                outerRadius={80}
-                fill="#8884d8"
+                cx="50%" cy="50%"
+                outerRadius={100}
                 dataKey="value"
+                label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                labelLine={true}
               >
-                {coloresData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={index === 0 ? '#ffffff' : '#000000'} stroke="#333" strokeWidth={2} />
-                ))}
+                <Cell fill="#e8e8e8" stroke="#888" strokeWidth={2} />
+                <Cell fill="#2a2a2a" stroke="#888" strokeWidth={2} />
               </Pie>
-              <Tooltip />
+              <Tooltip contentStyle={TOOLTIP_STYLE} />
             </PieChart>
           </ResponsiveContainer>
         </div>
       </div>
 
-      <div style={{ background: '#fff', padding: '20px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', marginBottom: '20px' }}>
-        <h3>Evolución Histórica (Partidas por Año)</h3>
-        <ResponsiveContainer width="100%" height={300}>
+      {/* Evolución histórica */}
+      <div style={{ ...CARD, marginBottom: 20 }}>
+        <h3 style={{ margin: '0 0 16px', color: 'var(--accent)', fontFamily: 'Georgia, serif' }}>
+          📈 Evolución Histórica (Partidas por Año)
+        </h3>
+        <ResponsiveContainer width="100%" height={280}>
           <LineChart data={stats.evolucionAnual}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="anio" />
-            <YAxis />
-            <Tooltip />
-            <Legend />
-            <Line type="monotone" dataKey="cantidad" stroke="#4a90e2" strokeWidth={2} />
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+            <XAxis dataKey="anio" tick={LABEL_STYLE} />
+            <YAxis tick={LABEL_STYLE} />
+            <Tooltip contentStyle={TOOLTIP_STYLE} />
+            <Legend wrapperStyle={{ color: 'var(--text-muted)', fontSize: 12 }} />
+            <Line type="monotone" dataKey="cantidad" stroke="var(--accent)" strokeWidth={2} dot={{ fill: 'var(--accent)' }} />
           </LineChart>
         </ResponsiveContainer>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
-        <div style={{ background: '#fff', padding: '20px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
-          <h3>Oponentes Más Frecuentes</h3>
-          <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
-            {stats.oponentesTop.map((oponente, idx) => (
-              <div key={idx} style={{ padding: '10px', borderBottom: '1px solid #eee', display: 'flex', justifyContent: 'space-between' }}>
-                <span>{oponente.oponente}</span>
-                <span style={{ fontWeight: 'bold', color: '#4a90e2' }}>{oponente.cantidad} partidas</span>
+      {/* Oponentes y variantes */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+
+        <div style={CARD}>
+          <h3 style={{ margin: '0 0 16px', color: 'var(--accent)', fontFamily: 'Georgia, serif' }}>
+            👥 Oponentes Más Frecuentes
+          </h3>
+          <div style={{ maxHeight: 300, overflowY: 'auto' }}>
+            {stats.oponentesTop?.map((op, idx) => (
+              <div key={idx} style={{
+                padding: '10px 4px',
+                borderBottom: '1px solid var(--border-subtle)',
+                display: 'flex',
+                justifyContent: 'space-between',
+                fontSize: 14,
+              }}>
+                <span style={{ color: 'var(--text-secondary)' }}>{op.oponente}</span>
+                <span style={{ fontWeight: 'bold', color: 'var(--accent)' }}>{op.cantidad} partidas</span>
               </div>
             ))}
           </div>
         </div>
 
-        <div style={{ background: '#fff', padding: '20px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
-          <h3>Variantes Más Jugadas</h3>
-          <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
-            {stats.variantesPorApertura.map((variante, idx) => (
-              <div key={idx} style={{ padding: '10px', borderBottom: '1px solid #eee' }}>
-                <div style={{ fontWeight: 'bold' }}>{variante.apertura}</div>
-                <div style={{ fontSize: '12px', color: '#666', display: 'flex', justifyContent: 'space-between' }}>
-                  <span>{variante.variante}</span>
-                  <span style={{ color: '#4a90e2' }}>{variante.cantidad} veces</span>
+        <div style={CARD}>
+          <h3 style={{ margin: '0 0 16px', color: 'var(--accent)', fontFamily: 'Georgia, serif' }}>
+            📋 Variantes Más Jugadas
+          </h3>
+          <div style={{ maxHeight: 300, overflowY: 'auto' }}>
+            {stats.variantesPorApertura?.map((v, idx) => (
+              <div key={idx} style={{ padding: '10px 4px', borderBottom: '1px solid var(--border-subtle)' }}>
+                <div style={{ fontWeight: 'bold', fontSize: 14, color: 'var(--text-primary)' }}>{v.apertura}</div>
+                <div style={{ fontSize: 12, color: 'var(--text-muted)', display: 'flex', justifyContent: 'space-between', marginTop: 2 }}>
+                  <span>{v.variante}</span>
+                  <span style={{ color: 'var(--accent)' }}>{v.cantidad}×</span>
                 </div>
               </div>
             ))}
           </div>
         </div>
+
       </div>
     </div>
   );

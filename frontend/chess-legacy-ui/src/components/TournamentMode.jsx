@@ -101,7 +101,11 @@ export default function TournamentMode({ onBack }) {
     if (user?.token) {
       setMoveHistory(prev => {
         const resultado = winner === 'player' ? 'win' : winner === 'master' ? 'loss' : 'draw';
-        const date = new Date().toISOString().slice(0, 10).replace(/-/g, '.');
+        const localDate = new Date();
+        const yyyy = localDate.getFullYear();
+        const mm = String(localDate.getMonth() + 1).padStart(2, '0');
+        const dd = String(localDate.getDate()).padStart(2, '0');
+        const date = `${yyyy}.${mm}.${dd}`;
         const pgn = `[Event "Torneo Chess Legacy"]\n[Date "${date}"]\n[White "Tú"]\n[Black "${selectedMaster.name}"]\n\n` +
           prev.reduce((acc, m, i) => {
             if (i % 2 === 0) acc += `${Math.ceil((i+1)/2)}. `;

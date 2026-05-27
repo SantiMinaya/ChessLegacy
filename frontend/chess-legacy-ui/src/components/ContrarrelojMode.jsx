@@ -8,6 +8,44 @@ import { useBoardTheme } from '../context/BoardThemeContext';
 const SECONDS_PER_MOVE = 10;
 const PHASES = { SELECT: 'select', PLAYING: 'playing', DONE: 'done' };
 
+const getProgresoKey = () => {
+  try {
+    const userStr = localStorage.getItem('chess_user');
+    if (userStr) {
+      const userObj = JSON.parse(userStr);
+      return `chess_retos_progreso_${userObj.id || userObj.username || 'anon'}`;
+    }
+  } catch {}
+  return 'chess_retos_progreso_anon';
+};
+
+const updateRetoProgreso = (key, value, isAccumulator = false) => {
+  try {
+    const hoyKey = new Date().toDateString();
+    const storageKey = getProgresoKey();
+    const stored = JSON.parse(localStorage.getItem(storageKey) || '{}');
+    if (stored.fecha !== hoyKey) {
+      stored.fecha = hoyKey;
+      stored.puzzles_resueltos = 0;
+      stored.casillas_seguidas = 0;
+      stored.contrarreloj_completados = [];
+      stored.adivina_aciertos = 0;
+      stored.aperturas_perfectas = [];
+    }
+    
+    if (isAccumulator) {
+      stored[key] = (stored[key] || 0) + value;
+    } else {
+      if (Array.isArray(stored[key])) {
+        if (!stored[key].includes(value)) stored[key].push(value);
+      } else {
+        stored[key] = Math.max(stored[key] || 0, value);
+      }
+    }
+    localStorage.setItem(storageKey, JSON.stringify(stored));
+  } catch {}
+};
+
 export default function ContrarrelojMode() {
   const { user } = useAuth();
   const { boardProps } = useBoardTheme();
@@ -126,6 +164,7 @@ export default function ContrarrelojMode() {
       modo: 'contrarreloj',
       timeouts: stats.timeouts,
     }).catch(() => {});
+    updateRetoProgreso('contrarreloj_completados', aperturaInfo.apertura);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase]);
 

@@ -16,7 +16,7 @@ public class PartidaRepository
 
     public async Task<(List<Partida>, int)> GetPartidasConFiltros(PartidaFiltrosRequest filtros)
     {
-        var query = _context.Partidas.AsQueryable();
+        var query = _context.Partidas.Include(p => p.Jugador).AsQueryable();
 
         if (filtros.JugadorId.HasValue)
             query = query.Where(p => p.JugadorId == filtros.JugadorId.Value);
@@ -60,6 +60,7 @@ public class PartidaRepository
     {
         var normalizado = NormalizarPgn(pgnStart);
         var candidatas = await _context.Partidas
+            .Include(p => p.Jugador)
             .Where(p => p.JugadorId == jugadorId)
             .ToListAsync();
         return candidatas.FirstOrDefault(p => NormalizarPgn(p.PGN).StartsWith(normalizado));
@@ -69,13 +70,13 @@ public class PartidaRepository
         System.Text.RegularExpressions.Regex.Replace(pgn, @"\s+", " ").Trim();
 
     public async Task<Partida?> GetByIdAsync(int id) =>
-        await _context.Partidas.FindAsync(id);
+        await _context.Partidas.Include(p => p.Jugador).FirstOrDefaultAsync(p => p.Id == id);
 
     public async Task<int> CountAsync() =>
         await _context.Partidas.CountAsync();
 
     public async Task<Partida?> GetByOffsetAsync(int offset) =>
-        await _context.Partidas.OrderBy(p => p.Id).Skip(offset).FirstOrDefaultAsync();
+        await _context.Partidas.Include(p => p.Jugador).OrderBy(p => p.Id).Skip(offset).FirstOrDefaultAsync();
 
     public async Task<List<Partida>> BuscarPorFen(string fen)
     {
@@ -83,6 +84,7 @@ public class PartidaRepository
         // Como SQLite no tiene funciones de ajedrez, buscamos por movimientos parciales
         // Estrategia: cargar candidatas con PGN no nulo y filtrar en memoria (limitado a 500)
         var candidatas = await _context.Partidas
+            .Include(p => p.Jugador)
             .Where(p => p.PGN != null && p.PGN.Length > 10)
             .OrderBy(p => p.Id)
             .Take(500)

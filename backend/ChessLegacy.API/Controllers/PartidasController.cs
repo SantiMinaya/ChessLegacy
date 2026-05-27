@@ -31,7 +31,9 @@ public class PartidasController : ControllerBase
             CodigoECO = p.CodigoECO,
             NombreApertura = p.AperturaNombre ?? "",
             Pgn = p.PGN,
-            ColorJugador = p.ColorJugador ?? "Blancas"
+            ColorJugador = p.ColorJugador ?? "Blancas",
+            NombreJugador = p.Jugador?.Nombre ?? "",
+            JugadorId = p.JugadorId
         }).ToList();
 
         return Ok(new
@@ -61,7 +63,9 @@ public class PartidasController : ControllerBase
             CodigoECO = partida.CodigoECO,
             NombreApertura = partida.AperturaNombre ?? "",
             Pgn = partida.PGN,
-            ColorJugador = partida.ColorJugador ?? "Blancas"
+            ColorJugador = partida.ColorJugador ?? "Blancas",
+            NombreJugador = partida.Jugador?.Nombre ?? "",
+            JugadorId = partida.JugadorId
         });
     }
 
@@ -82,7 +86,9 @@ public class PartidasController : ControllerBase
             CodigoECO = partida.CodigoECO,
             NombreApertura = partida.AperturaNombre ?? "",
             Pgn = partida.PGN,
-            ColorJugador = partida.ColorJugador ?? "Blancas"
+            ColorJugador = partida.ColorJugador ?? "Blancas",
+            NombreJugador = partida.Jugador?.Nombre ?? "",
+            JugadorId = partida.JugadorId
         });
     }
 
@@ -102,7 +108,9 @@ public class PartidasController : ControllerBase
             Anio = partida.Anio, Oponente = partida.Oponente,
             Resultado = partida.Resultado ?? "", CodigoECO = partida.CodigoECO,
             NombreApertura = partida.AperturaNombre ?? "", Pgn = partida.PGN,
-            ColorJugador = partida.ColorJugador ?? "Blancas"
+            ColorJugador = partida.ColorJugador ?? "Blancas",
+            NombreJugador = partida.Jugador?.Nombre ?? "",
+            JugadorId = partida.JugadorId
         });
     }
 
@@ -117,7 +125,9 @@ public class PartidasController : ControllerBase
             Anio = p.Anio, Oponente = p.Oponente,
             Resultado = p.Resultado ?? "", CodigoECO = p.CodigoECO,
             NombreApertura = p.AperturaNombre ?? "", Pgn = p.PGN,
-            ColorJugador = p.ColorJugador ?? "Blancas"
+            ColorJugador = p.ColorJugador ?? "Blancas",
+            NombreJugador = p.Jugador?.Nombre ?? "",
+            JugadorId = p.JugadorId
         }));
     }
 

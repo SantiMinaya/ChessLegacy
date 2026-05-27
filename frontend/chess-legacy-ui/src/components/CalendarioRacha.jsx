@@ -5,6 +5,13 @@ import './CalendarioRacha.css';
 
 const MESES = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
 
+const getLocalISODate = (date) => {
+  const yyyy = date.getFullYear();
+  const mm = String(date.getMonth() + 1).padStart(2, '0');
+  const dd = String(date.getDate()).padStart(2, '0');
+  return `${yyyy}-${mm}-${dd}`;
+};
+
 export default function CalendarioRacha() {
   const { user } = useAuth();
   const [diasActivos, setDiasActivos] = useState(new Set());
@@ -16,43 +23,58 @@ export default function CalendarioRacha() {
       .catch(() => {});
   }, [user.token]);
 
-  // Construir cuadrícula: 53 semanas × 7 días, empezando el domingo de hace ~364 días
+  // Año actual: de 1 de enero a 31 de diciembre
   const hoy = new Date();
   hoy.setHours(0, 0, 0, 0);
+  const anyo = hoy.getFullYear();
 
-  // Primer día: retroceder 364 días y ajustar al domingo anterior
-  const inicio = new Date(hoy);
-  inicio.setDate(inicio.getDate() - 364);
+  // Inicio: domingo de la semana que contiene el 1 de enero
+  const primerDiaAnyo = new Date(anyo, 0, 1);
+  const inicio = new Date(primerDiaAnyo);
   inicio.setDate(inicio.getDate() - inicio.getDay()); // retroceder al domingo
+
+  // Fin: sábado de la semana que contiene el 31 de diciembre
+  const ultimoDiaAnyo = new Date(anyo, 11, 31);
+  const fin = new Date(ultimoDiaAnyo);
+  fin.setDate(fin.getDate() + (6 - fin.getDay())); // avanzar al sábado
 
   const semanas = [];
   const etiquetasMeses = []; // { semana, mes }
   let cursor = new Date(inicio);
   let semanaIdx = 0;
+  let mesActual = -1;
 
-  while (cursor <= hoy) {
+  while (cursor <= fin) {
     const semana = [];
     for (let d = 0; d < 7; d++) {
       const fecha = new Date(cursor);
-      const iso = fecha.toISOString().slice(0, 10);
-      semana.push({ fecha, iso, futuro: fecha > hoy });
+      const iso = getLocalISODate(fecha);
+      const fueraAnyo = fecha.getFullYear() !== anyo;
+      semana.push({ fecha, iso, futuro: fecha > hoy, fueraAnyo });
       cursor.setDate(cursor.getDate() + 1);
     }
-    // Detectar cambio de mes en esta semana para la etiqueta
-    const primerDia = semana[0].fecha;
-    if (semanaIdx === 0 || primerDia.getDate() <= 7) {
-      etiquetasMeses.push({ semana: semanaIdx, mes: MESES[primerDia.getMonth()] });
+
+    // Etiqueta de mes: detectar cuando aparece un mes nuevo en días del año en curso
+    const primerDiaReal = semana.find(d => !d.fueraAnyo);
+    if (primerDiaReal) {
+      const mes = primerDiaReal.fecha.getMonth();
+      if (mes !== mesActual) {
+        mesActual = mes;
+        etiquetasMeses.push({ semana: semanaIdx, mes: MESES[mes] });
+      }
     }
+
     semanas.push(semana);
     semanaIdx++;
   }
 
-  const totalActivos = diasActivos.size;
+  // Contar solo días activos dentro del año actual
+  const totalActivos = [...diasActivos].filter(d => d.startsWith(`${anyo}-`)).length;
 
   return (
     <div className="calendario-wrap">
       <div className="calendario-header">
-        <span>{totalActivos} día{totalActivos !== 1 ? 's' : ''} activo{totalActivos !== 1 ? 's' : ''} en el último año</span>
+        <span>{totalActivos} día{totalActivos !== 1 ? 's' : ''} activo{totalActivos !== 1 ? 's' : ''} en {anyo}</span>
       </div>
       <div className="calendario-scroll">
         <div className="calendario-grid-wrap">
@@ -72,15 +94,15 @@ export default function CalendarioRacha() {
           <div className="calendario-grid">
             {semanas.map((semana, si) => (
               <div key={si} className="calendario-col">
-                {semana.map(({ fecha, iso, futuro }) => {
-                  const activo = diasActivos.has(iso);
+                {semana.map(({ fecha, iso, futuro, fueraAnyo }) => {
+                  const activo = !fueraAnyo && diasActivos.has(iso);
                   const label = fecha.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
                   return (
                     <div
                       key={iso}
-                      className={`calendario-celda ${futuro ? 'futuro' : activo ? 'activo' : 'inactivo'}`}
-                      onMouseEnter={e => setTooltip({ text: activo ? `✅ ${label}` : label, x: e.clientX, y: e.clientY })}
-                      onMouseLeave={() => setTooltip(null)}
+                      className={`calendario-celda ${fueraAnyo ? 'fuera-anyo' : futuro ? 'futuro' : activo ? 'activo' : 'inactivo'}`}
+                      onMouseEnter={!fueraAnyo ? e => setTooltip({ text: activo ? `✅ ${label}` : label, x: e.clientX, y: e.clientY }) : undefined}
+                      onMouseLeave={!fueraAnyo ? () => setTooltip(null) : undefined}
                     />
                   );
                 })}

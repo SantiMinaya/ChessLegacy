@@ -40,6 +40,25 @@ export default function AnalisisPartida({ moves, masterName, onClose }) {
     setPositions(fens);
   }, [moves]);
 
+  // Navegación con flechas del teclado
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (['INPUT', 'TEXTAREA'].includes(document.activeElement?.tagName) || document.activeElement?.isContentEditable) {
+        return;
+      }
+      if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        setCursor(c => Math.min(moves.length, c + 1));
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        setCursor(c => Math.max(0, c - 1));
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [moves]);
+
   // Analizar todos los movimientos
   useEffect(() => {
     if (positions.length < 2) return;

@@ -5,95 +5,133 @@ import { useToast } from '../context/ToastContext';
 import { useBoardTheme } from '../context/BoardThemeContext';
 import { useChessInput } from '../hooks/useChessInput';
 
+const getProgresoKey = () => {
+  try {
+    const userStr = localStorage.getItem('chess_user');
+    if (userStr) {
+      const userObj = JSON.parse(userStr);
+      return `chess_retos_progreso_${userObj.id || userObj.username || 'anon'}`;
+    }
+  } catch {}
+  return 'chess_retos_progreso_anon';
+};
+
+const updateRetoProgreso = (key, value, isAccumulator = false) => {
+  try {
+    const hoyKey = new Date().toDateString();
+    const storageKey = getProgresoKey();
+    const stored = JSON.parse(localStorage.getItem(storageKey) || '{}');
+    if (stored.fecha !== hoyKey) {
+      stored.fecha = hoyKey;
+      stored.puzzles_resueltos = 0;
+      stored.casillas_seguidas = 0;
+      stored.contrarreloj_completados = [];
+      stored.adivina_aciertos = 0;
+      stored.aperturas_perfectas = [];
+    }
+    
+    if (isAccumulator) {
+      stored[key] = (stored[key] || 0) + value;
+    } else {
+      if (Array.isArray(stored[key])) {
+        if (!stored[key].includes(value)) stored[key].push(value);
+      } else {
+        stored[key] = Math.max(stored[key] || 0, value);
+      }
+    }
+    localStorage.setItem(storageKey, JSON.stringify(stored));
+  } catch {}
+};
+
 // FENs y soluciones verificados con chess.js
 const PUZZLES = [
   {
     id: 1,
-    titulo: 'Mate en 1',
-    fen: '6k1/5ppp/8/8/8/8/8/4R1K1 w - - 0 1',
-    solucion: ['Re8#'],
-    descripcion: 'Las blancas dan mate en 1 movimiento.',
+    titulo: 'Mate en 1 (Pasillo)',
+    fen: '6k1/5ppp/8/8/8/8/8/3R2K1 w - - 0 1',
+    solucion: ['Rd8#'],
+    descripcion: 'Las blancas aprovechan la debilidad de la primera fila para dar el mate del pasillo.',
     dificultad: 'Fácil',
     turno: 'w',
   },
   {
     id: 2,
-    titulo: 'Mate en 1 — Pasillo',
-    fen: '6k1/5ppp/8/8/8/8/5PPP/4R1K1 w - - 0 1',
-    solucion: ['Re8#'],
-    descripcion: 'Mate del pasillo: la torre da mate en la 8ª fila.',
+    titulo: 'Horquilla de caballo',
+    fen: 'q3k3/8/8/3N4/8/8/8/4K3 w - - 0 1',
+    solucion: ['Nc7+'],
+    descripcion: 'Usa el caballo blanco para dar un jaque doble y ganar la dama negra.',
     dificultad: 'Fácil',
     turno: 'w',
   },
   {
     id: 3,
-    titulo: 'Horquilla de caballo',
-    fen: '4k3/8/8/3n4/8/8/8/2K1R3 b - - 0 1',
-    solucion: ['Nf4'],
-    descripcion: 'Las negras ganan la torre con una horquilla.',
+    titulo: 'Clavada ganadora',
+    fen: '4k3/4q3/8/8/8/8/4R1K1/8 w - - 0 1',
+    solucion: ['Rxe7+'],
+    descripcion: 'Clava la dama enemiga contra el rey y gánala de manera simple.',
     dificultad: 'Fácil',
-    turno: 'b',
+    turno: 'w',
   },
   {
     id: 4,
-    titulo: 'Clavada ganadora',
-    fen: '3rk3/8/8/8/8/8/8/3RK3 w - - 0 1',
-    solucion: ['Rd8+', 'Rxd8'],
-    descripcion: 'Las blancas ganan la torre negra con una clavada.',
+    titulo: 'Mate de la coz (Ahogado)',
+    fen: '6rk/5ppp/7N/8/8/8/8/6K1 w - - 0 1',
+    solucion: ['Nf7#'],
+    descripcion: 'El caballo remata al rey negro que se encuentra completamente asfixiado por sus propias piezas.',
     dificultad: 'Media',
     turno: 'w',
   },
   {
     id: 5,
-    titulo: 'Mate en 2 — Ataque de flanco',
-    fen: '5rk1/5ppp/8/8/8/8/5PPP/5RK1 w - - 0 1',
-    solucion: ['Rf6', 'Rxf6', 'gxf6#'],
-    descripcion: 'Las blancas dan mate en 2 con un sacrificio de torre.',
+    titulo: 'Jaque descubierto',
+    fen: '3k4/8/8/q7/3B4/8/8/3R2K1 w - - 0 1',
+    solucion: ['Bb6+', 'Ke8', 'Bxa5'],
+    descripcion: 'Mueve el alfil con doble jaque y descubre el ataque de tu torre sobre la dama rival para ganarla.',
     dificultad: 'Media',
     turno: 'w',
   },
   {
     id: 6,
-    titulo: 'Doble amenaza',
-    fen: '4k3/8/8/8/8/8/8/R3K3 w Q - 0 1',
-    solucion: ['Ra8#'],
-    descripcion: 'Mate con torre en la 8ª fila.',
+    titulo: 'Mate Árabe',
+    fen: '7k/6R1/5N2/8/8/8/8/6K1 w - - 0 1',
+    solucion: ['Rh7#'],
+    descripcion: 'El rey negro está atrapado en la esquina. Remata coordinando la torre y el caballo.',
     dificultad: 'Fácil',
     turno: 'w',
   },
   {
     id: 7,
-    titulo: 'Coronación con mate',
-    fen: '8/5P1k/8/8/8/8/8/6K1 w - - 0 1',
-    solucion: ['f8=Q+', 'Kh6', 'Qg7#'],
-    descripcion: 'Corona el peón y da mate en 2.',
+    titulo: 'Mate de Anastasia',
+    fen: 'r4r1k/1p2Nppp/8/7Q/8/5R2/6PP/6K1 w - - 0 1',
+    solucion: ['Qxh7+', 'Kxh7', 'Rh3#'],
+    descripcion: 'Sacrifica la dama en h7 para abrir la columna h y remata de forma brillante con la torre.',
     dificultad: 'Media',
     turno: 'w',
   },
   {
     id: 8,
-    titulo: 'Mate de Epaulette',
-    fen: '3qk3/8/8/8/8/8/8/3QK3 w - - 0 1',
-    solucion: ['Qd8+', 'Qxd8#'],
-    descripcion: 'Las blancas dan mate con un sacrificio de dama.',
+    titulo: 'Mate de Charreteras',
+    fen: '3rkr2/8/8/3Q4/5N2/8/8/4K3 w - - 0 1',
+    solucion: ['Qe6#'],
+    descripcion: 'El rey negro está flanqueado por sus propias torres. Da mate en el centro con la dama defendida.',
     dificultad: 'Media',
     turno: 'w',
   },
   {
     id: 9,
-    titulo: 'Mate de Boden',
-    fen: '2kr4/ppp5/8/8/8/8/8/2B1KB2 w - - 0 1',
-    solucion: ['Ba6#'],
-    descripcion: 'Mate con dos alfiles cruzados.',
-    dificultad: 'Difícil',
+    titulo: 'Coronación y Mate',
+    fen: 'k7/5P2/2B5/8/8/8/8/4K3 w - - 0 1',
+    solucion: ['f8=Q#'],
+    descripcion: 'Promociona tu peón a dama dando jaque mate apoyado por la diagonal del alfil.',
+    dificultad: 'Fácil',
     turno: 'w',
   },
   {
     id: 10,
-    titulo: 'Zugzwang',
-    fen: '8/8/8/8/8/1k6/8/1K6 w - - 0 1',
-    solucion: ['Ka1'],
-    descripcion: 'Las blancas fuerzan zugzwang al rey negro.',
+    titulo: 'Mate con Caballo y Alfil',
+    fen: 'k3N3/8/8/8/8/4B3/8/4K3 w - - 0 1',
+    solucion: ['Nc7#'],
+    descripcion: 'Usa el salto de caballo a c7 coordinado con el alfil para cerrar el escape del rey.',
     dificultad: 'Difícil',
     turno: 'w',
   },
@@ -151,6 +189,7 @@ export default function PuzzlesTacticos() {
         setScore(s => s + 1);
         setFeedback('solved');
         playSound('correct');
+        updateRetoProgreso('puzzles_resueltos', 1, true);
       }
     }, 600);
     return () => clearTimeout(timer);
@@ -181,6 +220,7 @@ export default function PuzzlesTacticos() {
         setScore(s => s + 1);
         setFeedback('solved');
         playSound('correct');
+        updateRetoProgreso('puzzles_resueltos', 1, true);
       } else {
         setFeedback('ok');
       }

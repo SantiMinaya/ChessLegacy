@@ -86,7 +86,14 @@
   cursor: default;
 }
 
-.calendario-celda:not(.futuro):hover {
+.calendario-celda.fuera-anyo {
+  background: transparent;
+  border: none;
+  cursor: default;
+  pointer-events: none;
+}
+
+.calendario-celda:not(.futuro):not(.fuera-anyo):hover {
   opacity: 0.75;
 }
 

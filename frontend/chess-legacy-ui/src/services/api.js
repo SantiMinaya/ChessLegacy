@@ -30,6 +30,7 @@ export const aperturasAPI = {
 export const authAPI = {
   login: (username, password) => axios.post(`${API_URL}/auth/login`, { username, password }),
   register: (username, password) => axios.post(`${API_URL}/auth/register`, { username, password }),
+  changePassword: (token, oldPassword, newPassword) => axios.post(`${API_URL}/auth/change-password`, { oldPassword, newPassword }, { headers: { Authorization: `Bearer ${token}` } }),
 };
 
 export const progresoAPI = {

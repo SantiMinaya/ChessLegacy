@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { progresoAPI } from '../services/api';
+import { progresoAPI, authAPI } from '../services/api';
 import { useBoardTheme, BOARD_THEMES, PIECE_SETS } from '../context/BoardThemeContext';
 import { CUSTOM_PIECE_SETS } from '../data/pieceSets';
 import CalendarioRacha from './CalendarioRacha';
@@ -51,9 +51,22 @@ export default function PerfilUsuario() {
   const [foto, setFoto] = useState(null);
   const [subiendoFoto, setSubiendoFoto] = useState(false);
 
+  // Estados para cambio de contraseña
+  const [oldPassword, setOldPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [pwdError, setPwdError] = useState('');
+  const [pwdSuccess, setPwdSuccess] = useState('');
+  const [pwdLoading, setPwdLoading] = useState(false);
+
   useEffect(() => {
     progresoAPI.get(user.token)
-      .then(r => setData(r.data))
+      .then(r => {
+        setData(r.data);
+        if (r.data.foto) {
+          setFoto(r.data.foto);
+        }
+      })
       .catch(() => setData({ progresos: [], logros: [] }))
       .finally(() => setLoading(false));
     progresoAPI.getPartidas(user.token)
@@ -94,7 +107,7 @@ export default function PerfilUsuario() {
     const logrosObt = new Set(logros.map(l => l.codigo));
     const totAciertos = progresos.reduce((s, p) => s + p.aciertos, 0);
     const totSesiones = progresos.reduce((s, p) => s + p.sesiones, 0);
-    const apDistintas = new Set(progresos.map(p => p.apertura)).size;
+    const apDistintas = new Set(progresos.filter(p => !p.apertura.startsWith('__')).map(p => p.apertura)).size;
     const doc = new jsPDF();
     doc.setFontSize(20);
     doc.setTextColor(212, 175, 55);
@@ -115,7 +128,7 @@ export default function PerfilUsuario() {
     doc.setFontSize(10);
     doc.setTextColor(0, 0, 0);
     let y = 115;
-    progresos.filter(p => !p.apertura.startsWith('__torneo__')).slice(0, 20).forEach(p => {
+    progresos.filter(p => !p.apertura.startsWith('__')).slice(0, 20).forEach(p => {
       const pct = p.intentos > 0 ? Math.round((p.aciertos / p.intentos) * 100) : 0;
       doc.text(`${p.apertura}${p.variante ? ' - ' + p.variante : ''}: ${pct}% (${p.sesiones} sesiones)`, 20, y);
       y += 8;
@@ -123,14 +136,44 @@ export default function PerfilUsuario() {
     doc.save(`chess-legacy-${user.username}.pdf`);
   };
 
+  const handlePasswordChange = async (e) => {
+    e.preventDefault();
+    setPwdError('');
+    setPwdSuccess('');
+
+    if (newPassword.length < 6) {
+      setPwdError('La nueva contraseña debe tener al menos 6 caracteres.');
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      setPwdError('Las contraseñas nuevas no coinciden.');
+      return;
+    }
+
+    setPwdLoading(true);
+    try {
+      await authAPI.changePassword(user.token, oldPassword, newPassword);
+      setPwdSuccess('¡Contraseña actualizada correctamente!');
+      setOldPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+    } catch (err) {
+      setPwdError(err.response?.data || 'Error al actualizar la contraseña.');
+    } finally {
+      setPwdLoading(false);
+    }
+  };
+
   if (loading) return <p style={{ color: '#c0c0c0', textAlign: 'center', padding: 40 }}>⏳ Cargando perfil...</p>;
 
   const { progresos, logros, rachaActual, maximaRacha, xp = 0 } = data;
   const nivel = getNivel(xp);
   const logrosObtenidos = new Set(logros.map(l => l.codigo));
-  const totalAciertos = progresos.reduce((s, p) => s + p.aciertos, 0);
-  const totalSesiones = progresos.reduce((s, p) => s + p.sesiones, 0);
-  const aperturasDistintas = new Set(progresos.map(p => p.apertura)).size;
+  const progresosReales = progresos.filter(p => !p.apertura.startsWith('__'));
+  const totalAciertos = progresosReales.reduce((s, p) => s + p.aciertos, 0);
+  const totalSesiones = progresosReales.reduce((s, p) => s + p.sesiones, 0);
+  const aperturasDistintas = new Set(progresosReales.map(p => p.apertura)).size;
 
   return (
     <div className="perfil">
@@ -197,7 +240,7 @@ export default function PerfilUsuario() {
 
       <div className="perfil-section">
         <h3>🎯 Misiones Semanales</h3>
-        <MisionesSemanales />
+        <MisionesSemanales progresos={progresos} logros={logros} partidas={partidas} />
       </div>
 
       <div className="perfil-section">
@@ -213,6 +256,48 @@ export default function PerfilUsuario() {
       <div className="perfil-section">
         <h3>🎨 Personalización</h3>
         <PanelPersonalizacion />
+      </div>
+
+      <div className="perfil-section">
+        <h3>🔒 Seguridad y Contraseña</h3>
+        <p style={{ color: '#888', fontSize: 13, margin: '0 0 16px' }}>Actualiza tus credenciales para mantener tu cuenta segura.</p>
+        <form onSubmit={handlePasswordChange} className="password-form">
+          <div className="perfil-field">
+            <label>Contraseña Actual</label>
+            <input
+              type="password"
+              value={oldPassword}
+              onChange={e => setOldPassword(e.target.value)}
+              placeholder="Escribe tu contraseña actual"
+              required
+            />
+          </div>
+          <div className="perfil-field">
+            <label>Nueva Contraseña</label>
+            <input
+              type="password"
+              value={newPassword}
+              onChange={e => setNewPassword(e.target.value)}
+              placeholder="Mínimo 6 caracteres"
+              required
+            />
+          </div>
+          <div className="perfil-field">
+            <label>Confirmar Nueva Contraseña</label>
+            <input
+              type="password"
+              value={confirmPassword}
+              onChange={e => setConfirmPassword(e.target.value)}
+              placeholder="Confirma tu nueva contraseña"
+              required
+            />
+          </div>
+          {pwdError && <div className="pwd-error">{pwdError}</div>}
+          {pwdSuccess && <div className="pwd-success">{pwdSuccess}</div>}
+          <button type="submit" className="pwd-btn" disabled={pwdLoading || !oldPassword || !newPassword || !confirmPassword}>
+            {pwdLoading ? '⏳ Guardando...' : '💾 Actualizar Contraseña'}
+          </button>
+        </form>
       </div>
 
       <div className="perfil-section">
@@ -289,12 +374,12 @@ export default function PerfilUsuario() {
         </div>
       </div>
 
-      {progresos.length > 0 && (
+      {progresos.filter(p => !p.apertura.startsWith('__')).length > 0 && (
         <div className="perfil-section">
           <h3>📖 Progreso por Apertura</h3>
           <div className="progreso-lista">
             {progresos
-              .filter(p => !p.apertura.startsWith('__torneo__'))
+              .filter(p => !p.apertura.startsWith('__'))
               .sort((a, b) => b.sesiones - a.sesiones)
               .map(p => {
                 const pct = p.intentos > 0 ? Math.round((p.aciertos / p.intentos) * 100) : 0;

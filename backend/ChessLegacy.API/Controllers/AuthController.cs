@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Text;
 using ChessLegacy.API.Data;
 using ChessLegacy.API.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -70,6 +71,32 @@ public class AuthController : ControllerBase
         );
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
+
+    [HttpPost("change-password")]
+    [Authorize]
+    public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest req)
+    {
+        if (string.IsNullOrWhiteSpace(req.OldPassword) || string.IsNullOrWhiteSpace(req.NewPassword))
+            return BadRequest("Se requieren ambas contraseñas.");
+
+        var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (string.IsNullOrEmpty(userIdClaim))
+            return Unauthorized("Usuario no autenticado.");
+
+        var userId = int.Parse(userIdClaim);
+        var usuario = await _db.Usuarios.FindAsync(userId);
+        if (usuario == null)
+            return NotFound("Usuario no encontrado.");
+
+        if (!BCrypt.Net.BCrypt.Verify(req.OldPassword, usuario.PasswordHash))
+            return BadRequest("La contraseña actual es incorrecta.");
+
+        usuario.PasswordHash = BCrypt.Net.BCrypt.HashPassword(req.NewPassword);
+        await _db.SaveChangesAsync();
+
+        return Ok("Contraseña actualizada con éxito.");
+    }
 }
 
 public record AuthRequest(string Username, string Password);
+public record ChangePasswordRequest(string OldPassword, string NewPassword);

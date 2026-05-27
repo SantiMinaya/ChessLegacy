@@ -32,8 +32,34 @@
 }
 
 .pdd-fecha  { color: var(--text-muted); font-size: 12px; margin: 0; text-transform: capitalize; }
-.pdd-info   { text-align: right; }
-.pdd-titulo { display: block; color: var(--text-primary); font-weight: bold; font-size: 15px; }
+.pdd-info   { text-align: right; display: flex; flex-direction: column; align-items: flex-end; }
+.pdd-titulo { display: block; color: var(--text-primary); font-weight: bold; font-size: 15px; margin-bottom: 6px; }
+.pdd-players {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  padding: 4px 10px;
+  border-radius: 8px;
+  margin-bottom: 4px;
+}
+.pdd-player {
+  font-size: 13px;
+  font-weight: 600;
+}
+.pdd-player.white {
+  color: var(--text-primary);
+}
+.pdd-player.black {
+  color: var(--text-secondary);
+}
+.pdd-vs {
+  font-size: 11px;
+  color: var(--accent);
+  font-weight: bold;
+  text-transform: uppercase;
+}
 .pdd-meta   { display: block; color: var(--text-muted); font-size: 12px; margin-top: 2px; }
 
 .pdd-body  { display: flex; gap: 20px; align-items: flex-start; flex-wrap: wrap; }

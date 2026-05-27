@@ -32,7 +32,19 @@ function generarRetos(fecha) {
   });
 }
 
-const STORAGE_KEY = 'chess_retos_completados';
+const getUserId = () => {
+  try {
+    const userStr = localStorage.getItem('chess_user');
+    if (userStr) {
+      const userObj = JSON.parse(userStr);
+      return userObj.id || userObj.username || 'anon';
+    }
+  } catch {}
+  return 'anon';
+};
+
+const getCompletadosKey = () => `chess_retos_completados_${getUserId()}`;
+const getProgresoKey = () => `chess_retos_progreso_${getUserId()}`;
 
 export default function RetosDelDia() {
   const { user } = useAuth();
@@ -40,30 +52,21 @@ export default function RetosDelDia() {
   const [retos, setRetos] = useState([]);
   const [completados, setCompletados] = useState(new Set());
 
-  useEffect(() => {
-    const hoy = new Date();
-    setRetos(generarRetos(hoy));
-    // Cargar completados del día de localStorage
-    try {
-      const stored = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
-      const hoyKey = hoy.toDateString();
-      setCompletados(new Set(stored[hoyKey] || []));
-    } catch { setCompletados(new Set()); }
-  }, []);
-
-  const completarReto = async (reto) => {
-    if (completados.has(reto.key)) return;
-    const nuevos = new Set(completados);
+  // Función para completar reto y guardar progreso
+  const completarReto = async (reto, currentCompletados) => {
+    if (currentCompletados.has(reto.key)) return currentCompletados;
+    const nuevos = new Set(currentCompletados);
     nuevos.add(reto.key);
     setCompletados(nuevos);
     // Persistir
     try {
-      const stored = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+      const completadosKey = getCompletadosKey();
+      const stored = JSON.parse(localStorage.getItem(completadosKey) || '{}');
       const hoyKey = new Date().toDateString();
       stored[hoyKey] = [...nuevos];
       // Limpiar días viejos
       Object.keys(stored).forEach(k => { if (k !== hoyKey) delete stored[k]; });
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(stored));
+      localStorage.setItem(completadosKey, JSON.stringify(stored));
     } catch {}
     // Dar XP
     if (user?.token) {
@@ -76,7 +79,50 @@ export default function RetosDelDia() {
       } catch {}
     }
     showLogro({ emoji: reto.icono, nombre: `+${reto.xp} XP — ${reto.texto}` });
+    return nuevos;
   };
+
+  useEffect(() => {
+    const hoy = new Date();
+    const listaRetos = generarRetos(hoy);
+    setRetos(listaRetos);
+
+    // Cargar completados del día
+    let currentCompletados = new Set();
+    try {
+      const completadosKey = getCompletadosKey();
+      const stored = JSON.parse(localStorage.getItem(completadosKey) || '{}');
+      const hoyKey = hoy.toDateString();
+      currentCompletados = new Set(stored[hoyKey] || []);
+      setCompletados(currentCompletados);
+    } catch { setCompletados(currentCompletados); }
+
+    // Verificar progreso pasivo de retos
+    try {
+      const progKey = getProgresoKey();
+      const progStored = JSON.parse(localStorage.getItem(progKey) || '{}');
+      const hoyKey = hoy.toDateString();
+      if (progStored.fecha === hoyKey) {
+        // Verificar cada reto
+        listaRetos.forEach(async (reto) => {
+          if (currentCompletados.has(reto.key)) return;
+
+          let cumple = false;
+          if (reto.id === 'casillas' && progStored.casillas_seguidas >= 8) cumple = true;
+          else if (reto.id === 'puzzle' && progStored.puzzles_resueltos >= 3) cumple = true;
+          else if (reto.id === 'contrarreloj' && progStored.contrarreloj_completados?.length >= 1) cumple = true;
+          else if (reto.id === 'adivinar' && progStored.adivina_aciertos >= 4) cumple = true;
+          else if (reto.id === 'apertura') {
+            if (progStored.aperturas_perfectas?.length >= 1) cumple = true;
+          }
+
+          if (cumple) {
+            currentCompletados = await completarReto(reto, currentCompletados);
+          }
+        });
+      }
+    } catch {}
+  }, [user]);
 
   const todosCompletados = retos.every(r => completados.has(r.key));
 
@@ -94,13 +140,17 @@ export default function RetosDelDia() {
               <span className="reto-icono">{reto.icono}</span>
               <span className="reto-texto">{reto.texto}</span>
               <span className="reto-xp">+{reto.xp} XP</span>
-              <button
-                className="reto-btn"
-                onClick={() => completarReto(reto)}
-                disabled={done}
-              >
-                {done ? '✅' : 'Completar'}
-              </button>
+              <span className="reto-status" style={{
+                fontSize: 13,
+                fontWeight: 'bold',
+                color: done ? 'var(--success)' : 'var(--text-muted)',
+                padding: '4px 10px',
+                borderRadius: 6,
+                background: done ? 'rgba(76,175,80,0.1)' : 'rgba(255,255,255,0.05)',
+                border: `1px solid ${done ? 'rgba(76,175,80,0.2)' : 'rgba(255,255,255,0.1)'}`
+              }}>
+                {done ? '✅ Completado' : '⌛ Pendiente'}
+              </span>
             </div>
           );
         })}

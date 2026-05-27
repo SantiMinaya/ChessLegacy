@@ -4,30 +4,35 @@ import PartidasFamosas from '../pages/PartidasFamosas';
 import StyleTraining from './StyleTraining';
 import Biography from './Biography';
 import Estadisticas from './Estadisticas';
-import AperturaTraining from './AperturaTraining';
+import VisorPartidaFamosa from './VisorPartidaFamosa';
 import './MasterDetail.css';
 
 export default function MasterDetail({ master, onBack }) {
   const [mode, setMode] = useState(null);
-  const [filtrosIniciales, setFiltrosIniciales] = useState(null);
+  const [partidaSeleccionada, setPartidaSeleccionada] = useState(null);
 
-  const abrirPartida = (filtros) => {
-    setFiltrosIniciales(filtros);
-    setMode('games');
+  // Abre el visor directo con el PGN embebido
+  const abrirPartidaDirecta = (game) => {
+    setPartidaSeleccionada(game);
+    setMode('visor');
   };
 
   if (mode === 'play') {
     return <PlayMaster master={master} onBack={() => setMode(null)} />;
   }
-  
-  if (mode === 'games') {
-    return <PartidasFamosas jugadorId={master.id} jugadorNombre={master.name} filtrosIniciales={filtrosIniciales} onBack={() => { setMode(null); setFiltrosIniciales(null); }} />;
+
+  if (mode === 'visor') {
+    return <VisorPartidaFamosa game={partidaSeleccionada} onBack={() => { setMode(null); setPartidaSeleccionada(null); }} />;
   }
-  
+
+  if (mode === 'games') {
+    return <PartidasFamosas jugadorId={master.id} jugadorNombre={master.name} filtrosIniciales={null} onBack={() => setMode(null)} />;
+  }
+
   if (mode === 'training') {
     return <StyleTraining master={master} onBack={() => setMode(null)} />;
   }
-  
+
   if (mode === 'bio') {
     return <Biography master={master} onBack={() => setMode(null)} />;
   }
@@ -36,14 +41,10 @@ export default function MasterDetail({ master, onBack }) {
     return <Estadisticas jugadorId={master.id} jugadorNombre={master.name} onBack={() => setMode(null)} />;
   }
 
-  if (mode === 'openings') {
-    return <AperturaTraining onBack={() => setMode(null)} />;
-  }
-
   return (
     <div className="master-detail">
       <button className="back-btn" onClick={onBack}>← Volver</button>
-      
+
       <div className="detail-header" style={{ borderTopColor: master.color }}>
         <div className="detail-photo">
           <img src={master.photo} alt={master.name} />
@@ -101,21 +102,45 @@ export default function MasterDetail({ master, onBack }) {
 
         {master.famousGamesList && (
           <section className="section">
-            <h2>Partidas Imprescindibles</h2>
+            <h2>♟️ Partidas Imprescindibles</h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               {master.famousGamesList.map((game, i) => (
-                <div key={i} style={{ background: 'rgba(255,255,255,0.05)', borderRadius: '8px', padding: '16px', borderLeft: `3px solid ${master.color}` }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                <div key={i} style={{
+                  background: 'rgba(255,255,255,0.04)',
+                  borderRadius: '10px', padding: '18px 20px',
+                  borderLeft: `4px solid ${master.color}`,
+                  border: `1px solid var(--border)`,
+                  borderLeftColor: master.color,
+                }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16 }}>
                     <div style={{ flex: 1 }}>
-                      <h4 style={{ margin: '0 0 4px 0', color: '#d4af37' }}>{game.title}</h4>
-                      <p style={{ margin: '0 0 8px 0', fontSize: '13px', opacity: 0.7 }}>vs {game.opponent} · {game.year} · {game.event}</p>
-                      <p style={{ margin: 0, fontSize: '14px', lineHeight: '1.5' }}>{game.why}</p>
+                      <h4 style={{ margin: '0 0 6px 0', color: '#d4af37', fontSize: 15 }}>{game.title}</h4>
+                      <p style={{ margin: '0 0 8px 0', fontSize: '13px', color: 'var(--text-muted)' }}>
+                        vs {game.opponent} · {game.year} · {game.event}
+                      </p>
+                      <p style={{ margin: 0, fontSize: '14px', lineHeight: '1.6', color: 'var(--text-secondary)' }}>
+                        {game.why}
+                      </p>
                     </div>
                     <button
-                      onClick={() => abrirPartida(game.filtros)}
-                      style={{ marginLeft: '16px', padding: '8px 14px', background: master.color, color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', whiteSpace: 'nowrap', fontSize: '13px' }}
+                      onClick={() => abrirPartidaDirecta(game)}
+                      style={{
+                        flexShrink: 0,
+                        padding: '10px 16px',
+                        background: master.color,
+                        color: '#fff',
+                        border: 'none',
+                        borderRadius: '8px',
+                        cursor: 'pointer',
+                        whiteSpace: 'nowrap',
+                        fontSize: '13px',
+                        fontWeight: 'bold',
+                        transition: 'opacity 0.15s',
+                      }}
+                      onMouseEnter={e => e.target.style.opacity = '0.8'}
+                      onMouseLeave={e => e.target.style.opacity = '1'}
                     >
-                      🔍 Ver partida
+                      ▶ Ver partida
                     </button>
                   </div>
                 </div>
@@ -128,10 +153,9 @@ export default function MasterDetail({ master, onBack }) {
           <h2>Entrenar con {master.name}</h2>
           <div className="action-buttons">
             <button className="action-btn primary" onClick={() => setMode('play')}>🎮 Jugar Contra {master.name}</button>
-            <button className="action-btn" onClick={() => setMode('games')}>📚 Ver Partidas</button>
+            <button className="action-btn" onClick={() => setMode('games')}>📚 Ver Todas las Partidas</button>
             <button className="action-btn" onClick={() => setMode('stats')}>📊 Estadísticas y Analytics</button>
             <button className="action-btn" onClick={() => setMode('training')}>🎯 Entrenar Estilo</button>
-            <button className="action-btn" onClick={() => setMode('openings')}>📖 Aprender Aperturas</button>
             <button className="action-btn" onClick={() => setMode('bio')}>📖 Biografía Completa</button>
           </div>
         </section>
